@@ -98,5 +98,3 @@ export default function TopAdmin({ name, role, noticesReviewed, img, path }) {
     </Flex>
   );
 }
-
-// padding="12.5px 20px"
