@@ -1,8 +1,6 @@
 import {
-  Box,
   ButtonGroup,
   Flex,
-  Grid,
   GridItem,
   HStack,
   Spacer,
@@ -10,7 +8,7 @@ import {
   SimpleGrid,
 } from "@chakra-ui/react";
 import ButtonItem from "../mini-components/ButtonItem";
-import CountingBox from "../components/CountingBox";
+import CountingCard from "../components/CountingCard";
 import TopSellers from "../components/TopSellers";
 import TopAdmin from "../components/TopAdmin";
 import NotifOfTakeDownds from "../components/NotifOfTakeDownds";
@@ -81,7 +79,7 @@ export default function Dashboard() {
         gap="24px"
       >
         <GridItem>
-          <CountingBox
+          <CountingCard
             title="Numbers of Takedowns"
             counting="478323"
             changeRatio="20.5%"
@@ -90,7 +88,7 @@ export default function Dashboard() {
           />
         </GridItem>
         <GridItem>
-          <CountingBox
+          <CountingCard
             title="% of Goods Scraped"
             counting="92.85%"
             changeRatio="20.5%"
@@ -99,7 +97,7 @@ export default function Dashboard() {
           />
         </GridItem>
         <GridItem>
-          <CountingBox
+          <CountingCard
             title="New Notices"
             counting="2395"
             icon="message-notif"
