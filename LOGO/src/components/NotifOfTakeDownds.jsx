@@ -80,11 +80,11 @@ export default function NotifOfTakeDownds() {
   ];
   return (
     <Flex direction="column" layerStyle="dashboardCardsLayaout" gap="20px">
-      <HStack>
+      <HStack justifyContent={"space-between"} width="100%">
         <HeadingItem fontWeight="500" fontSize="18px" color="secondaryColor">
           Notifications of Take Downs
         </HeadingItem>
-        <Spacer />
+        <Spacer display={{ base: "none", md: "block" }} />
         <LinkItem
           to="/User-management"
           height="fit-content"

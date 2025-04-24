@@ -19,20 +19,47 @@ export default function Analytics() {
         <Spacer />
         <Flex gap="23px">
           <HStack>
-            <Box boxSize="12px" bg="#D7F0FC" borderRadius="full"></Box>
-            <Text fontSize="12px" color="secondaryColor" fontWeight="600">
+            <Box
+              boxSize={{ base: "10px", md: "12px" }}
+              aspectRatio="1"
+              bg="#D7F0FC"
+              borderRadius="full"
+            ></Box>
+            <Text
+              fontSize={{ base: "10px", md: "12px" }}
+              color="secondaryColor"
+              fontWeight="600"
+            >
               Listings Removed
             </Text>
           </HStack>
           <HStack>
-            <Box boxSize="12px" bg="#CDEFD9" borderRadius="full"></Box>
-            <Text fontSize="12px" color="secondaryColor" fontWeight="600">
+            <Box
+              boxSize={{ base: "10px", md: "12px" }}
+              aspectRatio="1"
+              bg="#CDEFD9"
+              borderRadius="full"
+            ></Box>
+            <Text
+              fontSize={{ base: "10px", md: "12px" }}
+              color="secondaryColor"
+              fontWeight="600"
+            >
               Notices Sent
             </Text>
           </HStack>
           <HStack>
-            <Box boxSize="12px" bg="#FEA4A3" borderRadius="full"></Box>
-            <Text fontSize="12px" color="secondaryColor" fontWeight="600">
+            <Box
+              boxSize={{ base: "10px", md: "12px" }}
+              aspectRatio="1"
+              bg="#FEA4A3"
+              borderRadius="full"
+            ></Box>
+            <Text
+              fontSize={{ base: "10px", md: "12px" }}
+              color="secondaryColor"
+              fontWeight="600"
+            >
               Notices Rejected
             </Text>
           </HStack>
