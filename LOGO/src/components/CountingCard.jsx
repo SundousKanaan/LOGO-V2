@@ -1,4 +1,5 @@
 import { Image, Text, Grid, GridItem } from "@chakra-ui/react";
+import { Icon } from "@chakra-ui/react";
 import HeadingItem from "../mini-components/HeadingItem";
 import ChartLine from "../mini-components/ChartLine";
 

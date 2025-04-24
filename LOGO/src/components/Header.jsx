@@ -1,8 +1,9 @@
-import { useLocation } from "react-router-dom";
+import { useState, useEffect } from "react";
 import { Flex, Image, Text, Spacer, HStack, VStack } from "@chakra-ui/react";
 import { Icon } from "@chakra-ui/react";
 import { HiOutlineMenuAlt3 } from "react-icons/hi";
-import { useToggleNavbar } from "../contexts/useToggleNavbar";
+import { useToggleNavbar } from "../contexts/toggleNavbarContext";
+import { useNavigator } from "../contexts/navigatorContext";
 import Pathes from "../global/pathes";
 import SearchBar from "../mini-components/SearchBar";
 import HeadingItem from "../mini-components/HeadingItem";
@@ -10,18 +11,20 @@ import LinkItem from "../mini-components/LinkItem";
 import ButtonItem from "../mini-components/ButtonItem";
 
 export default function Header() {
+  const [pageTitle, setPageTitle] = useState("");
   const { toggleNavbar } = useToggleNavbar();
+  const { currentLocation } = useNavigator();
+
+  useEffect(() => {
+    const currentPath = Pathes.find((path) => path.path === currentLocation);
+    if (currentPath) {
+      setPageTitle(currentPath.label);
+    }
+  }, [currentLocation]);
 
   const userName = "John Smith"; // !TODO: change to dynamic value
   const imgSrc = "/src/assets/user.jpg"; // !TODO: change to dynamic value
   const role = "Admin"; // !TODO: change to dynamic value
-  const location = useLocation();
-  let pageTitle = "";
-  Pathes.filter((Path) => {
-    if (Path.path === location.pathname) {
-      pageTitle = Path.label;
-    }
-  });
 
   return (
     <Flex

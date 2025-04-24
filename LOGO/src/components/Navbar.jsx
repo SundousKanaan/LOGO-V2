@@ -1,18 +1,14 @@
-import { useNavigate, useLocation } from "react-router-dom";
 import { List, Text, Image, Spacer, Flex } from "@chakra-ui/react";
-import { useToggleNavbar } from "../contexts/useToggleNavbar";
+import { useToggleNavbar } from "../contexts/toggleNavbarContext";
+import { useNavigator } from "../contexts/navigatorContext";
 import Pathes from "../global/pathes";
 import LinkItem from "../mini-components/LinkItem";
-import ButtonItem from "../mini-components/ButtonItem";
 import HeadingItem from "../mini-components/HeadingItem";
 
 export default function Navbar() {
   const { setIsNavbarOpen } = useToggleNavbar();
-  const location = useLocation().pathname;
-  const navigate = useNavigate();
-  const handleLogout = () => {
-    navigate("/login", { replace: true });
-  };
+  const { currentLocation } = useNavigator();
+
   const handleToggleNavbar = () => {
     setIsNavbarOpen((prev) => !prev);
   };
@@ -51,7 +47,7 @@ export default function Navbar() {
             width="100%"
             height="50px"
             borderRadius="12px"
-            bgColor={location === path.path && "themeColor"}
+            bgColor={currentLocation === path.path && "themeColor"}
             fontFamily="body"
             position="relative"
           >
@@ -62,9 +58,9 @@ export default function Navbar() {
               alignItems="center"
               justifyContent="start"
               gap="12px"
-              fontWeight={location === path.path ? "600" : "400"}
+              fontWeight={currentLocation === path.path ? "600" : "400"}
               paddingLeft="16px"
-              color={location === path.path ? "white" : "secondaryColor"}
+              color={currentLocation === path.path ? "white" : "secondaryColor"}
               onClick={handleToggleNavbar}
             >
               {path.path === "/Notifications" && (
@@ -85,7 +81,8 @@ export default function Navbar() {
                   {/* TODO: make the amunt dynamic */}3
                 </Text>
               )}
-              {location === path.path ? (
+
+              {currentLocation === path.path ? (
                 <Image
                   borderRadius="full"
                   boxSize="24px"
@@ -107,12 +104,13 @@ export default function Navbar() {
         ))}
       </List.Root>
       <Spacer display={{ base: "none", lg: "block" }} />
-      <ButtonItem
-        variant="ghost"
+      <LinkItem
+        variant="button"
+        path={"/login"}
         width={{ base: "fit-content", lg: "100%" }}
         gap="12px"
-        onClick={handleLogout}
         _hover={{ bg: "lightGray" }}
+        height="50px"
       >
         <Image
           borderRadius="full"
@@ -121,7 +119,7 @@ export default function Navbar() {
           alt="log out icon"
         />
         Log out
-      </ButtonItem>
+      </LinkItem>
     </Flex>
   );
 }

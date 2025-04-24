@@ -1,6 +1,6 @@
-// import { useState } from "react";
-import { Routes, Route, useLocation } from "react-router-dom";
-import { useToggleNavbar } from "./contexts/useToggleNavbar";
+import { Routes, Route } from "react-router-dom";
+import { useToggleNavbar } from "./contexts/toggleNavbarContext";
+import { useNavigator } from "./contexts/navigatorContext";
 
 import { Grid, GridItem } from "@chakra-ui/react";
 import Navbar from "./components/Navbar";
@@ -8,7 +8,7 @@ import Header from "./components/Header";
 import Pathes from "./global/pathes";
 
 export default function App() {
-  const location = useLocation().pathname;
+  const { currentLocation } = useNavigator();
   const { isNavbarOpen } = useToggleNavbar();
 
   return (
@@ -28,7 +28,7 @@ export default function App() {
             "navbar page"
           `,
       }}
-      gap={{ base: "10px", xl: "24px" }}
+      gap="24px"
       bg="lightGray"
       h="100vh"
       overflow="hidden"
@@ -44,35 +44,29 @@ export default function App() {
         bg="white"
         transition="0.3s"
         transform={{
-          base: isNavbarOpen ? "scaleY(0)" : "scaleY(1)",
+          base: isNavbarOpen ? "scaleY(1)" : "scaleY(0)",
           md: "scaleY(1)",
         }}
         transformOrigin="top"
       >
         <Navbar />
       </GridItem>
-
       <GridItem
         gridArea="header"
         padding={{ base: "0 10px 0 10px", md: "0 48px 0 0" }}
       >
         <Header />
       </GridItem>
-
       <GridItem
         gridArea="page"
         overflowY="auto"
-        padding={{
-          base: "0 10px 20px 10px",
-          lg: "0 10px 20px 0",
-          xl: "0 24px 20px 0",
-        }}
+        padding={{ base: "0 10px 20px 10px", lg: "0 20px 20px 0" }}
       >
         <Routes>
           {Pathes.map((Path, i) => (
             <Route
               key={i}
-              index={location === "/"}
+              index={currentLocation === "/"}
               path={Path.path}
               element={<Path.element />}
             />
