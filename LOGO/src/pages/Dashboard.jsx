@@ -74,7 +74,7 @@ export default function Dashboard() {
           </ButtonGroup>
         </HStack>
       </Flex>
-      {/* page content */}
+
       <SimpleGrid
         width={{ base: "100%", lg: "calc(100% - 24px)" }}
         columns={{ base: 1, lg: 3 }}
