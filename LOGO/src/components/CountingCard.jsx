@@ -75,7 +75,7 @@ export default function CountingCard({
           gap="4.5px"
           width="60px"
           height="28px"
-          bg="lightrRisingColor"
+          bg="statusGreenLight"
           padding="9px 8px"
           borderRadius="full"
         >
@@ -85,7 +85,7 @@ export default function CountingCard({
             alt="Placeholder Image"
           />
           <Text
-            color="risingColor"
+            color="statusGreen"
             fontFamily="body"
             fontSize="10px"
             fontWeight="600"

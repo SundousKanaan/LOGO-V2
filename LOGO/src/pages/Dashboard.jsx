@@ -38,6 +38,8 @@ export default function Dashboard() {
           spacing="8px"
           width={{ base: "fit-content", sm: "100%", md: "fit-content" }}
           justifyContent="space-between"
+          flexWrap="wrap"
+          gap="8px"
         >
           <Text
             fontWeight="500"

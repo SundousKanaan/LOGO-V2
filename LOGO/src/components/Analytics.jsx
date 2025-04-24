@@ -1,12 +1,4 @@
-import {
-  Box,
-  Flex,
-  HStack,
-  List,
-  ListItem,
-  Spacer,
-  Text,
-} from "@chakra-ui/react";
+import { Box, Flex, HStack, Spacer, Text } from "@chakra-ui/react";
 import AnalyticsChart from "../mini-components/AnalyticsChart";
 
 export default function Analytics() {

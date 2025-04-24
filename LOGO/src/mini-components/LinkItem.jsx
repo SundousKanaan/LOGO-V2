@@ -12,12 +12,14 @@ export default function LinkItem({ path, children, variant, ...props }) {
     <ChakraLink
       as={RouterLink}
       to={path}
+      fontFamily="body"
       {...props}
       {...(variant === "button" && {
         borderRadius: "10px",
         _hover: {
           boxShadow:
             "inset 0 0 0 2px var(--chakra-colors-theme-color), 0 5px 7px var(--chakra-colors-light-black)",
+          textDecor: "none",
         },
         _focus: {
           boxShadow:

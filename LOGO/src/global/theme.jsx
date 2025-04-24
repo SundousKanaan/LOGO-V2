@@ -15,6 +15,63 @@ const layerStyles = defineLayerStyles({
       borderRadius: "24px",
     },
   },
+  ProductCardsListGridLayaout: {
+    description: "Product cards grid layout",
+    value: {
+      display: "grid",
+      gridTemplateColumns: {
+        base: "repeat(1, 1fr)",
+        md: "repeat(2, 1fr)",
+        lg: "repeat(3, 1fr)",
+        xl: "repeat(4, 1fr)",
+        "2xl": "repeat(5, 1fr)",
+      },
+      gap: "24px",
+    },
+  },
+
+  ProductCardsListLayaout: {
+    description: "Product cards list layout",
+    value: {
+      display: "flex",
+      flexDirection: "column",
+      gap: "24px",
+    },
+  },
+
+  ProductCardGridLayaout: {
+    description: "Product card grid layout",
+    value: {
+      w: "100%",
+      h: "100%",
+      display: "Grid",
+      gridTemplateColumns: "1fr",
+      gridTemplateRows: "243px auto",
+      gap: "12px",
+      padding: "16px",
+      bg: "white",
+      borderRadius: "24px",
+      position: "relative",
+      border: "none",
+    },
+  },
+
+  ProductCardListLayaout: {
+    description: "Product card list layout",
+    value: {
+      w: "100%",
+      h: "100%",
+      display: "flex",
+      flexDirection: "row",
+      flexWrap: "wrap",
+      alignItems: "center",
+      gap: "12px",
+      padding: "16px",
+      bg: "white",
+      borderRadius: "24px",
+      border: "none",
+    },
+  },
 });
 
 export const system = createSystem(defaultConfig, {
@@ -31,11 +88,15 @@ export const system = createSystem(defaultConfig, {
         lightGray2: { value: "#f1f1f1" },
         lightBlue: { value: "#F4F6F7" },
         infoNotic: { value: "#ff4a4a" },
-        risingColor: { value: "#42AA65" },
-        lightrRisingColor: { value: "#EBFDEF" },
-        fallingColor: { value: "#ff4a4a" },
-        lightFallingColor: { value: "#FDE8E8" },
         lightBlack: { value: "#00000050" },
+
+        statusRed: { value: "#ff4a4a" },
+        statusRedLight: { value: "#FDE8E8" },
+        statusGreen: { value: "#42AA65" },
+        statusGreenLight: { value: "#EBFDEF" },
+
+        statusOrange: { value: "#FF9600" },
+        statusOrangeLight: { value: "#FFEFE7" },
       },
     },
     layerStyles,

@@ -59,6 +59,7 @@ export default function App() {
       </GridItem>
       <GridItem
         gridArea="page"
+        mt={{ base: "0", md: "24px" }}
         overflowY="auto"
         padding={{ base: "0 10px 20px 10px", lg: "0 20px 20px 0" }}
       >
