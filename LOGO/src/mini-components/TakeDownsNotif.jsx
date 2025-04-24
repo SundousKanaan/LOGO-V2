@@ -4,13 +4,13 @@ import HeadingItem from "./HeadingItem";
 
 export default function TakeDownsNotif({ title, link, time }) {
   return (
-    <Flex width="100%">
+    <Flex width="100%" pb="12px" borderBottom={"solid 1px #F2F2F2"}>
       <HStack spacing="9px">
         <HeadingItem
           fontWeight="400"
           fontSize="14px"
           color="secondaryColor"
-          maxWidth={{ base: "150px", md: "300px", lg: "300px" }}
+          maxWidth={{ base: "150px", md: "300px", lg: "330px" }}
           lineClamp="2"
           lineHeight="20px"
         >

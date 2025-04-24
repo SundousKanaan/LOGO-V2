@@ -6,7 +6,7 @@ export default function ButtonItem({ children, variant, onClick, ...props }) {
     <Button
       variant={variant}
       {...props}
-      transition="transform .5s"
+      transition="transform .1s"
       onClick={onClick}
       _hover={{ boxShadow: "0 0 0 2px var(--chakra-colors-themeColor)" }}
       _active={{

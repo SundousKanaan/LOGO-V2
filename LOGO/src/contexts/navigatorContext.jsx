@@ -14,7 +14,10 @@ export const NavigatorProvider = ({ children }) => {
   const navigate = useNavigate();
 
   const navigateTO = (path) => {
+    console.log("navigateTO", path);
+
     navigate(path, { replace: true });
+    setCurrentLocation(path);
   };
 
   return (

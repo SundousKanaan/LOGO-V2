@@ -1,5 +1,13 @@
 import { useState, useEffect } from "react";
-import { Flex, Image, Text, Spacer, HStack, VStack } from "@chakra-ui/react";
+import {
+  Flex,
+  Box,
+  Text,
+  Spacer,
+  HStack,
+  VStack,
+  Avatar,
+} from "@chakra-ui/react";
 import { Icon } from "@chakra-ui/react";
 import { HiOutlineMenuAlt3 } from "react-icons/hi";
 import { useToggleNavbar } from "../contexts/toggleNavbarContext";
@@ -13,10 +21,14 @@ import ButtonItem from "../mini-components/ButtonItem";
 export default function Header() {
   const [pageTitle, setPageTitle] = useState("");
   const { toggleNavbar } = useToggleNavbar();
-  const { currentLocation } = useNavigator();
+  const { currentLocation, navigateTO } = useNavigator();
 
   useEffect(() => {
     const currentPath = Pathes.find((path) => path.path === currentLocation);
+    console.log("currentPath", currentLocation);
+    if (currentLocation === "/profile") {
+      setPageTitle("Profile");
+    }
     if (currentPath) {
       setPageTitle(currentPath.label);
     }
@@ -67,13 +79,12 @@ export default function Header() {
 
         {/* !TODO: change to dynamic values: img.src & texts */}
         <HStack>
-          <Image
-            borderRadius="full"
-            boxSize="40px"
-            objectFit="cover"
-            src={imgSrc}
-            alt={`${userName} profile photo`}
-          />
+          <Box onClick={() => navigateTO("/profile")} cursor="pointer">
+            <Avatar.Root>
+              <Avatar.Fallback name={userName} />
+              <Avatar.Image src={imgSrc} alt={`${userName} profile photo`} />
+            </Avatar.Root>
+          </Box>
 
           <VStack
             width={{ base: "fit-content", md: "fit-content" }}
@@ -81,11 +92,12 @@ export default function Header() {
             gap="0"
             display={{ base: "none", lg: "flex" }}
           >
-            <LinkItem height="fit-content" variant="text" to={`/${userName}`}>
+            <LinkItem height="fit-content" variant="text" to={"/profile"}>
               <HeadingItem
                 fontSize="18px"
                 lineHeight="24px"
                 fontWeight="500"
+                padding="1px"
                 whiteSpace="nowrap"
               >
                 {userName}

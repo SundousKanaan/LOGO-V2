@@ -6,6 +6,7 @@ import { Grid, GridItem } from "@chakra-ui/react";
 import Navbar from "./components/Navbar";
 import Header from "./components/Header";
 import Pathes from "./global/pathes";
+import Profile from "./pages/Profile";
 
 export default function App() {
   const { currentLocation } = useNavigator();
@@ -72,6 +73,7 @@ export default function App() {
               element={<Path.element />}
             />
           ))}
+          <Route path="/profile" element={<Profile />} />
         </Routes>
       </GridItem>
     </Grid>

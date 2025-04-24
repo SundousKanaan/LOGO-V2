@@ -99,7 +99,7 @@ export default function NotifOfTakeDownds() {
           View All
         </LinkItem>
       </HStack>
-      <VStack spacing="28px" align="start">
+      <VStack gap="16px" align="start">
         {notifications.map((notification, index) => (
           <TakeDownsNotif
             key={index}

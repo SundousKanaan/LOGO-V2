@@ -14,6 +14,7 @@ export default function LinkItem({ path, children, variant, ...props }) {
       to={path}
       fontFamily="body"
       {...props}
+      transition="transform .1s"
       {...(variant === "button" && {
         borderRadius: "10px",
         _hover: {
@@ -25,6 +26,9 @@ export default function LinkItem({ path, children, variant, ...props }) {
           boxShadow:
             "inset 0 0 0 2px var(--chakra-colors-theme-color), 0 5px 7px var(--chakra-colors-light-black)",
           outline: "none",
+        },
+        _active: {
+          transform: "scale(0.9)",
         },
       })}
       {...(variant === "text" && {
