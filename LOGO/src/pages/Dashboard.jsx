@@ -18,7 +18,6 @@ export default function Dashboard() {
   return (
     <>
       <Flex
-        width={{ base: "100%", lg: "calc(100% - 24px)" }}
         height={{ base: "fit-content", lg: "45px" }}
         alignItems={{ base: "start", lg: "center" }}
         marginBottom="20px"
@@ -35,7 +34,11 @@ export default function Dashboard() {
 
         <Spacer />
 
-        <HStack spacing="8px">
+        <HStack
+          spacing="8px"
+          width={{ base: "fit-content", sm: "100%", md: "fit-content" }}
+          justifyContent="space-between"
+        >
           <Text
             fontWeight="500"
             fontSize="12px"
@@ -73,11 +76,7 @@ export default function Dashboard() {
         </HStack>
       </Flex>
 
-      <SimpleGrid
-        width={{ base: "100%", lg: "calc(100% - 24px)" }}
-        columns={{ base: 1, lg: 3 }}
-        gap="24px"
-      >
+      <SimpleGrid columns={{ base: 1, lg: 2, xl: 3 }} gap="24px">
         <GridItem>
           <CountingCard
             title="Numbers of Takedowns"
@@ -96,7 +95,7 @@ export default function Dashboard() {
             date="October 2023"
           />
         </GridItem>
-        <GridItem>
+        <GridItem colSpan={{ base: 1, lg: 2, xl: 1 }}>
           <CountingCard
             title="New Notices"
             counting="2395"
@@ -108,13 +107,13 @@ export default function Dashboard() {
         <GridItem colSpan={{ base: 1, lg: 2 }}>
           <Analytics />
         </GridItem>
-        <GridItem>
+        <GridItem colSpan={{ base: 1, lg: 2, xl: 1 }}>
           <TopSellers />
         </GridItem>
         <GridItem colSpan={{ base: 1, lg: 2 }}>
           <NotifOfTakeDownds />
         </GridItem>
-        <GridItem>
+        <GridItem colSpan={{ base: 1, lg: 2, xl: 1 }}>
           {/* // TODO: make the data dynamic */}
           <TopAdmin
             name="Carl Meadows"

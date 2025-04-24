@@ -28,7 +28,7 @@ export default function App() {
             "navbar page"
           `,
       }}
-      gap="24px"
+      gap={{ base: "10px", xl: "24px" }}
       bg="lightGray"
       h="100vh"
       overflow="hidden"
@@ -51,16 +51,22 @@ export default function App() {
       >
         <Navbar />
       </GridItem>
+
       <GridItem
         gridArea="header"
         padding={{ base: "0 10px 0 10px", md: "0 48px 0 0" }}
       >
         <Header />
       </GridItem>
+
       <GridItem
         gridArea="page"
         overflowY="auto"
-        padding={{ base: "0 10px 20px 10px", lg: "0 0 20px 0" }}
+        padding={{
+          base: "0 10px 20px 10px",
+          lg: "0 10px 20px 0",
+          xl: "0 24px 20px 0",
+        }}
       >
         <Routes>
           {Pathes.map((Path, i) => (

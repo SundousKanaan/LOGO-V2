@@ -1,4 +1,4 @@
-import { Stack, Image, Text, Grid, GridItem } from "@chakra-ui/react";
+import { Image, Text, Grid, GridItem } from "@chakra-ui/react";
 import HeadingItem from "../mini-components/HeadingItem";
 import ChartLine from "../mini-components/ChartLine";
 
