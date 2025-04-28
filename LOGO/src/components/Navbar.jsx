@@ -78,20 +78,20 @@ export default function Navbar({ toggleNavbar }) {
             >
               {path.path === "/Notifications" && (
                 <Text
-                  width={convertPx(17)}
-                  height={convertPx(17)}
+                  width="fit-content"
+                  p={`${convertPx(5)} ${convertPx(6)} ${convertPx(
+                    4
+                  )} ${convertPx(6)}`}
                   borderRadius="full"
                   color="white"
                   fontSize={convertPx(12)}
                   fontWeight="600"
-                  display="grid"
-                  placeItems="center"
-                  position="absolute"
                   right={convertPx(5)}
-                  top={`calc(50% - ${convertPx(17)} / 2)`}
                   bg="infoNotic"
+                  lineHeight={convertPx(12)}
+                  order="2"
                 >
-                  {/* TODO: make the amunt dynamic */}3
+                  3 {/* TODO: make the amunt dynamic */}
                 </Text>
               )}
               {

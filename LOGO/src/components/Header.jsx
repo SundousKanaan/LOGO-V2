@@ -9,7 +9,7 @@ import {
   Avatar,
 } from "@chakra-ui/react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { HiMenuAlt3 } from "react-icons/hi";
+import { HiMenuAlt2 } from "react-icons/hi";
 import { convertPx } from "../hooks/useConvertPx";
 
 import Pathes from "../global/pathes";
@@ -55,18 +55,17 @@ export default function Header({ toggleNavbar }) {
         justifyContent="space-between"
         width={{ base: "100%", md: "fit-content" }}
       >
-        <HeadingItem fontSize={convertPx(32)} lineHeight={convertPx(24)}>
-          {pageTitle}
-        </HeadingItem>
-
         <ButtonItem
           variant={"ghost"}
           width={convertPx(40)}
           display={{ base: "flex", md: "none" }}
           onClick={handleToggleNavbar}
         >
-          <HiMenuAlt3 color="secondaryColor" />
+          <HiMenuAlt2 color="secondaryColor" />
         </ButtonItem>
+        <HeadingItem fontSize={convertPx(32)} lineHeight={convertPx(24)}>
+          {pageTitle}
+        </HeadingItem>
       </HStack>
 
       <Spacer />
