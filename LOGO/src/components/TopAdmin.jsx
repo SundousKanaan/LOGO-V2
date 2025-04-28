@@ -7,6 +7,8 @@ import {
   Flex,
   Center,
 } from "@chakra-ui/react";
+import { convertPx } from "../hooks/useConvertPx";
+
 import HeadingItem from "../components/mini-components/HeadingItem";
 import LinkItem from "../components/mini-components/LinkItem";
 
@@ -16,80 +18,86 @@ export default function TopAdmin({ name, role, noticesReviewed, img, path }) {
       direction="column"
       justify="space-around"
       layerStyle="dashboardCardsLayout"
-      h="236px"
+      h={convertPx(236)}
     >
       <HStack>
-        <HeadingItem fontWeight="500" fontSize="18px" color="secondaryColor">
+        <HeadingItem
+          fontWeight="500"
+          fontSize={convertPx(18)}
+          color="secondaryColor"
+        >
           Top Admin
         </HeadingItem>
         <Spacer />
         <LinkItem
           to="/User-management"
           height="fit-content"
-          padding="5px 10px"
+          padding={`${convertPx(5)} ${convertPx(10)}`}
           fontWeight="500"
-          fontSize="14px"
+          fontSize={convertPx(14)}
           color="secondaryColor"
           _hover={{
-            boxShadow: "0 0 0 2px var(--chakra-colors-themeColor)",
+            boxShadow: `0 0 0 ${convertPx(2)} var(--chakra-colors-themeColor)`,
           }}
         >
           View All
         </LinkItem>
       </HStack>
 
-      <HStack spacing="26px">
-        <VStack width="84px" height="127px" spacing="8px" flexShrink="0">
+      <HStack spacing={convertPx(26)}>
+        <VStack
+          width={convertPx(84)}
+          height={convertPx(127)}
+          spacing={convertPx(8)}
+          flexShrink="0"
+        >
           <Image
             src={img}
             alt="Top Admin"
-            boxSize="84px"
+            boxSize={convertPx(84)}
             aspectRatio="1/1"
             objectFit="cover"
             borderRadius="full"
-            border="5px solid "
+            border={`${convertPx(5)} solid`}
             borderColor="lightGray2"
           />
 
-          <VStack align="center" spacing="0">
-            <HeadingItem fontSize="12px" fontWeight="500">
+          <VStack align="center" gap="0">
+            <HeadingItem fontSize={convertPx(12)} fontWeight="500">
               {name}
             </HeadingItem>
-            <Text fontSize="10px" opacity=".5">
+            <Text fontSize={convertPx(10)} opacity=".5">
               {role}
             </Text>
           </VStack>
         </VStack>
 
-        <VStack width="100%" height="114px" spacing="12px">
+        <VStack width="100%" height={convertPx(114)} spacing={convertPx(12)}>
           <Center
             bg="lightBlue"
-            borderRadius="12px"
+            borderRadius={convertPx(12)}
             width="100%"
-            height="51px"
-            gap="12px"
+            height={convertPx(51)}
+            gap={convertPx(12)}
           >
-            <Text fontSize="12px" fontWeight="500" opacity=".5">
+            <Text fontSize={convertPx(12)} fontWeight="500" opacity=".5">
               Notices Reviewed:
             </Text>
-            <Text fontSize="16px" fontWeight="600">
+            <Text fontSize={convertPx(16)} fontWeight="600">
               {noticesReviewed}
             </Text>
           </Center>
           <LinkItem
             to={path}
             width="100%"
-            height="51px"
+            height={convertPx(51)}
             fontWeight="600"
-            fontSize="16px"
+            fontSize={convertPx(16)}
             color="white"
             bg="themeColor"
             display="grid"
             placeItems="center"
-            borderRadius="12px"
-            _hover={{
-              boxShadow: "0 0 0 2px var(--chakra-colors-themeColor)",
-            }}
+            borderRadius={convertPx(12)}
           >
             View Details
           </LinkItem>

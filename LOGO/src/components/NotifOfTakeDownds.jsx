@@ -1,4 +1,6 @@
 import { Flex, HStack, VStack, Spacer } from "@chakra-ui/react";
+import { convertPx } from "../hooks/useConvertPx";
+
 import HeadingItem from "../components/mini-components/HeadingItem";
 import LinkItem from "../components/mini-components/LinkItem";
 import TakeDownsNotif from "../components/mini-components/TakeDownsNotif";
@@ -79,27 +81,35 @@ export default function NotifOfTakeDownds() {
     },
   ];
   return (
-    <Flex direction="column" layerStyle="dashboardCardsLayout" gap="20px">
+    <Flex
+      direction="column"
+      layerStyle="dashboardCardsLayout"
+      gap={convertPx(20)}
+    >
       <HStack justifyContent={"space-between"} width="100%">
-        <HeadingItem fontWeight="500" fontSize="18px" color="secondaryColor">
+        <HeadingItem
+          fontWeight="500"
+          fontSize={convertPx(18)}
+          color="secondaryColor"
+        >
           Notifications of Take Downs
         </HeadingItem>
         <Spacer display={{ base: "none", md: "block" }} />
         <LinkItem
           to="/User-management"
           height="fit-content"
-          padding="5px 10px"
+          padding={`${convertPx(5)} ${convertPx(10)}`}
           fontWeight="500"
-          fontSize="14px"
+          fontSize={convertPx(14)}
           color="secondaryColor"
           _hover={{
-            boxShadow: "0 0 0 2px var(--chakra-colors-themeColor)",
+            boxShadow: `0 0 0 ${convertPx(2)} var(--chakra-colors-themeColor)`,
           }}
         >
           View All
         </LinkItem>
       </HStack>
-      <VStack gap="16px" align="start">
+      <VStack gap={convertPx(16)} align="start">
         {notifications.map((notification, index) => (
           <TakeDownsNotif
             key={index}

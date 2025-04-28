@@ -3,12 +3,10 @@ import {
   Bar,
   XAxis,
   YAxis,
-  Tooltip,
   ResponsiveContainer,
-  Legend,
   CartesianGrid,
 } from "recharts";
-import { Box, Text } from "@chakra-ui/react";
+import { Box } from "@chakra-ui/react";
 
 export default function AnalyticsChart({ data, ...props }) {
   if (!data || data.length === 0) {

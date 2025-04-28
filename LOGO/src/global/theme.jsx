@@ -3,6 +3,7 @@ import {
   defaultConfig,
   defineLayerStyles,
 } from "@chakra-ui/react";
+import { convertPx } from "../hooks/useConvertPx";
 
 const layerStyles = defineLayerStyles({
   dashboardCardsLayout: {
@@ -10,9 +11,9 @@ const layerStyles = defineLayerStyles({
     value: {
       w: "100%",
       h: "100%",
-      p: "20px 24px",
+      p: `${convertPx(20)} ${convertPx(24)}`,
       bg: "white",
-      borderRadius: "24px",
+      borderRadius: `${convertPx(24)}`,
     },
   },
 
@@ -27,7 +28,7 @@ const layerStyles = defineLayerStyles({
         xl: "repeat(4, 1fr)",
         "2xl": "repeat(5, 1fr)",
       },
-      gap: "24px",
+      gap: `${convertPx(24)}`,
     },
   },
 
@@ -36,7 +37,7 @@ const layerStyles = defineLayerStyles({
     value: {
       display: "flex",
       flexDirection: "column",
-      gap: "24px",
+      gap: `${convertPx(24)}`,
     },
   },
 
@@ -48,10 +49,10 @@ const layerStyles = defineLayerStyles({
       display: "Grid",
       gridTemplateColumns: "1fr",
       gridTemplateRows: "243px auto",
-      gap: "12px",
-      padding: "16px",
+      gap: `${convertPx(12)}`,
+      padding: `${convertPx(16)}`,
       bg: "white",
-      borderRadius: "24px",
+      borderRadius: `${convertPx(24)}`,
       position: "relative",
       border: "none",
     },
@@ -66,11 +67,11 @@ const layerStyles = defineLayerStyles({
       flexDirection: "row",
       flexWrap: "wrap",
       alignItems: "center",
-      rowGap: "5px",
-      columnGap: "12px",
-      padding: "16px",
+      rowGap: `${convertPx(5)}`,
+      columnGap: `${convertPx(12)}`,
+      padding: `${convertPx(16)}`,
       bg: "white",
-      borderRadius: "24px",
+      borderRadius: `${convertPx(24)}`,
       border: "none",
     },
   },

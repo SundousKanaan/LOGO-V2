@@ -10,6 +10,7 @@ import {
 } from "@chakra-ui/react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { HiMenuAlt3 } from "react-icons/hi";
+import { convertPx } from "../hooks/useConvertPx";
 
 import Pathes from "../global/pathes";
 import SearchBar from "../components/mini-components/SearchBar";
@@ -43,24 +44,24 @@ export default function Header({ toggleNavbar }) {
   return (
     <Flex
       as="header"
-      height="100%"
-      pt={{ base: "10px", lg: "0" }}
+      h={{ base: convertPx(110), md: convertPx(50) }}
+      pt={{ base: convertPx(10), lg: "0" }}
       flexDirection={{ base: "column", md: "row" }}
       alignItems={{ base: "start", md: "end" }}
       justifyContent="space-between"
-      gap={{ base: "5px", md: "20px" }}
+      gap={{ base: convertPx(5), md: convertPx(20) }}
     >
       <HStack
         justifyContent="space-between"
         width={{ base: "100%", md: "fit-content" }}
       >
-        <HeadingItem fontSize="32px" lineHeight="50px">
+        <HeadingItem fontSize={convertPx(32)} lineHeight={convertPx(24)}>
           {pageTitle}
         </HeadingItem>
 
         <ButtonItem
           variant={"ghost"}
-          width="40px"
+          width={convertPx(40)}
           display={{ base: "flex", md: "none" }}
           onClick={handleToggleNavbar}
         >
@@ -72,7 +73,7 @@ export default function Header({ toggleNavbar }) {
 
       <Flex
         width={{ base: "100%", md: "50%", lg: "fit-content" }}
-        gap={{ base: "16px", lg: "40px" }}
+        gap={{ base: convertPx(16), lg: convertPx(40) }}
         justifyContent="space-between"
       >
         <SearchBar />
@@ -101,17 +102,17 @@ export default function Header({ toggleNavbar }) {
               to={`/profile/${userName}`}
             >
               <HeadingItem
-                fontSize="18px"
-                lineHeight="24px"
+                fontSize={convertPx(18)}
+                lineHeight={convertPx(24)}
                 fontWeight="500"
-                padding="1px"
+                padding={convertPx(1)}
                 whiteSpace="nowrap"
               >
                 {userName}
               </HeadingItem>
             </LinkItem>
             <Text
-              fontSize="14px"
+              fontSize={convertPx(14)}
               fontWeight="400"
               opacity="0.5"
               color="secondaryColor"

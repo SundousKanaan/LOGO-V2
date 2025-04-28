@@ -1,5 +1,6 @@
 import { Link as ChakraLink } from "@chakra-ui/react";
 import { Link as RouterLink } from "react-router-dom";
+import { convertPx } from "../../hooks/useConvertPx";
 
 export default function LinkItem({ path, children, variant, ...props }) {
   // when the height is not defined in the parent component, set it to 100% automatically
@@ -16,15 +17,21 @@ export default function LinkItem({ path, children, variant, ...props }) {
       {...props}
       transition="transform .1s"
       {...(variant === "button" && {
-        borderRadius: "10px",
+        borderRadius: convertPx(10),
         _hover: {
-          boxShadow:
-            "inset 0 0 0 2px var(--chakra-colors-theme-color), 0 5px 7px var(--chakra-colors-light-black)",
+          boxShadow: `inset 0 0 0 ${convertPx(
+            2
+          )} var(--chakra-colors-theme-color), 0 ${convertPx(5)} ${convertPx(
+            7
+          )} var(--chakra-colors-light-black)`,
           textDecor: "none",
         },
         _focus: {
-          boxShadow:
-            "inset 0 0 0 2px var(--chakra-colors-theme-color), 0 5px 7px var(--chakra-colors-light-black)",
+          boxShadow: `inset 0 0 0 ${convertPx(
+            2
+          )} var(--chakra-colors-theme-color), 0 ${convertPx(5)} ${convertPx(
+            7
+          )} var(--chakra-colors-light-black)`,
           outline: "none",
         },
         _active: {
@@ -33,8 +40,11 @@ export default function LinkItem({ path, children, variant, ...props }) {
       })}
       {...(variant === "text" && {
         _focus: {
-          boxShadow:
-            " 0 0 0 2px var(--chakra-colors-theme-color), 0 5px 7px var(--chakra-colors-light-black)",
+          boxShadow: `0 0 0 ${convertPx(
+            2
+          )} var(--chakra-colors-theme-color), 0 ${convertPx(5)} ${convertPx(
+            7
+          )} var(--chakra-colors-light-black)`,
           outline: "none",
         },
       })}

@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import HeadingItem from "../components/mini-components/HeadingItem";
 import ButtonItem from "../components/mini-components/ButtonItem";
 import { LogoutIcon } from "../global/icons";
-
+import { convertPx } from "../hooks/useConvertPx";
 import { useAuth } from "../contexts/AuthContext";
 
 export default function Profile() {
@@ -27,17 +27,17 @@ export default function Profile() {
 
       <ButtonItem
         variant="solid"
-        mt="20px"
+        mt={convertPx(20)}
         bg="themeColor"
         color="white"
         fontWeight="600"
         display="flex"
         alignItems="center"
         justifyContent="center"
-        gap="12px"
+        gap={convertPx(12)}
         onClick={handleLogout}
       >
-        <LogoutIcon color="white" boxSize="20px" />
+        <LogoutIcon color="white" boxSize={convertPx(20)} />
         Log out
       </ButtonItem>
     </Grid>

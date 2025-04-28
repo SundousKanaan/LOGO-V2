@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { Flex, Spacer, HStack, ButtonGroup, Text, Box } from "@chakra-ui/react";
+import { convertPx } from "../hooks/useConvertPx";
+
 import ProductCard from "../components/ProductCard";
 import ButtonItem from "../components/mini-components/ButtonItem";
 
@@ -15,16 +17,16 @@ export default function Reviews() {
   return (
     <>
       <Flex
-        height={{ base: "fit-content", lg: "45px" }}
+        height={{ base: "fit-content", lg: convertPx(45) }}
         alignItems={{ base: "start", lg: "center" }}
-        marginBottom="24px"
+        marginBottom={convertPx(24)}
         flexDirection={{ base: "column", md: "row" }}
       >
         <Text
-          fontSize="18px"
+          fontSize={convertPx(18)}
           fontWeight="500"
           color="secondaryColor"
-          mb={{ base: "8px", md: "0" }}
+          mb={{ base: convertPx(8), md: "0" }}
         >
           Product List
         </Text>
@@ -32,16 +34,16 @@ export default function Reviews() {
         <Spacer />
 
         <HStack
-          spacing="8px"
+          spacing={convertPx(8)}
           width={{ base: "fit-content", sm: "100%", md: "fit-content" }}
           justifyContent="space-between"
         >
-          <ButtonGroup variant="solid" spacing="12px">
+          <ButtonGroup variant="solid" spacing={convertPx(12)}>
             <ButtonItem
               bg={viewMode === "grid" ? "secondaryColor" : "white"}
               color={viewMode === "grid" ? "white" : "secondaryColor"}
-              padding="9px 21px"
-              borderRadius="10px"
+              padding={`${convertPx(9)} ${convertPx(21)}`}
+              borderRadius={convertPx(10)}
               onClick={() => handleViewModeChange("grid")}
             >
               Grid View
@@ -50,8 +52,8 @@ export default function Reviews() {
             <ButtonItem
               bg={viewMode === "list" ? "secondaryColor" : "white"}
               color={viewMode === "list" ? "white" : "secondaryColor"}
-              padding="9px 21px"
-              borderRadius="10px"
+              padding={`${convertPx(9)} ${convertPx(21)}`}
+              borderRadius={convertPx(10)}
               onClick={() => handleViewModeChange("list")}
             >
               List View

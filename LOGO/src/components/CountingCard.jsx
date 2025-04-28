@@ -1,6 +1,8 @@
 import React from "react";
-import { Image, Text, Grid, GridItem } from "@chakra-ui/react";
+import { Text, Grid, GridItem } from "@chakra-ui/react";
 import { Icon } from "@chakra-ui/react";
+import { convertPx } from "../hooks/useConvertPx";
+
 import HeadingItem from "../components/mini-components/HeadingItem";
 import ChartLine from "../components/mini-components/ChartLine";
 import { ArrowTopIcon } from "../global/icons";
@@ -17,8 +19,10 @@ export default function CountingCard({
   return (
     <Grid
       layerStyle="dashboardCardsLayout"
-      templateColumns="155px 1fr"
-      templateRows="42px 20px  48px 30px auto"
+      templateColumns={`${convertPx(155)} 1fr`}
+      templateRows={`${convertPx(42)} ${convertPx(20)} ${convertPx(
+        48
+      )} ${convertPx(30)} auto`}
       {...props}
     >
       <GridItem
@@ -27,15 +31,15 @@ export default function CountingCard({
         display="flex"
         opacity="60%"
         width="100%"
-        height="42px"
+        height={convertPx(42)}
         alignItems="center"
-        gap="8px"
+        gap={convertPx(8)}
       >
         {React.createElement(icon, { size: "lg", color: "secondaryColor" })}
 
         <HeadingItem
           fontWeight="400"
-          fontSize="16px"
+          fontSize={convertPx(16)}
           color="secondaryColor"
           width="fit-content"
         >
@@ -44,15 +48,15 @@ export default function CountingCard({
       </GridItem>
       <GridItem
         width="100%"
-        height="48px"
+        height={convertPx(48)}
         flexDir="row"
-        gap="12px"
+        gap={convertPx(12)}
         display="flex"
         alignContent="center"
         alignItems="center"
       >
         <Text
-          fontSize="40px"
+          fontSize={convertPx(40)}
           fontWeight="600"
           color="secondaryColor"
           lineHeight="120%"
@@ -69,24 +73,24 @@ export default function CountingCard({
           alignSelf="center"
           display="flex"
           alignItems="center"
-          gap="4.5px"
-          width="60px"
-          height="28px"
+          gap={convertPx(4.5)}
+          width={convertPx(60)}
+          height={convertPx(28)}
           bg="statusGreenLight"
-          padding="9px 8px"
+          padding={`${convertPx(9)} ${convertPx(8)}`}
           borderRadius="full"
         >
           {/* TODO: make the icon dynamic rising or falling */}
           <Icon
             as={ArrowTopIcon}
             color="statusGreen"
-            height="8px"
-            width="8px"
+            height={convertPx(8)}
+            width={convertPx(8)}
           />
           <Text
             color="statusGreen"
             fontFamily="body"
-            fontSize="10px"
+            fontSize={convertPx(10)}
             fontWeight="600"
           >
             {changeRatio}
@@ -96,7 +100,7 @@ export default function CountingCard({
       <GridItem gridColumn="1 / 3" gridRow="4 / 5" alignSelf="end">
         <Text
           fontWeight="400"
-          fontSize="14px"
+          fontSize={convertPx(14)}
           color="secondaryColor"
           width="fit-content"
           opacity="0.5"

@@ -7,6 +7,8 @@ import {
   Flex,
   Spacer,
 } from "@chakra-ui/react";
+import { convertPx } from "../../hooks/useConvertPx";
+
 import HeadingItem from "./HeadingItem";
 
 export default function SellerMiniBox({ name, company, listing, img }) {
@@ -20,15 +22,19 @@ export default function SellerMiniBox({ name, company, listing, img }) {
         <Image
           src={`/src/assets/${img}.svg`}
           alt="seller"
-          boxSize="36px"
+          boxSize={convertPx(36)}
           objectFit="cover"
-          borderRadius="10px"
+          borderRadius={convertPx(10)}
         />
-        <VStack align="start" spacing="0" gap="0">
-          <HeadingItem fontSize="12px" fontWeight="500" lineHeight="12px">
+        <VStack align="start" spacing={convertPx(0)} gap={convertPx(0)}>
+          <HeadingItem
+            fontSize={convertPx(12)}
+            fontWeight="500"
+            lineHeight={convertPx(12)}
+          >
             {name}
           </HeadingItem>
-          <Text fontSize="10px" opacity=".5">
+          <Text fontSize={convertPx(10)} opacity=".5">
             {company}
           </Text>
         </VStack>
@@ -36,7 +42,7 @@ export default function SellerMiniBox({ name, company, listing, img }) {
 
       <Spacer />
 
-      <Text fontSize="14px" fontWeight="500" opacity=".5">
+      <Text fontSize={convertPx(14)} fontWeight="500" opacity=".5">
         Listing #{listing}
       </Text>
     </Flex>

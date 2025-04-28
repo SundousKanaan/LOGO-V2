@@ -38,7 +38,7 @@ function PrivateLayouts() {
         md: `${convertPx(220)} 1fr`,
       }}
       gridTemplateRows={{
-        base: `${convertPx(125)} auto`,
+        base: `fit-content auto`,
         md: `${convertPx(91)} minmax(calc(100vh - ${convertPx(115)}), 1fr)`,
       }}
       gridTemplateAreas={{
@@ -74,17 +74,17 @@ function PrivateLayouts() {
       </GridItem>
       <GridItem
         gridArea="header"
+        alignSelf="end"
         padding={{ base: `0 ${convertPx(10)}`, md: `0 ${convertPx(48)} 0 0` }}
       >
         <Header toggleNavbar={toggleNavbar} />
       </GridItem>
       <GridItem
         gridArea="page"
-        mt={{ base: "0", md: convertPx(24) }}
         overflowY="auto"
         padding={{
           base: `0 ${convertPx(10)} ${convertPx(20)} ${convertPx(10)}`,
-          lg: `0 ${convertPx(20)} ${convertPx(20)} 0`,
+          lg: `${convertPx(24)} ${convertPx(20)} ${convertPx(20)} 0`,
         }}
       >
         <Outlet /> {/* This is where the main content will be rendered */}

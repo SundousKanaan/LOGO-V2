@@ -1,6 +1,6 @@
 import { Box, HStack, Spacer, List } from "@chakra-ui/react";
+import { convertPx } from "../hooks/useConvertPx";
 import HeadingItem from "../components/mini-components/HeadingItem";
-import ButtonItem from "../components/mini-components/ButtonItem";
 import SellerMiniBox from "../components/mini-components/SellerMiniBox";
 import LinkItem from "../components/mini-components/LinkItem";
 
@@ -42,19 +42,23 @@ export default function TopSellers() {
   return (
     <Box bg="white" layerStyle="dashboardCardsLayout">
       <HStack>
-        <HeadingItem width="fit-content" fontSize="18px" fontWeight="500">
+        <HeadingItem
+          width="fit-content"
+          fontSize={convertPx(18)}
+          fontWeight="500"
+        >
           Top 5 Fake Sellers
         </HeadingItem>
         <Spacer />
         <LinkItem
           to="/"
           height="fit-content"
-          padding="5px 10px"
+          padding={`${convertPx(5)} ${convertPx(10)}`}
           fontWeight="500"
-          fontSize="14px"
+          fontSize={convertPx(14)}
           color="secondaryColor"
           _hover={{
-            boxShadow: "0 0 0 2px var(--chakra-colors-themeColor)",
+            boxShadow: `0 0 0 ${convertPx(2)} var(--chakra-colors-themeColor)`,
           }}
         >
           View All
@@ -62,23 +66,30 @@ export default function TopSellers() {
       </HStack>
 
       <List.Root
-        gap="18px"
-        marginTop="16px"
+        gap={convertPx(18)}
+        marginTop={convertPx(16)}
         listStyleType="none"
         overflowY="auto"
-        maxH={{ base: "337px", md: "100px", lg: "100%" }}
-        padding={{ base: "0 10px", lg: "0" }}
+        maxH={{
+          base: convertPx(337),
+          md: convertPx(100),
+          lg: "100%",
+        }}
+        padding={{
+          base: `0 ${convertPx(10)}`,
+          lg: "0",
+        }}
         css={{
           "&::-webkit-scrollbar": {
-            width: "4px",
+            width: convertPx(4),
             opacity: "0",
           },
           "&::-webkit-scrollbar-track": {
-            width: "6px",
+            width: convertPx(6),
           },
           "&::-webkit-scrollbar-thumb": {
             background: "transparent",
-            borderRadius: "24px",
+            borderRadius: convertPx(24),
             transition: ".5s",
           },
           "&:hover::-webkit-scrollbar-thumb": {
