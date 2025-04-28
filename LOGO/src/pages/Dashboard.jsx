@@ -7,12 +7,13 @@ import {
   Text,
   SimpleGrid,
 } from "@chakra-ui/react";
-import ButtonItem from "../mini-components/ButtonItem";
+import ButtonItem from "../components/mini-components/ButtonItem";
 import CountingCard from "../components/CountingCard";
 import TopSellers from "../components/TopSellers";
 import TopAdmin from "../components/TopAdmin";
 import NotifOfTakeDownds from "../components/NotifOfTakeDownds";
 import Analytics from "../components/Analytics";
+import { ChartIcon, CoinIcon, NotificationMessageIcon } from "../global/icons";
 
 export default function Dashboard() {
   return (
@@ -84,7 +85,7 @@ export default function Dashboard() {
             title="Numbers of Takedowns"
             counting="478323"
             changeRatio="20.5%"
-            icon="chart-square"
+            icon={ChartIcon}
             date="October 2023"
           />
         </GridItem>
@@ -93,7 +94,7 @@ export default function Dashboard() {
             title="% of Goods Scraped"
             counting="92.85%"
             changeRatio="20.5%"
-            icon="coin"
+            icon={CoinIcon}
             date="October 2023"
           />
         </GridItem>
@@ -101,7 +102,7 @@ export default function Dashboard() {
           <CountingCard
             title="New Notices"
             counting="2395"
-            icon="message-notif"
+            icon={NotificationMessageIcon}
             date="October 2023"
             chart={true}
           />

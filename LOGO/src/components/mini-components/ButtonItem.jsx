@@ -8,12 +8,12 @@ export default function ButtonItem({ children, variant, onClick, ...props }) {
       {...props}
       transition="transform .1s"
       onClick={onClick}
-      _hover={{ boxShadow: "0 0 0 2px var(--chakra-colors-themeColor)" }}
+      _hover={{ boxShadow: "0 0 0 2px var(--chakra-colors-theme-color)" }}
       _active={{
-        boxShadow: "0 0 0 2px var(--chakra-colors-themeColor)",
+        boxShadow: "0 0 0 2px var(--chakra-colors-theme-color)",
         transform: "scale(0.9)",
       }}
-      _focus={{ boxShadow: "0 0 0 2px var(--chakra-colors-themeColor)" }}
+      _focus={{ boxShadow: "0 0 0 2px var(--chakra-colors-theme-color)" }}
     >
       {children}
     </Button>

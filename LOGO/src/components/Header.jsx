@@ -8,15 +8,15 @@ import {
   VStack,
   Avatar,
 } from "@chakra-ui/react";
-import { Icon } from "@chakra-ui/react";
-import { HiOutlineMenuAlt3 } from "react-icons/hi";
+import { HiMenuAlt3 } from "react-icons/hi";
+
 import { useToggleNavbar } from "../contexts/toggleNavbarContext";
 import { useNavigator } from "../contexts/navigatorContext";
 import Pathes from "../global/pathes";
-import SearchBar from "../mini-components/SearchBar";
-import HeadingItem from "../mini-components/HeadingItem";
-import LinkItem from "../mini-components/LinkItem";
-import ButtonItem from "../mini-components/ButtonItem";
+import SearchBar from "../components/mini-components/SearchBar";
+import HeadingItem from "../components/mini-components/HeadingItem";
+import LinkItem from "../components/mini-components/LinkItem";
+import ButtonItem from "../components/mini-components/ButtonItem";
 
 export default function Header() {
   const [pageTitle, setPageTitle] = useState("");
@@ -25,7 +25,6 @@ export default function Header() {
 
   useEffect(() => {
     const currentPath = Pathes.find((path) => path.path === currentLocation);
-    console.log("currentPath", currentLocation);
     if (currentLocation === "/profile") {
       setPageTitle("Profile");
     }
@@ -62,9 +61,7 @@ export default function Header() {
           display={{ base: "flex", md: "none" }}
           onClick={toggleNavbar}
         >
-          <Icon color="secondaryColor">
-            <HiOutlineMenuAlt3 />
-          </Icon>
+          <HiMenuAlt3 color="secondaryColor" />
         </ButtonItem>
       </HStack>
 

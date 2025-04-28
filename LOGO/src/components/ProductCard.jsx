@@ -1,6 +1,6 @@
-import { Image, Text, VStack, Card } from "@chakra-ui/react";
-import LinkItem from "../mini-components/LinkItem";
-import HeadingItem from "../mini-components/HeadingItem";
+import { Image, Text, VStack, HStack, Card, Spacer } from "@chakra-ui/react";
+import LinkItem from "../components/mini-components/LinkItem";
+import HeadingItem from "../components/mini-components/HeadingItem";
 
 function ProductCard({
   viewMode,
@@ -17,9 +17,7 @@ function ProductCard({
   return (
     <Card.Root
       layerStyle={
-        viewMode === "grid"
-          ? "ProductCardGridLayaout"
-          : "ProductCardListLayaout"
+        viewMode === "grid" ? "ProductCardGridLayout" : "ProductCardListLayout"
       }
     >
       <Image
@@ -28,17 +26,20 @@ function ProductCard({
         borderRadius={viewMode === "grid" ? "24px" : "8px"}
         boxSize={viewMode === "grid" ? "100%" : "68px"}
         aspectRatio="1/1"
-        layerStyle="ProductCardLayaout.img"
+        layerStyle="ProductCardLayout.img"
       />
-
       <Card.Body
         p="0"
         gap={viewMode === "grid" ? "4" : "24px"}
         flexDir={viewMode === "grid" ? "column" : "row"}
         alignItems={viewMode === "grid" ? "start" : "center"}
+        justifyContent={{
+          base: viewMode === "grid" ? "start" : "space-between",
+          lg: "start",
+        }}
       >
         <VStack alignItems={"start"} gap="4px" width="fit-content">
-          <HeadingItem fontSize="16px" lineHeight="20px" minW="175px">
+          <HeadingItem fontSize="16px" lineHeight="20px" lineClamp={2}>
             {title}
           </HeadingItem>
 
@@ -55,7 +56,7 @@ function ProductCard({
         <Text
           w="fit-content"
           h="fit-content"
-          fontSize="14px"
+          fontSize={{ base: "12px", md: "14px" }}
           fontWeight="500"
           color={
             status === "Removed"
@@ -88,7 +89,7 @@ function ProductCard({
         mt="4px"
         width={{
           base: "100%",
-          md: viewMode === "grid" ? "auto" : "fit-content",
+          lg: viewMode === "grid" ? "auto" : "fit-content",
         }}
         gap={{ base: "5px", md: viewMode === "grid" ? "0" : "16px" }}
       >

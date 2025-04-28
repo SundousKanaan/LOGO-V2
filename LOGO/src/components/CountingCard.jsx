@@ -1,7 +1,9 @@
+import React from "react";
 import { Image, Text, Grid, GridItem } from "@chakra-ui/react";
 import { Icon } from "@chakra-ui/react";
-import HeadingItem from "../mini-components/HeadingItem";
-import ChartLine from "../mini-components/ChartLine";
+import HeadingItem from "../components/mini-components/HeadingItem";
+import ChartLine from "../components/mini-components/ChartLine";
+import { ArrowTopIcon } from "../global/icons";
 
 export default function CountingCard({
   title,
@@ -12,10 +14,9 @@ export default function CountingCard({
   chart,
   ...props
 }) {
-  // TODO:  add the chart line
   return (
     <Grid
-      layerStyle="dashboardCardsLayaout"
+      layerStyle="dashboardCardsLayout"
       templateColumns="155px 1fr"
       templateRows="42px 20px  48px 30px auto"
       {...props}
@@ -30,12 +31,8 @@ export default function CountingCard({
         alignItems="center"
         gap="8px"
       >
-        <Image
-          src={`/src/assets/icons/${icon}.svg`}
-          alt={`${icon} icon`}
-          boxSize="24px"
-          objectFit="cover"
-        />
+        {React.createElement(icon, { size: "lg", color: "secondaryColor" })}
+
         <HeadingItem
           fontWeight="400"
           fontSize="16px"
@@ -80,9 +77,11 @@ export default function CountingCard({
           borderRadius="full"
         >
           {/* TODO: make the icon dynamic rising or falling */}
-          <Image
-            src="/src/assets/icons/rising-arrow.svg"
-            alt="Placeholder Image"
+          <Icon
+            as={ArrowTopIcon}
+            color="statusGreen"
+            height="8px"
+            width="8px"
           />
           <Text
             color="statusGreen"

@@ -1,8 +1,8 @@
 import { Box, HStack, Spacer, List } from "@chakra-ui/react";
-import HeadingItem from "../mini-components/HeadingItem";
-import ButtonItem from "../mini-components/ButtonItem";
-import SellerMiniBox from "../mini-components/SellerMiniBox";
-import LinkItem from "../mini-components/LinkItem";
+import HeadingItem from "../components/mini-components/HeadingItem";
+import ButtonItem from "../components/mini-components/ButtonItem";
+import SellerMiniBox from "../components/mini-components/SellerMiniBox";
+import LinkItem from "../components/mini-components/LinkItem";
 
 export default function TopSellers() {
   // TODO:  change this list to the list from the API
@@ -40,7 +40,7 @@ export default function TopSellers() {
   ];
 
   return (
-    <Box bg="white" layerStyle="dashboardCardsLayaout">
+    <Box bg="white" layerStyle="dashboardCardsLayout">
       <HStack>
         <HeadingItem width="fit-content" fontSize="18px" fontWeight="500">
           Top 5 Fake Sellers

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Flex, Spacer, HStack, ButtonGroup, Text, Box } from "@chakra-ui/react";
 import ProductCard from "../components/ProductCard";
-import ButtonItem from "../mini-components/ButtonItem";
+import ButtonItem from "../components/mini-components/ButtonItem";
 
 export default function Reviews() {
   const [viewMode, setViewMode] = useState("grid");
@@ -63,8 +63,8 @@ export default function Reviews() {
       <Box
         layerStyle={
           viewMode === "grid"
-            ? "ProductCardsListGridLayaout"
-            : "ProductCardsListLayaout"
+            ? "ProductCardsListGridLayout"
+            : "ProductCardsListLayout"
         }
       >
         <ProductCard

@@ -7,15 +7,15 @@ import {
   Flex,
   Center,
 } from "@chakra-ui/react";
-import HeadingItem from "../mini-components/HeadingItem";
-import LinkItem from "../mini-components/LinkItem";
+import HeadingItem from "../components/mini-components/HeadingItem";
+import LinkItem from "../components/mini-components/LinkItem";
 
 export default function TopAdmin({ name, role, noticesReviewed, img, path }) {
   return (
     <Flex
       direction="column"
       justify="space-around"
-      layerStyle="dashboardCardsLayaout"
+      layerStyle="dashboardCardsLayout"
       h="236px"
     >
       <HStack>

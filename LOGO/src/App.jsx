@@ -1,6 +1,8 @@
+import { useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
 import { useToggleNavbar } from "./contexts/toggleNavbarContext";
 import { useNavigator } from "./contexts/navigatorContext";
+import { useAuth } from "./contexts/AuthContext";
 
 import { Grid, GridItem } from "@chakra-ui/react";
 import Navbar from "./components/Navbar";
@@ -9,8 +11,18 @@ import Pathes from "./global/pathes";
 import Profile from "./pages/Profile";
 
 export default function App() {
-  const { currentLocation } = useNavigator();
+  const { currentLocation, navigateTO } = useNavigator();
   const { isNavbarOpen } = useToggleNavbar();
+  const { isAuthenticated } = useAuth();
+
+  useEffect(() => {
+    console.log("currentLocation", currentLocation);
+    console.log("isAuthenticated", isAuthenticated);
+
+    if (!isAuthenticated && currentLocation !== "/login") {
+      navigateTO("/login");
+    }
+  }, [isAuthenticated, currentLocation, navigateTO]);
 
   return (
     <Grid
@@ -37,12 +49,13 @@ export default function App() {
       <GridItem
         gridArea={{ md: "navbar" }}
         position={{ base: "fixed", md: "static" }}
-        top={{ base: "55px", md: "auto" }}
+        top={{ base: "60px", md: "auto" }}
         left={{ base: "0", md: "auto" }}
         bottom={{ base: "0", md: "auto" }}
         right={{ base: "0", md: "auto" }}
         zIndex="9999"
-        bg="white"
+        bg={{ base: "inherit", md: "white" }}
+        h={{ base: "calc(100% - 60px)", md: "100%" }}
         transition="0.3s"
         transform={{
           base: isNavbarOpen ? "scaleY(1)" : "scaleY(0)",

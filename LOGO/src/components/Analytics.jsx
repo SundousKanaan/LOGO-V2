@@ -1,9 +1,9 @@
 import { Box, Flex, HStack, Spacer, Text } from "@chakra-ui/react";
-import AnalyticsChart from "../mini-components/AnalyticsChart";
+import AnalyticsChart from "../components/mini-components/AnalyticsChart";
 
 export default function Analytics() {
   return (
-    <Box layerStyle="dashboardCardsLayaout">
+    <Box layerStyle="dashboardCardsLayout">
       <HStack marginBottom="16px">
         <Text fontSize="18px" fontWeight="500" color="secondaryColor">
           Analytics

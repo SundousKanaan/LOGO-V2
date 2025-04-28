@@ -5,7 +5,7 @@ import {
 } from "@chakra-ui/react";
 
 const layerStyles = defineLayerStyles({
-  dashboardCardsLayaout: {
+  dashboardCardsLayout: {
     description: "Dashboard cards layout",
     value: {
       w: "100%",
@@ -15,7 +15,7 @@ const layerStyles = defineLayerStyles({
       borderRadius: "24px",
     },
   },
-  ProductCardsListGridLayaout: {
+  ProductCardsListGridLayout: {
     description: "Product cards grid layout",
     value: {
       display: "grid",
@@ -30,7 +30,7 @@ const layerStyles = defineLayerStyles({
     },
   },
 
-  ProductCardsListLayaout: {
+  ProductCardsListLayout: {
     description: "Product cards list layout",
     value: {
       display: "flex",
@@ -39,7 +39,7 @@ const layerStyles = defineLayerStyles({
     },
   },
 
-  ProductCardGridLayaout: {
+  ProductCardGridLayout: {
     description: "Product card grid layout",
     value: {
       w: "100%",
@@ -56,7 +56,7 @@ const layerStyles = defineLayerStyles({
     },
   },
 
-  ProductCardListLayaout: {
+  ProductCardListLayout: {
     description: "Product card list layout",
     value: {
       w: "100%",

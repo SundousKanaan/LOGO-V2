@@ -4,18 +4,15 @@ import { createContext, useContext, useState, useEffect } from "react";
 const NavigatorContext = createContext();
 
 export const NavigatorProvider = ({ children }) => {
-  const [currentLocation, setCurrentLocation] = useState("");
-  const location = useLocation().pathname;
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const [currentLocation, setCurrentLocation] = useState(pathname);
 
   useEffect(() => {
-    setCurrentLocation(location);
-  }, [location]);
-
-  const navigate = useNavigate();
+    setCurrentLocation(pathname);
+  }, [pathname]);
 
   const navigateTO = (path) => {
-    console.log("navigateTO", path);
-
     navigate(path, { replace: true });
     setCurrentLocation(path);
   };

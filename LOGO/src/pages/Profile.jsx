@@ -1,30 +1,45 @@
-import { Grid, Icon, HStack, Text } from "@chakra-ui/react";
-import HeadingItem from "../mini-components/HeadingItem";
-import LinkItem from "../mini-components/LinkItem";
+import { useEffect } from "react";
+import { Grid } from "@chakra-ui/react";
+import HeadingItem from "../components/mini-components/HeadingItem";
+import ButtonItem from "../components/mini-components/ButtonItem";
+import { LogoutIcon } from "../global/icons";
+import { useNavigator } from "../contexts/navigatorContext";
+
+import { useAuth } from "../contexts/AuthContext";
 
 export default function Profile() {
+  const { navigateTO } = useNavigator();
+  const { logout, isAuthenticated } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+  };
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigateTO("/login");
+    }
+  }, [isAuthenticated]);
+
   return (
     <Grid w="100%" h="100%" placeContent="center" justify-items="stretch">
       <HeadingItem textAlign="center">Welcome back John!</HeadingItem>
-      <Text textAlign="center">Have you a great day!</Text>
 
-      <LinkItem
-        path="/login"
-        variant="button"
+      <ButtonItem
+        variant="solid"
         mt="20px"
         bg="themeColor"
         color="white"
         fontWeight="600"
-        display="grid"
-        placeContent="center"
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+        gap="12px"
+        onClick={handleLogout}
       >
-        <HStack>
-          <Icon color="white" boxSize="20px" mr="10px">
-            <img src="src/assets/icons/logout-active.svg" alt="logout icon" />
-          </Icon>
-          Log out
-        </HStack>
-      </LinkItem>
+        <LogoutIcon color="white" boxSize="20px" />
+        Log out
+      </ButtonItem>
     </Grid>
   );
 }

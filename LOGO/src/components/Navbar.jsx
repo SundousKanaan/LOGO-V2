@@ -1,27 +1,36 @@
-import { List, Text, Image, Spacer, Flex } from "@chakra-ui/react";
+import { List, Text, Spacer, Flex } from "@chakra-ui/react";
 import { useToggleNavbar } from "../contexts/toggleNavbarContext";
 import { useNavigator } from "../contexts/navigatorContext";
 import Pathes from "../global/pathes";
-import LinkItem from "../mini-components/LinkItem";
-import HeadingItem from "../mini-components/HeadingItem";
+import LinkItem from "../components/mini-components/LinkItem";
+import HeadingItem from "../components/mini-components/HeadingItem";
+import { LogoutIcon } from "../global/icons";
+import { useAuth } from "../contexts/AuthContext";
+import ButtonItem from "./mini-components/ButtonItem";
 
 export default function Navbar() {
   const { setIsNavbarOpen } = useToggleNavbar();
-  const { currentLocation } = useNavigator();
+  const { currentLocation, navigateTO } = useNavigator();
+  const { logout } = useAuth();
 
   const handleToggleNavbar = () => {
     setIsNavbarOpen((prev) => !prev);
   };
+
+  const handleLogout = () => {
+    logout();
+    navigateTO("/login");
+  };
+
   return (
     <Flex
       as="nav"
-      height={{ base: "calc(100% - 55px)", lg: "100%" }}
+      h="100%"
       padding={{ base: "15px 20px", lg: "40px 20px" }}
       flexDirection="column"
-      justify="start"
+      justify={{ base: "space-between", md: "start" }}
       align="start"
-      gap="34px"
-      bg="white"
+      gap={{ base: "0", md: "34px" }}
     >
       <HeadingItem
         as="h1"
@@ -81,45 +90,32 @@ export default function Navbar() {
                   {/* TODO: make the amunt dynamic */}3
                 </Text>
               )}
-
-              {currentLocation === path.path ? (
-                <Image
-                  borderRadius="full"
-                  boxSize="24px"
-                  src={`/src/assets/icons/${path.icon}-active.svg`}
-                  alt={`${path.icon} icon`}
+              {
+                <path.icon
+                  size="lg"
+                  color={
+                    currentLocation === path.path ? "white" : "secondaryColor"
+                  }
                 />
-              ) : (
-                <Image
-                  borderRadius="full"
-                  boxSize="24px"
-                  src={`/src/assets/icons/${path.icon}.svg`}
-                  alt={`${path.icon} icon`}
-                />
-              )}
-
+              }
               {path.label}
             </LinkItem>
           </List.Item>
         ))}
       </List.Root>
       <Spacer display={{ base: "none", lg: "block" }} />
-      <LinkItem
-        variant="button"
-        path={"/login"}
-        width={{ base: "fit-content", lg: "100%" }}
-        gap="12px"
-        _hover={{ bg: "lightGray" }}
+      <ButtonItem
+        variant="ghost"
+        width="100%"
         height="50px"
+        padding={{ base: "20px 8px", lg: "0 8px" }}
+        justifyContent="start"
+        gap="12px"
+        onClick={handleLogout}
       >
-        <Image
-          borderRadius="full"
-          boxSize="24px"
-          src="/src/assets/icons/logout.svg"
-          alt="log out icon"
-        />
+        <LogoutIcon size="lg" />
         Log out
-      </LinkItem>
+      </ButtonItem>
     </Flex>
   );
 }

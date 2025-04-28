@@ -1,7 +1,7 @@
 import { Flex, HStack, VStack, Spacer } from "@chakra-ui/react";
-import HeadingItem from "../mini-components/HeadingItem";
-import LinkItem from "../mini-components/LinkItem";
-import TakeDownsNotif from "../mini-components/TakeDownsNotif";
+import HeadingItem from "../components/mini-components/HeadingItem";
+import LinkItem from "../components/mini-components/LinkItem";
+import TakeDownsNotif from "../components/mini-components/TakeDownsNotif";
 
 export default function NotifOfTakeDownds() {
   // TODO: make the data dynamic from API
@@ -79,7 +79,7 @@ export default function NotifOfTakeDownds() {
     },
   ];
   return (
-    <Flex direction="column" layerStyle="dashboardCardsLayaout" gap="20px">
+    <Flex direction="column" layerStyle="dashboardCardsLayout" gap="20px">
       <HStack justifyContent={"space-between"} width="100%">
         <HeadingItem fontWeight="500" fontSize="18px" color="secondaryColor">
           Notifications of Take Downs

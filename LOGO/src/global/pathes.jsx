@@ -2,47 +2,57 @@ import Reviews from "../pages/Reviews";
 import NoPage from "../pages/NoPage";
 import Dashboard from "../pages/Dashboard";
 
+import {
+  HomeIcon,
+  QuoteDownIcon,
+  HashIcon,
+  WebIcon,
+  NotificationBellIcon,
+  SettingsIcon,
+  UserIcon,
+} from "./icons";
+
 const Pathes = [
   {
     path: "/",
     label: "Dashboard",
-    icon: "home",
+    icon: HomeIcon,
     element: Dashboard,
   },
   {
     path: "/Reviews",
     label: "Reviews",
-    icon: "quote-down-square",
+    icon: QuoteDownIcon,
     element: Reviews,
   },
   {
     path: "/Keywords",
     label: "Keywords",
-    icon: "keyword",
+    icon: HashIcon,
     element: NoPage,
   },
   {
     path: "/Web-crawler",
     label: "Web crawler",
-    icon: "web",
+    icon: WebIcon,
     element: NoPage,
   },
   {
     path: "/Notifications",
     label: "Notifications",
-    icon: "notification",
+    icon: NotificationBellIcon,
     element: NoPage,
   },
   {
     path: "/Settings",
     label: "Settings",
-    icon: "setting",
+    icon: SettingsIcon,
     element: NoPage,
   },
   {
     path: "/User-management",
     label: "User management",
-    icon: "user",
+    icon: UserIcon,
     element: NoPage,
   },
 ];
