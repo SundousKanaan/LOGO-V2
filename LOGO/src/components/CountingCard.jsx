@@ -115,7 +115,7 @@ export default function CountingCard({
           gridRow="2 / 4"
           alignSelf="end"
           width="100%"
-          height="88px"
+          height={convertPx(88)}
         >
           <ChartLine />
         </GridItem>

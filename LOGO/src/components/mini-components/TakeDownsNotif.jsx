@@ -6,7 +6,11 @@ import HeadingItem from "./HeadingItem";
 
 export default function TakeDownsNotif({ title, link, time }) {
   return (
-    <Flex width="100%" pb={convertPx(12)} borderBottom={"solid 1px #F2F2F2"}>
+    <Flex
+      width="100%"
+      pb={convertPx(12)}
+      borderBottom={`solid ${convertPx(1)} #F2F2F2`}
+    >
       <HStack spacing={convertPx(9)}>
         <HeadingItem
           fontWeight="400"

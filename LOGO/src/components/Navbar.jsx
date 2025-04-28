@@ -79,19 +79,18 @@ export default function Navbar({ toggleNavbar }) {
               {path.path === "/Notifications" && (
                 <Text
                   width="fit-content"
-                  p={`${convertPx(5)} ${convertPx(6)} ${convertPx(
-                    4
-                  )} ${convertPx(6)}`}
                   borderRadius="full"
                   color="white"
                   fontSize={convertPx(12)}
                   fontWeight="600"
                   right={convertPx(5)}
                   bg="infoNotic"
-                  lineHeight={convertPx(12)}
+                  lineHeight={convertPx(13.5)}
                   order="2"
+                  p={`${convertPx(4)} ${convertPx(6)} ${convertPx(4)} ${convertPx(6)}`}
+
                 >
-                  3 {/* TODO: make the amunt dynamic */}
+                  3{/* TODO: make the amunt dynamic */}
                 </Text>
               )}
               {

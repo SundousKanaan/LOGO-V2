@@ -1,4 +1,4 @@
-import { Input, Stack } from "@chakra-ui/react";
+import { Input } from "@chakra-ui/react";
 import { convertPx } from "../../hooks/useConvertPx";
 
 export default function InputField({
@@ -13,11 +13,11 @@ export default function InputField({
       bg="white"
       _focusVisible={{
         borderColor: "themeColor",
-        borderWidth: convertPx(2), // Converted px value
+        borderWidth: convertPx(2),
       }}
       _hover={{
         borderColor: "themeColor",
-        borderWidth: convertPx(2), // Converted px value
+        borderWidth: convertPx(2),
       }}
       type={type}
       name={name}

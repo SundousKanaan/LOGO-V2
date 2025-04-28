@@ -48,7 +48,7 @@ const layerStyles = defineLayerStyles({
       h: "100%",
       display: "Grid",
       gridTemplateColumns: "1fr",
-      gridTemplateRows: "243px auto",
+      gridTemplateRows: ` ${convertPx(243)} auto`,
       gap: `${convertPx(12)}`,
       padding: `${convertPx(16)}`,
       bg: "white",
