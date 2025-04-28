@@ -8,30 +8,33 @@ import {
   VStack,
   Avatar,
 } from "@chakra-ui/react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { HiMenuAlt3 } from "react-icons/hi";
 
-import { useToggleNavbar } from "../contexts/toggleNavbarContext";
-import { useNavigator } from "../contexts/navigatorContext";
 import Pathes from "../global/pathes";
 import SearchBar from "../components/mini-components/SearchBar";
 import HeadingItem from "../components/mini-components/HeadingItem";
 import LinkItem from "../components/mini-components/LinkItem";
 import ButtonItem from "../components/mini-components/ButtonItem";
 
-export default function Header() {
+export default function Header({ toggleNavbar }) {
   const [pageTitle, setPageTitle] = useState("");
-  const { toggleNavbar } = useToggleNavbar();
-  const { currentLocation, navigateTO } = useNavigator();
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
 
   useEffect(() => {
-    const currentPath = Pathes.find((path) => path.path === currentLocation);
-    if (currentLocation === "/profile") {
+    const currentPath = Pathes.find((path) => path.path === pathname);
+    if (pathname.startsWith("/profile/")) {
       setPageTitle("Profile");
     }
     if (currentPath) {
       setPageTitle(currentPath.label);
     }
-  }, [currentLocation]);
+  }, [pathname]);
+
+  function handleToggleNavbar() {
+    toggleNavbar();
+  }
 
   const userName = "John Smith"; // !TODO: change to dynamic value
   const imgSrc = "/src/assets/user.jpg"; // !TODO: change to dynamic value
@@ -59,7 +62,7 @@ export default function Header() {
           variant={"ghost"}
           width="40px"
           display={{ base: "flex", md: "none" }}
-          onClick={toggleNavbar}
+          onClick={handleToggleNavbar}
         >
           <HiMenuAlt3 color="secondaryColor" />
         </ButtonItem>
@@ -76,7 +79,10 @@ export default function Header() {
 
         {/* !TODO: change to dynamic values: img.src & texts */}
         <HStack>
-          <Box onClick={() => navigateTO("/profile")} cursor="pointer">
+          <Box
+            onClick={() => navigate(`/profile/${userName}`, { replace: true })}
+            cursor="pointer"
+          >
             <Avatar.Root>
               <Avatar.Fallback name={userName} />
               <Avatar.Image src={imgSrc} alt={`${userName} profile photo`} />
@@ -89,7 +95,11 @@ export default function Header() {
             gap="0"
             display={{ base: "none", lg: "flex" }}
           >
-            <LinkItem height="fit-content" variant="text" to={"/profile"}>
+            <LinkItem
+              height="fit-content"
+              variant="text"
+              to={`/profile/${userName}`}
+            >
               <HeadingItem
                 fontSize="18px"
                 lineHeight="24px"

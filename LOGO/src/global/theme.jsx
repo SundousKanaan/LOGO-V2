@@ -15,13 +15,14 @@ const layerStyles = defineLayerStyles({
       borderRadius: "24px",
     },
   },
+
   ProductCardsListGridLayout: {
     description: "Product cards grid layout",
     value: {
       display: "grid",
       gridTemplateColumns: {
         base: "repeat(1, 1fr)",
-        md: "repeat(2, 1fr)",
+        sm: "repeat(2, 1fr)",
         lg: "repeat(3, 1fr)",
         xl: "repeat(4, 1fr)",
         "2xl": "repeat(5, 1fr)",
@@ -65,7 +66,8 @@ const layerStyles = defineLayerStyles({
       flexDirection: "row",
       flexWrap: "wrap",
       alignItems: "center",
-      gap: "12px",
+      rowGap: "5px",
+      columnGap: "12px",
       padding: "16px",
       bg: "white",
       borderRadius: "24px",

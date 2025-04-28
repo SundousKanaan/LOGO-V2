@@ -84,14 +84,17 @@ function ProductCard({
 
       <Card.Footer
         alignItems={viewMode === "grid" ? "end" : "center"}
-        justifyContent="space-between"
+        justifyContent={{
+          base: viewMode === "grid" ? "space-between" : "end",
+          lg: "space-between",
+        }}
         p="0"
         mt="4px"
         width={{
           base: "100%",
           lg: viewMode === "grid" ? "auto" : "fit-content",
         }}
-        gap={{ base: "5px", md: viewMode === "grid" ? "0" : "16px" }}
+        gap={viewMode === "grid" ? "0" : "16px"}
       >
         <LinkItem
           href={viewDetailsLink}
@@ -100,8 +103,12 @@ function ProductCard({
           fontSize="14px"
           fontWeight="500"
           bg="themeColor"
-          padding={viewMode === "grid" ? "6px 12px" : "16px 42px"}
-          height={viewMode === "grid" ? "34px" : "54px"}
+          padding={
+            viewMode === "grid"
+              ? "6px 12px"
+              : { base: "16px 12px", lg: "16px 28.5px" }
+          }
+          height={viewMode === "grid" ? "34px" : { base: "40px", lg: "54px" }}
           borderRadius="8px"
           whiteSpace="nowrap"
         >
@@ -114,8 +121,12 @@ function ProductCard({
           fontSize="14px"
           fontWeight="500"
           bg="secondaryColor"
-          padding={viewMode === "grid" ? "6px 12px" : "16px 28.5px"}
-          height={viewMode === "grid" ? "34px" : "54px"}
+          padding={
+            viewMode === "grid"
+              ? "6px 12px"
+              : { base: "16px 12px", lg: "16px 28.5px" }
+          }
+          height={viewMode === "grid" ? "34px" : { base: "40px", lg: "54px" }}
           borderRadius="8px"
           order={viewMode === "grid" ? "0" : "-1"}
           whiteSpace="nowrap"

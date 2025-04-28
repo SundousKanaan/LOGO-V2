@@ -1,17 +1,17 @@
 import { useEffect, useState } from "react";
-import { Box, Heading, Field, Fieldset, Stack, Text } from "@chakra-ui/react";
-import { FormControl, FormLabel } from "@chakra-ui/form-control";
+import { useNavigate } from "react-router-dom";
+import { Field, Fieldset, Stack, Text } from "@chakra-ui/react";
 import InputField from "../components/mini-components/Inputfield";
 import ButtonItem from "../components/mini-components/ButtonItem";
-import { useNavigator } from "../contexts/navigatorContext";
 import { useAuth } from "../contexts/AuthContext";
+import { convertPx } from "../hooks/useConvertPx";
 
 export default function Login() {
-  const { navigateTO } = useNavigator();
   const [isDisabledLogin, setIsDisabledLogin] = useState(true);
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
   const { login, isAuthenticated, loginMessage } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (userName != "" && password != "") {
@@ -40,7 +40,7 @@ export default function Login() {
         setUserName("");
         setPassword("");
         setIsDisabledLogin(true);
-        navigateTO("/");
+        navigate("/", { replace: true });
       }, 1000);
     } else {
       setIsDisabledLogin(true);
@@ -55,11 +55,11 @@ export default function Login() {
       flexDirection="column"
       alignItems="center"
       justifyContent="center"
-      gap="20px"
+      gap={convertPx(20)}
       bg="lightGray"
     >
       <Stack>
-        <Fieldset.Legend fontWeight="800" fontSize="30px">
+        <Fieldset.Legend fontWeight="800" fontSize={convertPx(30)}>
           Login
         </Fieldset.Legend>
       </Stack>
@@ -68,13 +68,13 @@ export default function Login() {
         display="flex"
         flexDirection="column"
         alignItems="center"
-        gap="20px"
-        width="350px"
+        gap={convertPx(20)}
+        width={convertPx(350)}
       >
         <Field.Root>
-          <Field.Label>Name:</Field.Label>
+          <Field.Label>Name</Field.Label>
           <InputField
-            h="50px"
+            h={convertPx(50)}
             type="text"
             placeholder="User name"
             name="name"
@@ -86,9 +86,9 @@ export default function Login() {
         </Field.Root>
 
         <Field.Root>
-          <Field.Label>Password:</Field.Label>
+          <Field.Label>Password</Field.Label>
           <InputField
-            h="50px"
+            h={convertPx(50)}
             type="password"
             placeholder="Password"
             name="password"
@@ -101,11 +101,11 @@ export default function Login() {
         {loginMessage && (
           <Text
             color={loginMessage && isAuthenticated ? "green" : "red"}
-            fontSize="14px"
+            fontSize={convertPx(14)}
             fontWeight="600"
             m="0"
             textAlign="center"
-            width="350px"
+            width={convertPx(350)}
           >
             {loginMessage}
           </Text>
@@ -115,9 +115,9 @@ export default function Login() {
       <ButtonItem
         variant="solid"
         type="submit"
-        width="350px"
-        height="50px"
-        gap="12px"
+        width={convertPx(350)}
+        height={convertPx(50)}
+        gap={convertPx(12)}
         bg="themeColor"
         color="white"
         transition="all .5s"

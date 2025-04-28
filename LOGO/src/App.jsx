@@ -1,47 +1,54 @@
-import { useEffect } from "react";
-import { Routes, Route } from "react-router-dom";
-import { useToggleNavbar } from "./contexts/toggleNavbarContext";
-import { useNavigator } from "./contexts/navigatorContext";
+import { useState } from "react";
+import { Routes, Route, Outlet, Navigate, HashRouter } from "react-router-dom";
 import { useAuth } from "./contexts/AuthContext";
-
 import { Grid, GridItem } from "@chakra-ui/react";
+import { convertPx } from "./hooks/useConvertPx";
+
 import Navbar from "./components/Navbar";
 import Header from "./components/Header";
 import Pathes from "./global/pathes";
 import Profile from "./pages/Profile";
+import Login from "./pages/Login";
 
-export default function App() {
-  const { currentLocation, navigateTO } = useNavigator();
-  const { isNavbarOpen } = useToggleNavbar();
+// Private and Public Route wrappers
+function PrivateRoute() {
   const { isAuthenticated } = useAuth();
 
-  useEffect(() => {
-    console.log("currentLocation", currentLocation);
-    console.log("isAuthenticated", isAuthenticated);
+  return isAuthenticated ? <Outlet /> : <Navigate to="/login" replace />;
+}
 
-    if (!isAuthenticated && currentLocation !== "/login") {
-      navigateTO("/login");
-    }
-  }, [isAuthenticated, currentLocation, navigateTO]);
+function PublicRoute() {
+  const { isAuthenticated } = useAuth();
+
+  return !isAuthenticated ? <Outlet /> : <Navigate to="/" replace />;
+}
+
+// Layout wrapper for the private pages
+function PrivateLayouts() {
+  const [isNavbarOpen, setIsNavbarOpen] = useState(false);
+
+  function toggleNavbar() {
+    setIsNavbarOpen(!isNavbarOpen);
+  }
 
   return (
     <Grid
       gridTemplateColumns={{
         base: "1fr",
-        md: "220px 1fr",
+        md: `${convertPx(220)} 1fr`,
       }}
       gridTemplateRows={{
-        base: "125px auto",
-        md: "91px minmax(calc(100vh - 115px), 1fr)",
+        base: `${convertPx(125)} auto`,
+        md: `${convertPx(91)} minmax(calc(100vh - ${convertPx(115)}), 1fr)`,
       }}
       gridTemplateAreas={{
         base: `"header" "page"`,
         md: `
-            "navbar header"
-            "navbar page"
-          `,
+          "navbar header"
+          "navbar page"
+        `,
       }}
-      gap="24px"
+      gap={convertPx(24)}
       bg="lightGray"
       h="100vh"
       overflow="hidden"
@@ -49,13 +56,13 @@ export default function App() {
       <GridItem
         gridArea={{ md: "navbar" }}
         position={{ base: "fixed", md: "static" }}
-        top={{ base: "60px", md: "auto" }}
+        top={{ base: convertPx(60), md: "auto" }}
         left={{ base: "0", md: "auto" }}
         bottom={{ base: "0", md: "auto" }}
         right={{ base: "0", md: "auto" }}
         zIndex="9999"
         bg={{ base: "inherit", md: "white" }}
-        h={{ base: "calc(100% - 60px)", md: "100%" }}
+        h={{ base: `calc(100% - ${convertPx(60)})`, md: "100%" }}
         transition="0.3s"
         transform={{
           base: isNavbarOpen ? "scaleY(1)" : "scaleY(0)",
@@ -63,32 +70,51 @@ export default function App() {
         }}
         transformOrigin="top"
       >
-        <Navbar />
+        <Navbar toggleNavbar={toggleNavbar} />
       </GridItem>
       <GridItem
         gridArea="header"
-        padding={{ base: "0 10px 0 10px", md: "0 48px 0 0" }}
+        padding={{ base: `0 ${convertPx(10)}`, md: `0 ${convertPx(48)} 0 0` }}
       >
-        <Header />
+        <Header toggleNavbar={toggleNavbar} />
       </GridItem>
       <GridItem
         gridArea="page"
-        mt={{ base: "0", md: "24px" }}
+        mt={{ base: "0", md: convertPx(24) }}
         overflowY="auto"
-        padding={{ base: "0 10px 20px 10px", lg: "0 20px 20px 0" }}
+        padding={{
+          base: `0 ${convertPx(10)} ${convertPx(20)} ${convertPx(10)}`,
+          lg: `0 ${convertPx(20)} ${convertPx(20)} 0`,
+        }}
       >
-        <Routes>
-          {Pathes.map((Path, i) => (
-            <Route
-              key={i}
-              index={currentLocation === "/"}
-              path={Path.path}
-              element={<Path.element />}
-            />
-          ))}
-          <Route path="/profile" element={<Profile />} />
-        </Routes>
+        <Outlet /> {/* This is where the main content will be rendered */}
       </GridItem>
     </Grid>
+  );
+}
+
+// App Function
+export default function App() {
+  return (
+    <HashRouter>
+      <Routes>
+        {/* Public routes */}
+        <Route element={<PublicRoute />}>
+          <Route path="/login" element={<Login />} />
+        </Route>
+        {/* Private routes */}
+        <Route element={<PrivateRoute />}>
+          <Route element={<PrivateLayouts />}>
+            {Pathes.map((Path, i) => (
+              <Route key={i} path={Path.path} element={<Path.element />} />
+            ))}
+            <Route path="/profile/:userName" element={<Profile />} />
+          </Route>
+        </Route>
+
+        {/* Fallback route */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </HashRouter>
   );
 }

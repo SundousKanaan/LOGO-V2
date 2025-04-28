@@ -1,15 +1,15 @@
 import { useEffect } from "react";
 import { Grid } from "@chakra-ui/react";
+import { useNavigate } from "react-router-dom";
 import HeadingItem from "../components/mini-components/HeadingItem";
 import ButtonItem from "../components/mini-components/ButtonItem";
 import { LogoutIcon } from "../global/icons";
-import { useNavigator } from "../contexts/navigatorContext";
 
 import { useAuth } from "../contexts/AuthContext";
 
 export default function Profile() {
-  const { navigateTO } = useNavigator();
   const { logout, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
 
   const handleLogout = () => {
     logout();
@@ -17,7 +17,7 @@ export default function Profile() {
 
   useEffect(() => {
     if (!isAuthenticated) {
-      navigateTO("/login");
+      navigate("/login", { replace: true });
     }
   }, [isAuthenticated]);
 

@@ -7,6 +7,8 @@ import {
   Text,
   SimpleGrid,
 } from "@chakra-ui/react";
+import { convertPx } from "../hooks/useConvertPx";
+
 import ButtonItem from "../components/mini-components/ButtonItem";
 import CountingCard from "../components/CountingCard";
 import TopSellers from "../components/TopSellers";
@@ -19,16 +21,16 @@ export default function Dashboard() {
   return (
     <>
       <Flex
-        height={{ base: "fit-content", lg: "45px" }}
+        height={{ base: "fit-content", lg: convertPx(45) }}
         alignItems={{ base: "start", lg: "center" }}
-        marginBottom="20px"
+        marginBottom={convertPx(20)}
         flexDirection={{ base: "column", md: "row" }}
       >
         <Text
           fontWeight="500"
-          fontSize="18px"
+          fontSize={convertPx(18)}
           color="secondaryColor"
-          mb={{ base: "8px", md: "0" }}
+          mb={{ base: convertPx(8), md: "0" }}
         >
           Wed, Oct 27
         </Text>
@@ -36,25 +38,25 @@ export default function Dashboard() {
         <Spacer />
 
         <HStack
-          spacing="8px"
+          spacing={convertPx(8)}
           width={{ base: "fit-content", sm: "100%", md: "fit-content" }}
           justifyContent="space-between"
           flexWrap="wrap"
-          gap="8px"
+          gap={convertPx(8)}
         >
           <Text
             fontWeight="500"
-            fontSize="12px"
+            fontSize={convertPx(12)}
             color="secondaryColor"
             opacity="0.6"
           >
             Choose Platform:
           </Text>
-          <ButtonGroup variant="solid" spacing="12px">
+          <ButtonGroup variant="solid" spacing={convertPx(12)}>
             <ButtonItem
               bg="white"
               color="secondaryColor"
-              padding="9px 21px"
+              padding={`${convertPx(9)} ${convertPx(21)}`}
               fontWeight="500"
             >
               Alibaba
@@ -62,14 +64,14 @@ export default function Dashboard() {
             <ButtonItem
               bg="white"
               color="secondaryColor"
-              padding="9px 21px"
+              padding={`${convertPx(9)} ${convertPx(21)}`}
               fontWeight="500"
             >
               AliExpress
             </ButtonItem>
             <ButtonItem
               bg="themeColor"
-              padding="9px 21px"
+              padding={`${convertPx(9)} ${convertPx(21)}`}
               fontWeight="600"
               color="white"
             >
@@ -79,7 +81,7 @@ export default function Dashboard() {
         </HStack>
       </Flex>
 
-      <SimpleGrid columns={{ base: 1, lg: 2, xl: 3 }} gap="24px">
+      <SimpleGrid columns={{ base: 1, lg: 2, xl: 3 }} gap={convertPx(24)}>
         <GridItem>
           <CountingCard
             title="Numbers of Takedowns"
