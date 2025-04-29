@@ -6,8 +6,9 @@ export default function SearchBar() {
   return (
     <Box
       width={{
-        base: `calc(100% - ${convertPx(70)})`,
-        lg: convertPx(490),
+        base: `calc(100% - ${convertPx(60)})`,
+        md: `calc(100% - ${convertPx(40)})`,
+        xl: convertPx(490),
       }}
       height="inherit"
       position="relative"

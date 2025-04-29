@@ -44,26 +44,37 @@ export default function Header({ toggleNavbar }) {
   return (
     <Flex
       as="header"
+      width="100%"
       h={{ base: convertPx(110), md: convertPx(50) }}
-      pt={{ base: convertPx(10), lg: "0" }}
+      pt={{ base: convertPx(16), lg: "0" }}
       flexDirection={{ base: "column", md: "row" }}
-      alignItems={{ base: "start", md: "end" }}
       justifyContent="space-between"
       gap={{ base: convertPx(5), md: convertPx(20) }}
+      position="relative"
     >
       <HStack
         justifyContent="space-between"
         width={{ base: "100%", md: "fit-content" }}
       >
         <ButtonItem
-          variant={"ghost"}
-          width={convertPx(40)}
+          variant={"solid"}
+          minWidth={convertPx(45)}
+          h={convertPx(45)}
+          px="0"
+          position="absolute"
           display={{ base: "flex", md: "none" }}
+          color="secondaryColor"
+          bg="white"
+          borderRadius={convertPx(8)}
           onClick={handleToggleNavbar}
         >
           <HiMenuAlt2 color="secondaryColor" />
         </ButtonItem>
-        <HeadingItem fontSize={convertPx(32)} lineHeight={convertPx(24)}>
+        <HeadingItem
+          fontSize={convertPx(32)}
+          width={{ base: "100%", md: "fit-content" }}
+          textAlign={{ base: "center", md: "start" }}
+        >
           {pageTitle}
         </HeadingItem>
       </HStack>
@@ -71,7 +82,8 @@ export default function Header({ toggleNavbar }) {
       <Spacer />
 
       <Flex
-        width={{ base: "100%", md: "50%", lg: "fit-content" }}
+        h={{ base: "100%", lg: "inherit" }}
+        width={{ base: "100%", md: "70%", xl: "fit-content" }}
         gap={{ base: convertPx(16), lg: convertPx(40) }}
         justifyContent="space-between"
       >
