@@ -3,11 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { Field, Fieldset, Stack, Text } from "@chakra-ui/react";
 import InputField from "../components/mini-components/Inputfield";
 import ButtonItem from "../components/mini-components/ButtonItem";
+import LinkItem from "../components/mini-components/LinkItem";
 import { useAuth } from "../contexts/AuthContext";
 import { convertPx } from "../hooks/useConvertPx";
 
 export default function Login() {
-  const [isDisabledLogin, setIsDisabledLogin] = useState(true);
+  const [isDisabled, setIsDisabled] = useState(true);
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
   const { login, isAuthenticated, loginMessage } = useAuth();
@@ -15,7 +16,7 @@ export default function Login() {
 
   useEffect(() => {
     if (userName != "" && password != "") {
-      return setIsDisabledLogin(false);
+      return setIsDisabled(false);
     }
   }, [userName, password]);
 
@@ -39,13 +40,13 @@ export default function Login() {
       setTimeout(() => {
         setUserName("");
         setPassword("");
-        setIsDisabledLogin(true);
+        setIsDisabled(true);
         navigate("/", { replace: true });
       }, 1000);
     } else {
-      setIsDisabledLogin(true);
+      setIsDisabled(true);
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, navigate]);
 
   return (
     <Fieldset.Root
@@ -81,7 +82,6 @@ export default function Login() {
             value={userName}
             bg={isAuthenticated ? "statusGreenLight" : "white"}
             onChange={handleChangeValidation}
-            required
           />
         </Field.Root>
 
@@ -95,17 +95,16 @@ export default function Login() {
             value={password}
             bg={isAuthenticated ? "statusGreenLight" : "white"}
             onChange={handleChangeValidation}
-            required
           />
         </Field.Root>
         {loginMessage && (
           <Text
             color={loginMessage && isAuthenticated ? "green" : "red"}
-            fontSize={convertPx(14)}
-            fontWeight="600"
+            fontSize={convertPx(12)}
+            fontWeight="400"
             m="0"
             textAlign="center"
-            width={convertPx(350)}
+            width="100%"
           >
             {loginMessage}
           </Text>
@@ -123,11 +122,30 @@ export default function Login() {
         transition="all .5s"
         m="0"
         _hover={{ width: "100%" }}
-        disabled={isDisabledLogin}
+        disabled={isDisabled}
         onClick={handleLogin}
       >
         Login
       </ButtonItem>
+
+      <Text
+        fontSize={convertPx(10)}
+        fontWeight="600"
+        color="secondaryColor"
+        textAlign="center"
+        height="fit-content"
+      >
+        Don't have an account?{" "}
+        <LinkItem
+          path={"/registering"}
+          variant={"ghost"}
+          color="themeColor"
+          textAlign="center"
+          height="fit-content"
+        >
+          Register here
+        </LinkItem>
+      </Text>
     </Fieldset.Root>
   );
 }
