@@ -3,6 +3,7 @@ import { createContext, useContext, useState, useEffect } from "react";
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
+  // TODO: Replace with your actual authentication logic
   const validCredentials = { username: "s", password: "s" };
 
   const storedAuthStatus =
