@@ -11,6 +11,7 @@ import {
 import { useNavigate, useLocation } from "react-router-dom";
 import { HiMenuAlt2 } from "react-icons/hi";
 import { convertPx } from "../hooks/useConvertPx";
+import { useAuth } from "../contexts/AuthContext";
 
 import Pathes from "../global/pathes";
 import SearchBar from "../components/mini-components/SearchBar";
@@ -22,6 +23,11 @@ export default function Header({ toggleNavbar }) {
   const [pageTitle, setPageTitle] = useState("");
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  const { currentUser } = useAuth();
+
+  const [userName, setUserName] = useState("");
+  const [imgSrc, setImgSrc] = useState("");
+  const [role, setRole] = useState("");
 
   useEffect(() => {
     const currentPath = Pathes.find((path) => path.path === pathname);
@@ -33,13 +39,21 @@ export default function Header({ toggleNavbar }) {
     }
   }, [pathname]);
 
+  useEffect(() => {
+    if (currentUser) {
+      setUserName(currentUser.displayName);
+      setImgSrc(currentUser.photo);
+      setRole(currentUser.role);
+    }
+  }, [currentUser]);
+
   function handleToggleNavbar() {
     toggleNavbar();
   }
 
-  const userName = "John Smith"; // !TODO: change to dynamic value
-  const imgSrc = "/src/assets/user.jpg"; // !TODO: change to dynamic value
-  const role = "Admin"; // !TODO: change to dynamic value
+  // const userName = currentUser?.displayName;
+  // const imgSrc = currentUser?.photo; // !TODO: change to dynamic value
+  // const role = currentUser?.role; // !TODO: change to dynamic value
 
   return (
     <Flex
@@ -96,7 +110,7 @@ export default function Header({ toggleNavbar }) {
             cursor="pointer"
           >
             <Avatar.Root>
-              <Avatar.Fallback name={userName} />
+              <Avatar.Fallback />
               <Avatar.Image src={imgSrc} alt={`${userName} profile photo`} />
             </Avatar.Root>
           </Box>
@@ -114,10 +128,11 @@ export default function Header({ toggleNavbar }) {
             >
               <HeadingItem
                 fontSize={convertPx(18)}
-                lineHeight={convertPx(24)}
+                lineHeight={convertPx(16)}
                 fontWeight="500"
                 padding={convertPx(1)}
                 whiteSpace="nowrap"
+                textTransform="capitalize"
               >
                 {userName}
               </HeadingItem>
@@ -127,6 +142,8 @@ export default function Header({ toggleNavbar }) {
               fontWeight="400"
               opacity="0.5"
               color="secondaryColor"
+              textTransform="capitalize"
+              lineHeight={convertPx(16)}
             >
               {role}
             </Text>

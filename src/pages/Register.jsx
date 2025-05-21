@@ -1,20 +1,26 @@
 import { useState } from "react";
+import { Field, Fieldset, Stack, Text, HStack } from "@chakra-ui/react";
 
-import { Field, Fieldset, Stack, Text } from "@chakra-ui/react";
 import { convertPx } from "../hooks/useConvertPx";
 import InputField from "../components/mini-components/Inputfield";
 import ButtonItem from "../components/mini-components/ButtonItem";
 import LinkItem from "../components/mini-components/LinkItem";
+import { useAuth } from "../contexts/AuthContext";
 
-function Registering() {
-  const [userName, setUserName] = useState("");
+function Registing() {
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [birthday, setBirthday] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [registerMessage, setRegisterMessage] = useState("");
   const [isUserNameValid, setIsUserNameValid] = useState("none");
   const [isEmailValid, setIsEmailValid] = useState("none");
   const [isPasswordValid, setIsPasswordValid] = useState("none");
+  const [isBirthdayValid, setIsBirthdayValid] = useState("none");
+
+  const { registerUser, errorMessage } = useAuth();
 
   const handleChangeValidation = (e) => {
     const { name, value } = e.target;
@@ -24,23 +30,29 @@ function Registering() {
     setIsEmailValid("none");
     setIsPasswordValid("none");
 
-    if (name === "name") {
-      setUserName(value);
+    if (name === "firstName") {
+      setFirstName(value);
+    } else if (name === "lastName") {
+      setLastName(value);
     } else if (name === "email") {
       setEmail(value);
     } else if (name === "password") {
       setPassword(value);
     } else if (name === "confirmPassword") {
       setConfirmPassword(value);
+    } else if (name === "birthday") {
+      setBirthday(value);
     }
   };
 
-  const handleRegister = () => {
+  const handleRegister = async () => {
     // check the validity of the inputs
-    const isValid_UserName = userName !== "" && /^[A-Za-z]+$/.test(userName);
+    const isValid_F_Name = firstName !== "" && /^[A-Za-z]+$/.test(firstName);
+    const isValid_L_Name = lastName !== "" && /^[A-Za-z]+$/.test(lastName);
+    const isValid_UserName = isValid_F_Name && isValid_L_Name;
     const isValid_Email = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     const isValid_Password = password.length >= 6 && /^\S+$/.test(password);
-    let isPasswordsMatch = password === confirmPassword;
+    const isPasswordsMatch = password === confirmPassword;
 
     // set the validity of the inputs
     setIsUserNameValid(isValid_UserName ? "true" : "false");
@@ -51,6 +63,7 @@ function Registering() {
       return;
     }
     setIsPasswordValid(isValid_Password ? "true" : "false");
+    setIsBirthdayValid(birthday !== "" ? "true" : "false");
 
     // show error messages according to the validity of the inputs
     if (!isValid_UserName || !isValid_Email || !isValid_Password) {
@@ -69,12 +82,15 @@ function Registering() {
     }
 
     // if all inputs are valid, register the user
-    setRegisterMessage("");
-    console.log("Registering user:", {
-      userName,
-      email,
-      password,
-    });
+    try {
+      // const userCredential = await registerUser(userName, email, password);
+      await registerUser({ firstName, lastName, email, password, birthday });
+      setRegisterMessage("");
+      console.log("User registered successfully");
+    } catch (error) {
+      console.error("Error registering user:", error);
+      setRegisterMessage("Error registering user");
+    }
   };
 
   return (
@@ -101,25 +117,47 @@ function Registering() {
         gap={convertPx(20)}
         width={convertPx(350)}
       >
-        <Field.Root>
-          <Field.Label>Full name</Field.Label>
-          <InputField
-            h={convertPx(50)}
-            type="text"
-            placeholder="Example: JohnDoe"
-            name="name"
-            value={userName}
-            bg="white"
-            boxShadow={
-              isUserNameValid === "false"
-                ? "inset 0 0 0 1px var(--chakra-colors-status-red)"
-                : isUserNameValid === "true"
-                ? "inset 0 0 0 1px var(--chakra-colors-status-green)"
-                : ""
-            }
-            onChange={handleChangeValidation}
-          />
-        </Field.Root>
+        <HStack>
+          <Field.Root>
+            <Field.Label>First name</Field.Label>
+            <InputField
+              h={convertPx(50)}
+              type="text"
+              placeholder="Example: John"
+              name="firstName"
+              value={firstName}
+              bg="white"
+              boxShadow={
+                isUserNameValid === "false"
+                  ? "inset 0 0 0 1px var(--chakra-colors-status-red)"
+                  : isUserNameValid === "true"
+                  ? "inset 0 0 0 1px var(--chakra-colors-status-green)"
+                  : ""
+              }
+              onChange={handleChangeValidation}
+            />
+          </Field.Root>
+
+          <Field.Root>
+            <Field.Label>Last name</Field.Label>
+            <InputField
+              h={convertPx(50)}
+              type="text"
+              placeholder="Example: Doe"
+              name="lastName"
+              value={lastName}
+              bg="white"
+              boxShadow={
+                isUserNameValid === "false"
+                  ? "inset 0 0 0 1px var(--chakra-colors-status-red)"
+                  : isUserNameValid === "true"
+                  ? "inset 0 0 0 1px var(--chakra-colors-status-green)"
+                  : ""
+              }
+              onChange={handleChangeValidation}
+            />
+          </Field.Root>
+        </HStack>
 
         <Field.Root>
           <Field.Label>Email</Field.Label>
@@ -134,6 +172,26 @@ function Registering() {
               isEmailValid === "false"
                 ? "inset 0 0 0 1px var(--chakra-colors-status-red)"
                 : isEmailValid === "true"
+                ? "inset 0 0 0 1px var(--chakra-colors-status-green)"
+                : ""
+            }
+            onChange={handleChangeValidation}
+          />
+        </Field.Root>
+
+        <Field.Root>
+          <Field.Label>Birthday</Field.Label>
+          <InputField
+            h={convertPx(50)}
+            type="date"
+            placeholder="Birthday"
+            name="birthday"
+            value={birthday}
+            bg="white"
+            boxShadow={
+              isBirthdayValid === "false"
+                ? "inset 0 0 0 1px var(--chakra-colors-status-red)"
+                : isBirthdayValid === "true"
                 ? "inset 0 0 0 1px var(--chakra-colors-status-green)"
                 : ""
             }
@@ -191,6 +249,18 @@ function Registering() {
             {registerMessage}
           </Text>
         )}
+        {errorMessage !== "" && (
+          <Text
+            color="red"
+            fontSize={convertPx(12)}
+            fontWeight="400"
+            m="0"
+            textAlign="center"
+            width="100%"
+          >
+            {errorMessage}
+          </Text>
+        )}
       </Fieldset.Content>
 
       <ButtonItem
@@ -235,4 +305,4 @@ function Registering() {
   );
 }
 
-export default Registering;
+export default Registing;

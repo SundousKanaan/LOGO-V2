@@ -9,7 +9,7 @@ import Header from "./components/Header";
 import Pathes from "./global/pathes";
 import Profile from "./pages/Profile";
 import Login from "./pages/Login";
-import Registering from "./pages/Registering";
+import Registing from "./pages/Register";
 
 // Private and Public Route wrappers
 function PrivateRoute() {
@@ -104,7 +104,7 @@ export default function App() {
         {/* Public routes */}
         <Route element={<PublicRoute />}>
           <Route path="/login" element={<Login />} />
-          <Route path="/registering" element={<Registering />} />
+          <Route path="/registering" element={<Registing />} />
         </Route>
         {/* Private routes */}
         <Route element={<PrivateRoute />}>

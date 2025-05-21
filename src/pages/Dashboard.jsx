@@ -25,6 +25,7 @@ export default function Dashboard() {
         alignItems={{ base: "start", lg: "center" }}
         marginBottom={convertPx(20)}
         flexDirection={{ base: "column", md: "row" }}
+        paddingTop={convertPx(2)}
       >
         <Text
           fontWeight="500"

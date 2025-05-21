@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Field, Fieldset, Stack, Text } from "@chakra-ui/react";
+
 import InputField from "../components/mini-components/Inputfield";
 import ButtonItem from "../components/mini-components/ButtonItem";
 import LinkItem from "../components/mini-components/LinkItem";
@@ -9,36 +10,46 @@ import { convertPx } from "../hooks/useConvertPx";
 
 export default function Login() {
   const [isDisabled, setIsDisabled] = useState(true);
-  const [userName, setUserName] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { login, isAuthenticated, loginMessage } = useAuth();
+  const { login, isAuthenticated, errorMessage, setErrorMessage } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (userName != "" && password != "") {
+    if (email != "" && password != "") {
       return setIsDisabled(false);
     }
-  }, [userName, password]);
+  }, [email, password]);
 
   const handleChangeValidation = (e) => {
     const { name, value } = e.target;
-
-    if (name === "name") {
-      setUserName(value);
+    if (name === "email") {
+      setEmail(value);
     }
     if (name === "password") {
       setPassword(value);
     }
+
+    const isUserEmailValid = email !== "" && /^[A-Za-z]+$/.test(email);
+    const isPasswordValid = password.length >= 6 && /^\S+$/.test(password);
+
+    if (!isUserEmailValid && isPasswordValid) {
+      setErrorMessage("Invalid Email address");
+    } else if (isUserEmailValid && !isPasswordValid) {
+      setErrorMessage("Invalid password");
+    } else if (!isUserEmailValid && !isPasswordValid) {
+      setErrorMessage("Invalid Email address and password");
+    }
   };
 
   const handleLogin = () => {
-    login(userName, password);
+    login(email, password);
   };
 
   useEffect(() => {
     if (isAuthenticated) {
       setTimeout(() => {
-        setUserName("");
+        setEmail("");
         setPassword("");
         setIsDisabled(true);
         navigate("/", { replace: true });
@@ -73,13 +84,13 @@ export default function Login() {
         width={convertPx(350)}
       >
         <Field.Root>
-          <Field.Label>Name</Field.Label>
+          <Field.Label>Email</Field.Label>
           <InputField
             h={convertPx(50)}
-            type="text"
-            placeholder="User name"
-            name="name"
-            value={userName}
+            type="email"
+            placeholder="email"
+            name="email"
+            value={email}
             bg={isAuthenticated ? "statusGreenLight" : "white"}
             onChange={handleChangeValidation}
           />
@@ -97,16 +108,16 @@ export default function Login() {
             onChange={handleChangeValidation}
           />
         </Field.Root>
-        {loginMessage && (
+        {errorMessage && (
           <Text
-            color={loginMessage && isAuthenticated ? "green" : "red"}
+            color={errorMessage && isAuthenticated ? "green" : "red"}
             fontSize={convertPx(12)}
             fontWeight="400"
             m="0"
             textAlign="center"
             width="100%"
           >
-            {loginMessage}
+            {errorMessage}
           </Text>
         )}
       </Fieldset.Content>
