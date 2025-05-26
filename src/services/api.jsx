@@ -9,12 +9,9 @@ const api = axios.create({
 });
 
 export const setAuthToken = (token) => {
-  // Set the token in the header for all requests
-  if (!token) {
-    // If no token is provided, remove the token from the header
+  if (token) {
     api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
   } else {
-    // If a token is provided, set it in the header
     delete api.defaults.headers.common["Authorization"];
   }
 };

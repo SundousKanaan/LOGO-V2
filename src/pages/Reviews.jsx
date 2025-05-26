@@ -9,8 +9,6 @@ export default function Reviews() {
   const [viewMode, setViewMode] = useState("grid");
 
   const handleViewModeChange = (mode) => {
-    console.log("View mode changed to:", mode);
-
     setViewMode(mode);
   };
 

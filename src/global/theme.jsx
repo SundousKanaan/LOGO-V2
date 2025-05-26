@@ -75,6 +75,20 @@ const layerStyles = defineLayerStyles({
       border: "none",
     },
   },
+
+  TodoItemLayout: {
+    description: "Todo item layout",
+    value: {
+      w: "100%",
+      h: "fit-content",
+      display: "flex",
+      flexDirection: "column",
+      padding: `${convertPx(12)}`,
+      bg: "white",
+      borderRadius: `${convertPx(8)}`,
+      border: "none",
+    },
+  },
 });
 
 export const system = createSystem(defaultConfig, {
@@ -92,6 +106,7 @@ export const system = createSystem(defaultConfig, {
         lightBlue: { value: "#F4F6F7" },
         infoNotic: { value: "#ff4a4a" },
         lightBlack: { value: "#00000050" },
+        lightThemeColor: { value: "#9999ff" },
 
         statusRed: { value: "#ff4a4a" },
         statusRedLight: { value: "#FDE8E8" },

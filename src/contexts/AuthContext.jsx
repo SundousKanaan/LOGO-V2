@@ -29,6 +29,8 @@ export function AuthProvider({ children }) {
         setCurrentUser({
           uid: user.uid,
           email: user.email,
+          firstName: matchedUser?.first_name,
+          lastName: matchedUser?.last_name,
           displayName: user.displayName,
           photo: matchedUser?.photoURL,
           role: matchedUser?.user_type,
@@ -121,4 +123,5 @@ export function AuthProvider({ children }) {
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => useContext(AuthContext);

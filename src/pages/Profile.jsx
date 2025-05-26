@@ -1,54 +1,82 @@
-import { useEffect } from "react";
-import { Grid, GridItem, Avatar } from "@chakra-ui/react";
+import { useEffect, useState } from "react";
+import {
+  Flex,
+  Spacer,
+  SimpleGrid,
+  GridItem,
+  Box,
+  VStack,
+  HStack,
+} from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import HeadingItem from "../components/mini-components/HeadingItem";
 import ButtonItem from "../components/mini-components/ButtonItem";
 import { LogoutIcon } from "../global/icons";
 import { convertPx } from "../hooks/useConvertPx";
 import { useAuth } from "../contexts/AuthContext";
+import TodoList from "../components/TodoList";
+import RadioButtons from "../components/mini-components/RadioButtons";
+import { useTodolists } from "../services/getTodolists";
 
 export default function Profile() {
   const { currentUser, logout, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const { data: todoList, isLoading } = useTodolists();
+  const [listData, setListData] = useState([]);
+  const [showedList, setShowedList] = useState("");
 
-  const handleLogout = () => {
-    logout();
-  };
+  useEffect(() => {
+    if (isLoading) {
+      return;
+    }
+
+    setListData(todoList);
+  }, [todoList, isLoading]);
+
+  useEffect(() => {
+    if (todoList?.length > 0) {
+      setShowedList(todoList[0].id);
+    } else {
+      setShowedList("");
+    }
+  }, [todoList]);
 
   useEffect(() => {
     if (!isAuthenticated) {
       navigate("/login", { replace: true });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated]);
 
+  const handleLogout = () => {
+    logout();
+  };
+
+  function handleChangeList(value) {
+    setShowedList(value);
+  }
+
   return (
-    <Grid
-      w="100%"
-      h="100%"
-      placeContent="center"
-      justify-items="stretch"
-      rowGap={convertPx(20)}
-    >
-      <GridItem justifySelf="center">
-        <Avatar.Root h={convertPx(150)} w={convertPx(150)}>
-          <Avatar.Fallback />
-          <Avatar.Image
-            src={currentUser?.photo}
-            alt={`${currentUser?.displayName} profile photo`}
-          />
-        </Avatar.Root>
-      </GridItem>
-
-      <GridItem>
-        <HeadingItem textAlign="center">
-          Welcome back {currentUser?.displayName}!
+    <>
+      <Flex
+        w="100%"
+        h={convertPx(40)}
+        placeContent="center"
+        justify-items="stretch"
+        rowGap={convertPx(20)}
+        mb={convertPx(16)}
+      >
+        <HeadingItem
+          textAlign="left"
+          lineHeight={convertPx(40)}
+          fontSize={{ base: convertPx(18), lg: convertPx(24) }}
+        >
+          Welcome back {currentUser?.firstName}!
         </HeadingItem>
-      </GridItem>
-
-      <GridItem w={"100%"}>
+        <Spacer />
         <ButtonItem
           variant="solid"
-          w="100%"
+          w={{ base: convertPx(150), lg: convertPx(200) }}
           bg="themeColor"
           color="white"
           fontWeight="600"
@@ -61,7 +89,38 @@ export default function Profile() {
           <LogoutIcon color="white" boxSize={convertPx(20)} />
           Log out
         </ButtonItem>
-      </GridItem>
-    </Grid>
+      </Flex>
+
+      <RadioButtons
+        data={
+          listData?.map((item) => ({
+            value: item.id,
+            label: item.title,
+          })) || []
+        }
+        sendDataToParent={handleChangeList}
+        openedList={showedList}
+      />
+
+      {isLoading ? (
+        <h1>loading..</h1>
+      ) : listData?.length > 0 ? (
+        <>
+          {listData.map((item, i) => (
+            <TodoList
+              key={i}
+              data={item}
+              display={item.id === showedList ? "flex" : "none"}
+            />
+          ))}
+        </>
+      ) : (
+        listData?.length === 0 && (
+          <HeadingItem fontSize={convertPx(20)} color="gray.500">
+            No todo lists found for you.
+          </HeadingItem>
+        )
+      )}
+    </>
   );
 }
