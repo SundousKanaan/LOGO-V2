@@ -102,7 +102,10 @@ function TodoItem({ data }) {
           <Icon as={FaRegClock} size={convertPx(14)} color={"gray.500"} />
 
           <Text fontSize={convertPx(14)} color={"gray.500"}>
-            1 apr
+            {new Date(data.created_at).toLocaleDateString("nl-NL", {
+              day: "2-digit",
+              month: "short",
+            })}
           </Text>
         </HStack>
 
@@ -115,7 +118,10 @@ function TodoItem({ data }) {
           <Icon as={MdUpdate} size={convertPx(14)} color={"gray.500"} />
 
           <Text fontSize={convertPx(14)} color={"gray.500"}>
-            2 apr
+            {new Date(data.last_modified).toLocaleDateString("nl-NL", {
+              day: "2-digit",
+              month: "short",
+            })}
           </Text>
         </HStack>
       </HStack>

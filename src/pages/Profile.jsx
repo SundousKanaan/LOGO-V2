@@ -1,13 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-  Flex,
-  Spacer,
-  SimpleGrid,
-  GridItem,
-  Box,
-  VStack,
-  HStack,
-} from "@chakra-ui/react";
+import { Flex, Spacer } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import HeadingItem from "../components/mini-components/HeadingItem";
 import ButtonItem from "../components/mini-components/ButtonItem";
@@ -29,17 +21,14 @@ export default function Profile() {
     if (isLoading) {
       return;
     }
-
     setListData(todoList);
   }, [todoList, isLoading]);
 
   useEffect(() => {
-    if (todoList?.length > 0) {
+    if (todoList?.length > 0 && showedList === "") {
       setShowedList(todoList[0].id);
-    } else {
-      setShowedList("");
     }
-  }, [todoList]);
+  }, [todoList, showedList]);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -91,21 +80,20 @@ export default function Profile() {
         </ButtonItem>
       </Flex>
 
-      <RadioButtons
-        data={
-          listData?.map((item) => ({
-            value: item.id,
-            label: item.title,
-          })) || []
-        }
-        sendDataToParent={handleChangeList}
-        openedList={showedList}
-      />
-
       {isLoading ? (
         <h1>loading..</h1>
       ) : listData?.length > 0 ? (
         <>
+          <RadioButtons
+            data={
+              listData?.map((item) => ({
+                value: item.id,
+                label: item.title,
+              })) || []
+            }
+            sendDataToParent={handleChangeList}
+            openedList={showedList}
+          />
           {listData.map((item, i) => (
             <TodoList
               key={i}

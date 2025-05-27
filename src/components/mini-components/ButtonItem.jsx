@@ -5,7 +5,6 @@ export default function ButtonItem({ children, variant, onClick, ...props }) {
   return (
     <Button
       variant={variant}
-      {...props}
       transition={`transform .1s`}
       onClick={onClick}
       _hover={{
@@ -18,6 +17,7 @@ export default function ButtonItem({ children, variant, onClick, ...props }) {
       _focus={{
         boxShadow: `0 0 0 ${convertPx(1)} var(--chakra-colors-theme-color)`,
       }}
+      {...props}
     >
       {children}
     </Button>

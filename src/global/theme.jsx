@@ -87,6 +87,7 @@ const layerStyles = defineLayerStyles({
       bg: "white",
       borderRadius: `${convertPx(8)}`,
       border: "none",
+      boxShadow: `0 0 ${convertPx(4)} rgba(0, 0, 0, 0.1)`,
     },
   },
 });
@@ -106,7 +107,7 @@ export const system = createSystem(defaultConfig, {
         lightBlue: { value: "#F4F6F7" },
         infoNotic: { value: "#ff4a4a" },
         lightBlack: { value: "#00000050" },
-        lightThemeColor: { value: "#9999ff" },
+        lightThemeColor: { value: "#c6c6fb" },
 
         statusRed: { value: "#ff4a4a" },
         statusRedLight: { value: "#FDE8E8" },

@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import { RadioGroup } from "@chakra-ui/react";
 import { convertPx } from "../../hooks/useConvertPx";
 
@@ -12,19 +11,11 @@ import { convertPx } from "../../hooks/useConvertPx";
 function RadioButtons({
   data,
   openedList,
-  withIndicator,
+  withIndicator = false,
   props,
   sendDataToParent,
 }) {
-  withIndicator = withIndicator || false;
-  const [selectedValue, setSelectedValue] = useState("");
-
-  useEffect(() => {
-    setSelectedValue(openedList);
-  }, [openedList]);
-
   function handleSelectChange(e) {
-    setSelectedValue(e.target.value);
     sendDataToParent(e.target.value);
   }
 
@@ -39,15 +30,15 @@ function RadioButtons({
         <RadioGroup.Item
           key={index}
           value={item.value}
-          bg={selectedValue === item.value ? "themeColor" : "transparent"}
-          color={selectedValue === item.value ? "white" : "secondaryColor"}
+          bg={openedList === item.value ? "themeColor" : "transparent"}
+          color={openedList === item.value ? "white" : "secondaryColor"}
           borderRadius={convertPx(4)}
           padding={convertPx(7) + " " + convertPx(12)}
           mr={convertPx(16)}
-          scrollSnapAlign={"start"}
+          scrollSnapAlign={"center"}
           _hover={{
-            cursor: "pointer",
-            bg: "lightThemeColor",
+            cursor: openedList !== item.value && "pointer",
+            bg: openedList !== item.value && "lightThemeColor",
           }}
           {...props}
         >
