@@ -12,6 +12,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { HiMenuAlt2 } from "react-icons/hi";
 import { convertPx } from "../hooks/useConvertPx";
 import { useAuth } from "../contexts/AuthContext";
+import { UsePickRandomColor } from "../hooks/usePickRandomColor";
 
 import Pathes from "../global/pathes";
 import SearchBar from "../components/mini-components/SearchBar";
@@ -109,7 +110,7 @@ export default function Header({ toggleNavbar }) {
             onClick={() => navigate(`/profile/${userName}`, { replace: true })}
             cursor="pointer"
           >
-            <Avatar.Root>
+            <Avatar.Root colorPalette={UsePickRandomColor(userName)}>
               <Avatar.Fallback />
               <Avatar.Image src={imgSrc} alt={`${userName} profile photo`} />
             </Avatar.Root>

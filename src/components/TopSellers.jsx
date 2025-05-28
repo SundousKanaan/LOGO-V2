@@ -1,5 +1,6 @@
 import { Box, HStack, Spacer, List } from "@chakra-ui/react";
 import { convertPx } from "../hooks/useConvertPx";
+import { UsePickRandomColor } from "../hooks/usePickRandomColor";
 import HeadingItem from "../components/mini-components/HeadingItem";
 import SellerMiniBox from "../components/mini-components/SellerMiniBox";
 import LinkItem from "../components/mini-components/LinkItem";

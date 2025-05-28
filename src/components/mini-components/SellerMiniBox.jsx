@@ -6,8 +6,10 @@ import {
   HStack,
   Flex,
   Spacer,
+  Avatar,
 } from "@chakra-ui/react";
 import { convertPx } from "../../hooks/useConvertPx";
+import { UsePickRandomColor } from "../../hooks/usePickRandomColor";
 
 import HeadingItem from "./HeadingItem";
 
@@ -19,13 +21,10 @@ export default function SellerMiniBox({ name, company, listing, img }) {
   return (
     <Flex align="center">
       <HStack align="center">
-        <Image
-          src={`/src/assets/${img}.svg`}
-          alt="seller"
-          boxSize={convertPx(36)}
-          objectFit="cover"
-          borderRadius={convertPx(10)}
-        />
+        <Avatar.Root shape="rounded" colorPalette={UsePickRandomColor(name)}>
+          <Avatar.Fallback />
+          <Avatar.Image src={img} alt={`${name} profile photo`} />
+        </Avatar.Root>
         <VStack align="start" spacing={convertPx(0)} gap={convertPx(0)}>
           <HeadingItem
             fontSize={convertPx(12)}

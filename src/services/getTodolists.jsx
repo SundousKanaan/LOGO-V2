@@ -6,8 +6,10 @@ async function getTodolists(id) {
   const userUid = id.id;
   try {
     const response = await api.get(
-      `/todos/todo_lists/owner/${userUid}/?expand=items`
+      `/todos/todo_lists/user_lists/${userUid}/?expand=items.assignee`
     );
+    console.log("++ API Response:", response.data);
+
     return response.data;
   } catch (error) {
     console.error("++ API Error:", error.response?.data || error.message);

@@ -6,13 +6,14 @@ import {
   Text,
   Icon,
   Avatar,
+  AvatarGroup,
   Select,
   createListCollection,
 } from "@chakra-ui/react";
+import { UsePickRandomColor } from "../../hooks/usePickRandomColor";
 import { convertPx } from "../../hooks/useConvertPx";
 import { FaRegClock } from "react-icons/fa6";
 import { MdUpdate } from "react-icons/md";
-import { useAuth } from "../../contexts/AuthContext";
 import { useQueryClient } from "react-query";
 import { putTodoItem } from "../../services/putTodoItem";
 import HeadingItem from "./HeadingItem";
@@ -26,11 +27,11 @@ function TodoItem({ data }) {
       { label: "Done", value: "done" },
     ],
   });
-  const { currentUser } = useAuth();
   const queryClient = useQueryClient();
   const [currentStatus, setCurrentStatus] = useState(
     status.items.find((item) => item.value === data.status) || status.items[0]
   );
+
   const handleChange = async (newValue) => {
     setCurrentStatus(newValue.items[0]);
     const req = {
@@ -74,13 +75,24 @@ function TodoItem({ data }) {
         pb={convertPx(8)}
         mt={convertPx(8)}
       >
-        <Avatar.Root size={"2xs"}>
-          <Avatar.Fallback name={currentUser?.displayName} />
-          <Avatar.Image
-            src={currentUser?.photo}
-            alt={`${currentUser?.displayName} profile photo`}
-          />
-        </Avatar.Root>
+        <AvatarGroup>
+          {data.assignee.map((assigneeItem) => (
+            <Avatar.Root
+              size={"2xs"}
+              borderWidth={convertPx(2)}
+              borderColor={"white"}
+              colorPalette={UsePickRandomColor(`${assigneeItem?.first_name}`)}
+            >
+              <Avatar.Fallback
+                name={`${assigneeItem?.first_name} ${assigneeItem?.last_name}`}
+              />
+              <Avatar.Image
+                src={assigneeItem?.photo}
+                alt={`${assigneeItem?.first_name} ${assigneeItem?.last_name} profile photo`}
+              />
+            </Avatar.Root>
+          ))}
+        </AvatarGroup>
 
         <Spacer />
         <HStack gap={convertPx(5)} p={`${convertPx(2)} ${convertPx(8)}`}>

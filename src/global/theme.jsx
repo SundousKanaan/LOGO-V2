@@ -121,3 +121,12 @@ export const system = createSystem(defaultConfig, {
     layerStyles,
   },
 });
+
+export const colorsPalette = [
+  "red",
+  "blue",
+  "green",
+  "yellow",
+  "purple",
+  "orange",
+];

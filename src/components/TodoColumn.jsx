@@ -8,7 +8,7 @@ import {
   Flex,
   Field,
   Fieldset,
-  Stack,
+  Avatar,
   Text,
   Textarea,
   Select,
@@ -140,8 +140,16 @@ function TodoColumn({ title, data, assignedList }) {
             </HStack>
             <HStack gap={convertPx(20)}>
               <Text w={convertPx(150)}>Assigned to</Text>
-
-              <Text>{currentUser.displayName}</Text>
+              <HStack>
+                <Avatar.Root size="xs">
+                  <Avatar.Fallback />
+                  <Avatar.Image
+                    src={currentUser.photo}
+                    alt={`${currentUser.displayName} profile photo`}
+                  />
+                </Avatar.Root>
+                <Text>{currentUser.displayName}</Text>
+              </HStack>
             </HStack>
             <HStack gap={convertPx(20)}>
               <Text w={convertPx(150)}>Assigned list</Text>
@@ -166,9 +174,9 @@ function TodoColumn({ title, data, assignedList }) {
             <Field.Root>
               <Flex
                 w={"100%"}
-                gap={{ base: convertPx(10), md: convertPx(20) }}
+                gap={{ base: convertPx(10), lg: convertPx(22) }}
                 align={"start"}
-                flexDirection={{ base: "column", md: "row" }}
+                flexDirection={{ base: "column", lg: "row" }}
               >
                 <Field.Label w={convertPx(242)}>Task description</Field.Label>
                 <Textarea
