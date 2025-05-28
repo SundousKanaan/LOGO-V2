@@ -1,6 +1,7 @@
 import Reviews from "../pages/Reviews";
 import NoPage from "../pages/NoPage";
 import Dashboard from "../pages/Dashboard";
+import UserManagement from "../pages/UserManagement";
 
 import {
   HomeIcon,
@@ -53,7 +54,7 @@ const Pathes = [
     path: "/User-management",
     label: "User management",
     icon: UserIcon,
-    element: NoPage,
+    element: UserManagement,
   },
 ];
 
