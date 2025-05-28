@@ -132,7 +132,7 @@ export default function Login() {
         color="white"
         transition="all .5s"
         m="0"
-        _hover={{ width: "100%" }}
+        _hover={{ transform: "scale(1.05)" }}
         disabled={isDisabled}
         onClick={handleLogin}
       >

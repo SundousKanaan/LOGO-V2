@@ -5,12 +5,14 @@ import {
   Icon,
   Center,
   HStack,
+  Flex,
   Field,
   Fieldset,
   Stack,
   Text,
-  Spacer,
   Textarea,
+  Select,
+  createListCollection,
 } from "@chakra-ui/react";
 import { useQueryClient } from "react-query";
 import { FaPlus } from "react-icons/fa";
@@ -20,6 +22,7 @@ import { postTodoItem } from "../services/postTodoItem";
 import HeadingItem from "./mini-components/HeadingItem";
 import ButtonItem from "./mini-components/ButtonItem";
 import InputField from "./mini-components/Inputfield";
+import Dropdown from "./mini-components/Dropdown";
 
 import Popup from "./Popup";
 
@@ -30,8 +33,16 @@ function TodoColumn({ title, data, assignedList }) {
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [newTaskDescription, setNewTaskDescription] = useState("");
   const queryClient = useQueryClient();
-
   const [isFormValid, setIsFormValid] = useState(false);
+  const [newTaskStatus, setNewTaskStatus] = useState(title);
+
+  const taskStatus = createListCollection({
+    items: [
+      { label: "Todo", value: "pending" },
+      { label: "Doing", value: "in_progress" },
+      { label: "Done", value: "done" },
+    ],
+  });
 
   useEffect(() => {
     if (!title) return;
@@ -72,7 +83,7 @@ function TodoColumn({ title, data, assignedList }) {
       await postTodoItem({
         title: newTaskTitle.trim(),
         description: newTaskDescription.trim(),
-        status: title,
+        status: newTaskStatus,
         assignee: currentUser.uid,
         todo_list: data[0].todo_list,
       });
@@ -97,28 +108,35 @@ function TodoColumn({ title, data, assignedList }) {
           <Fieldset.Content>
             <HStack gap={convertPx(20)}>
               <Text w={convertPx(150)}>Status</Text>
-
-              <Text
+              <Dropdown
+                collection={taskStatus}
+                defaultValue={title}
+                handleChange={(value) => {
+                  setNewTaskStatus(value.items[0].value);
+                }}
                 fontWeight={"bold"}
-                bg={
-                  title === "pending"
-                    ? "lightThemeColor"
-                    : title === "in_progress"
-                    ? "statusOrangeLight"
-                    : "statusGreenLight"
-                }
-                color={
-                  title === "pending"
-                    ? "themeColor"
-                    : title === "in_progress"
-                    ? "statusOrange"
-                    : "statusGreen"
-                }
-                p={`${convertPx(2)} ${convertPx(12)}`}
-                borderRadius={convertPx(4)}
+                buttonProps={{
+                  bg:
+                    title === "pending"
+                      ? "lightThemeColor"
+                      : title === "in_progress"
+                      ? "statusOrangeLight"
+                      : "statusGreenLight",
+                  color:
+                    title === "pending"
+                      ? "themeColor"
+                      : title === "in_progress"
+                      ? "statusOrange"
+                      : "statusGreen",
+                  border: "none",
+                }}
               >
-                {colTitle}
-              </Text>
+                {taskStatus.items.map((taskState) => (
+                  <Select.Item item={taskState} key={taskState.value}>
+                    <Select.ItemText>{taskState.label}</Select.ItemText>
+                  </Select.Item>
+                ))}
+              </Dropdown>
             </HStack>
             <HStack gap={convertPx(20)}>
               <Text w={convertPx(150)}>Assigned to</Text>
@@ -146,7 +164,12 @@ function TodoColumn({ title, data, assignedList }) {
               </HStack>
             </Field.Root>
             <Field.Root>
-              <HStack gap={convertPx(20)} align={"start"}>
+              <Flex
+                w={"100%"}
+                gap={{ base: convertPx(10), md: convertPx(20) }}
+                align={"start"}
+                flexDirection={{ base: "column", md: "row" }}
+              >
                 <Field.Label w={convertPx(242)}>Task description</Field.Label>
                 <Textarea
                   w={"100%"}
@@ -158,7 +181,7 @@ function TodoColumn({ title, data, assignedList }) {
                   pb={convertPx(8)}
                   onChange={handleInputChange}
                 />
-              </HStack>
+              </Flex>
             </Field.Root>
           </Fieldset.Content>
         </Fieldset.Root>

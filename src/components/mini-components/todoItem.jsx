@@ -6,17 +6,17 @@ import {
   Text,
   Icon,
   Avatar,
-  Portal,
   Select,
   createListCollection,
 } from "@chakra-ui/react";
-import { useQueryClient } from "react-query";
 import { convertPx } from "../../hooks/useConvertPx";
 import { FaRegClock } from "react-icons/fa6";
 import { MdUpdate } from "react-icons/md";
 import { useAuth } from "../../contexts/AuthContext";
-import HeadingItem from "./HeadingItem";
+import { useQueryClient } from "react-query";
 import { putTodoItem } from "../../services/putTodoItem";
+import HeadingItem from "./HeadingItem";
+import Dropdown from "./Dropdown";
 
 function TodoItem({ data }) {
   const status = createListCollection({
@@ -27,11 +27,10 @@ function TodoItem({ data }) {
     ],
   });
   const { currentUser } = useAuth();
+  const queryClient = useQueryClient();
   const [currentStatus, setCurrentStatus] = useState(
     status.items.find((item) => item.value === data.status) || status.items[0]
   );
-  const queryClient = useQueryClient();
-
   const handleChange = async (newValue) => {
     setCurrentStatus(newValue.items[0]);
     const req = {
@@ -52,32 +51,18 @@ function TodoItem({ data }) {
           {data.title}
         </HeadingItem>
         <Spacer />
-        <Select.Root
+        <Dropdown
           collection={status}
-          width={convertPx(100)}
-          defaultValue={[currentStatus.value]}
-          onValueChange={handleChange}
+          defaultValue={currentStatus.value}
+          handleChange={handleChange}
+          withIndicator
         >
-          <Select.Control>
-            <Select.Trigger>
-              <Select.ValueText placeholder="Select status" />
-            </Select.Trigger>
-            <Select.IndicatorGroup>
-              <Select.Indicator />
-            </Select.IndicatorGroup>
-          </Select.Control>
-          <Portal>
-            <Select.Positioner>
-              <Select.Content>
-                {status.items.map((state) => (
-                  <Select.Item item={state} key={state.value}>
-                    <Select.ItemText>{state.label}</Select.ItemText>
-                  </Select.Item>
-                ))}
-              </Select.Content>
-            </Select.Positioner>
-          </Portal>
-        </Select.Root>
+          {status.items.map((state) => (
+            <Select.Item item={state} key={state.value}>
+              <Select.ItemText>{state.label}</Select.ItemText>
+            </Select.Item>
+          ))}
+        </Dropdown>
       </HStack>
       <Text color="gray.500" fontSize={convertPx(14)}>
         {data.description}

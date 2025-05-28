@@ -62,7 +62,7 @@ function PrivateLayouts() {
         left={{ base: "0", md: "auto" }}
         bottom={{ base: "0", md: "auto" }}
         right={{ base: "0", md: "auto" }}
-        zIndex="9999"
+        zIndex="1000"
         bg={{ base: "inherit", md: "white" }}
         h={{ base: `calc(100% - ${convertPx(60)})`, md: "100%" }}
         transition="0.3s"

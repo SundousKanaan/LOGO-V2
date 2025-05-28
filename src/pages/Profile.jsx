@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
 import { Flex, Spacer } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
-import HeadingItem from "../components/mini-components/HeadingItem";
-import ButtonItem from "../components/mini-components/ButtonItem";
 import { LogoutIcon } from "../global/icons";
-import { convertPx } from "../hooks/useConvertPx";
 import { useAuth } from "../contexts/AuthContext";
+import { convertPx } from "../hooks/useConvertPx";
+import { useTodolists } from "../services/getTodolists";
+import ButtonItem from "../components/mini-components/ButtonItem";
+import HeadingItem from "../components/mini-components/HeadingItem";
 import TodoList from "../components/TodoList";
 import RadioButtons from "../components/mini-components/RadioButtons";
-import { useTodolists } from "../services/getTodolists";
 
 export default function Profile() {
   const { currentUser, logout, isAuthenticated } = useAuth();

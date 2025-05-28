@@ -273,7 +273,7 @@ function Registing() {
         color="white"
         transition="all .5s"
         m="0"
-        _hover={{ width: "100%" }}
+        _hover={{ transform: "scale(1.05)" }}
         onClick={handleRegister}
         _active={{
           transform: "scale(0.9)",
