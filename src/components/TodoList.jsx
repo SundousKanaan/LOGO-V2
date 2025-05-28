@@ -24,7 +24,12 @@ function TodoList({ data, ...props }) {
         {...props}
       >
         {colTitels.map((colTitle, index) => (
-          <TodoColumn key={index} title={colTitle} data={data.items} />
+          <TodoColumn
+            key={index}
+            title={colTitle}
+            data={data.items}
+            assignedList={data.title}
+          />
         ))}
       </Flex>
     </>
