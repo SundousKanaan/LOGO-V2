@@ -2,6 +2,7 @@ import { useState } from "react";
 import {
   Flex,
   HStack,
+  VStack,
   Spacer,
   Text,
   Icon,
@@ -10,7 +11,8 @@ import {
   Select,
   createListCollection,
 } from "@chakra-ui/react";
-import { MdOutlineDeleteForever } from "react-icons/md";
+// import { MdOutlineDeleteForever } from "react-icons/md";
+import { IoCloseCircleOutline } from "react-icons/io5";
 import { UsePickRandomColor } from "../../hooks/usePickRandomColor";
 import { convertPx } from "../../hooks/useConvertPx";
 import { FaRegClock } from "react-icons/fa6";
@@ -74,23 +76,43 @@ function TodoItem({ data }) {
         <HStack
           borderBottom={`${convertPx(1)} solid var(--chakra-colors-gray-200)`}
           pb={convertPx(8)}
+          alignItems={"start"}
         >
-          <HeadingItem fontSize={convertPx(16)} lineHeight={1.5}>
-            {data.title}
-          </HeadingItem>
+          <VStack alignItems="start">
+            <HeadingItem fontSize={convertPx(16)} lineHeight={1.5}>
+              {data.title}
+            </HeadingItem>{" "}
+            <Dropdown
+              collection={status}
+              defaultValue={currentStatus.value}
+              handleChange={handleChange}
+              withIndicator
+              fontWeight={600}
+              bg={
+                data.status === "pending"
+                  ? "lightThemeColor"
+                  : data.status === "in_progress"
+                  ? "statusOrangeLight"
+                  : "statusGreenLight"
+              }
+              color={
+                data.status === "pending"
+                  ? "themeColor"
+                  : data.status === "in_progress"
+                  ? "statusOrange"
+                  : "statusGreen"
+              }
+              borderRadius={convertPx(4)}
+              buttonProps={{ borderColor: "transparent" }}
+            >
+              {status.items.map((state) => (
+                <Select.Item item={state} key={state.value}>
+                  <Select.ItemText>{state.label}</Select.ItemText>
+                </Select.Item>
+              ))}
+            </Dropdown>
+          </VStack>
           <Spacer />
-          <Dropdown
-            collection={status}
-            defaultValue={currentStatus.value}
-            handleChange={handleChange}
-            withIndicator
-          >
-            {status.items.map((state) => (
-              <Select.Item item={state} key={state.value}>
-                <Select.ItemText>{state.label}</Select.ItemText>
-              </Select.Item>
-            ))}
-          </Dropdown>
           <ButtonItem
             variant="ghost"
             size="md"
@@ -99,7 +121,7 @@ function TodoItem({ data }) {
             pr={convertPx(8)}
             onClick={() => confirmDelete(data.title)}
           >
-            <Icon as={MdOutlineDeleteForever} color="secondaryColor" />
+            <Icon as={IoCloseCircleOutline} color="secondaryColor" />
           </ButtonItem>
         </HStack>
         <Text

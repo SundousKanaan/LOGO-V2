@@ -113,21 +113,22 @@ function TodoColumn({ title, data, assignedList }) {
               <Dropdown
                 collection={taskStatus}
                 defaultValue={title}
+                withIndicator
                 handleChange={(value) => {
                   setNewTaskStatus(value.items[0].value);
                 }}
                 fontWeight={"bold"}
                 buttonProps={{
                   bg:
-                    title === "pending"
+                    newTaskStatus === "pending"
                       ? "lightThemeColor"
-                      : title === "in_progress"
+                      : newTaskStatus === "in_progress"
                       ? "statusOrangeLight"
                       : "statusGreenLight",
                   color:
-                    title === "pending"
+                    newTaskStatus === "pending"
                       ? "themeColor"
-                      : title === "in_progress"
+                      : newTaskStatus === "in_progress"
                       ? "statusOrange"
                       : "statusGreen",
                   border: "none",
