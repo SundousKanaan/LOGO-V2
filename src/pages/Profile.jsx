@@ -10,6 +10,7 @@ import HeadingItem from "../components/mini-components/HeadingItem";
 import TodoList from "../components/TodoList";
 import RadioButtons from "../components/mini-components/RadioButtons";
 
+
 export default function Profile() {
   const { currentUser, logout, isAuthenticated } = useAuth();
   const navigate = useNavigate();

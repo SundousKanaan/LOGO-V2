@@ -1,7 +1,15 @@
 import { Dialog, Portal, CloseButton, Button } from "@chakra-ui/react";
-import { convertPx } from "../hooks/useConvertPx";
+import { convertPx } from "../../hooks/useConvertPx";
 
-function Popup({ isOpen, onClose, onSave, disableSaveButton, children }) {
+function Popup({
+  title,
+  isOpen,
+  onClose,
+  onSave,
+  disableSaveButton,
+  ActionButtonText = "Save",
+  children,
+}) {
   return (
     <Dialog.Root open={isOpen} scrollBehavior="outside">
       <Portal>
@@ -9,7 +17,7 @@ function Popup({ isOpen, onClose, onSave, disableSaveButton, children }) {
         <Dialog.Positioner>
           <Dialog.Content width="90%">
             <Dialog.Header>
-              <Dialog.Title>New Task</Dialog.Title>
+              <Dialog.Title>{title}</Dialog.Title>
             </Dialog.Header>
 
             <Dialog.Body>{children}</Dialog.Body>
@@ -26,7 +34,7 @@ function Popup({ isOpen, onClose, onSave, disableSaveButton, children }) {
                 onClick={onSave}
                 disabled={disableSaveButton}
               >
-                Save
+                {ActionButtonText}
               </Button>
             </Dialog.Footer>
 

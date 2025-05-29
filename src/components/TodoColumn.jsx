@@ -19,12 +19,14 @@ import { FaPlus } from "react-icons/fa";
 import { convertPx } from "../hooks/useConvertPx";
 import { useAuth } from "../contexts/AuthContext";
 import { postTodoItem } from "../services/postTodoItem";
+import { UsePickRandomColor } from "../hooks/usePickRandomColor";
+
 import HeadingItem from "./mini-components/HeadingItem";
 import ButtonItem from "./mini-components/ButtonItem";
 import InputField from "./mini-components/Inputfield";
 import Dropdown from "./mini-components/Dropdown";
 
-import Popup from "./Popup";
+import Popup from "./mini-components/Popup";
 
 function TodoColumn({ title, data, assignedList }) {
   const [colTitle, setColTitle] = useState();
@@ -63,8 +65,6 @@ function TodoColumn({ title, data, assignedList }) {
 
   function handleInputChange(e) {
     const value = e.target.value;
-    console.log(e.target.name);
-
     if (e.target.name === "taskTitle") {
       setNewTaskTitle(value);
     } else if (e.target.name === "taskDescription") {
@@ -78,15 +78,16 @@ function TodoColumn({ title, data, assignedList }) {
     );
   }, [newTaskTitle, newTaskDescription]);
 
-  async function saveTask() {
+  async function saveTask(listUid) {
     if (isFormValid) {
-      await postTodoItem({
+      const req = {
         title: newTaskTitle.trim(),
         description: newTaskDescription.trim(),
         status: newTaskStatus,
-        assignee: currentUser.uid,
-        todo_list: data[0].todo_list,
-      });
+        assignee: [currentUser.uid], // assignee is an array of user IDs
+        todo_list: listUid,
+      };
+      await postTodoItem(req);
       queryClient.invalidateQueries("dbTodolists");
       handleOpenPopup();
       setNewTaskTitle("");
@@ -97,11 +98,12 @@ function TodoColumn({ title, data, assignedList }) {
   return (
     <>
       <Popup
+        title={"New Task"}
         isOpen={isPopupOpen}
-        onClose={handleOpenPopup}
         selectedCol={title}
         colTitle={colTitle}
-        onSave={saveTask}
+        onSave={() => saveTask(assignedList.uid)}
+        onClose={() => handleOpenPopup()}
         disableSaveButton={!isFormValid}
       >
         <Fieldset.Root>
@@ -141,7 +143,10 @@ function TodoColumn({ title, data, assignedList }) {
             <HStack gap={convertPx(20)}>
               <Text w={convertPx(150)}>Assigned to</Text>
               <HStack>
-                <Avatar.Root size="xs">
+                <Avatar.Root
+                  size="xs"
+                  colorPalette={UsePickRandomColor(currentUser.displayName)}
+                >
                   <Avatar.Fallback />
                   <Avatar.Image
                     src={currentUser.photo}
@@ -154,7 +159,7 @@ function TodoColumn({ title, data, assignedList }) {
             <HStack gap={convertPx(20)}>
               <Text w={convertPx(150)}>Assigned list</Text>
 
-              <Text>{assignedList}</Text>
+              <Text>{assignedList.title}</Text>
             </HStack>
             <Field.Root>
               <HStack gap={convertPx(20)} align={"start"}>

@@ -28,7 +28,7 @@ function TodoList({ data, ...props }) {
             key={index}
             title={colTitle}
             data={data.items}
-            assignedList={data.title}
+            assignedList={{ title: data.title, uid: data.id }}
           />
         ))}
       </Flex>

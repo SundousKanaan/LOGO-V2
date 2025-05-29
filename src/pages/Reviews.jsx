@@ -18,7 +18,6 @@ export default function Reviews() {
         height={{ base: "fit-content", lg: convertPx(45) }}
         alignItems={{ base: "start", lg: "center" }}
         marginBottom={convertPx(24)}
-        flexDirection={{ base: "column", md: "row" }}
       >
         <Text
           fontSize={convertPx(18)}
@@ -33,7 +32,7 @@ export default function Reviews() {
 
         <HStack
           spacing={convertPx(8)}
-          width={{ base: "fit-content", sm: "100%", md: "fit-content" }}
+          width="fit-content"
           justifyContent="space-between"
         >
           <ButtonGroup variant="solid" spacing={convertPx(12)}>

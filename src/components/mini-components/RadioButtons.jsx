@@ -30,7 +30,7 @@ function RadioButtons({
         <RadioGroup.Item
           key={index}
           value={item.value}
-          bg={openedList === item.value ? "themeColor" : "transparent"}
+          bg={openedList === item.value ? "themeColor" : "white"}
           color={openedList === item.value ? "white" : "secondaryColor"}
           borderRadius={convertPx(4)}
           padding={convertPx(7) + " " + convertPx(12)}
