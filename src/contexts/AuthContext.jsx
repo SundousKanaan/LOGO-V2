@@ -3,8 +3,8 @@ import { loginUser, logoutUser } from "../firebase/authService";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { setAuthToken } from "../services/api";
 // import login function from firebase
-import { postUser } from "../services/postUser";
-import { useUsers } from "../services/getUsers";
+import { postUser } from "../services/users/postUser";
+import { useUsers } from "../services/users/getUsers";
 
 const AuthContext = createContext();
 
@@ -37,6 +37,7 @@ export function AuthProvider({ children }) {
         });
         const token = await user.getIdToken();
         setAuthToken(token); // set the token in the header
+
         localStorage.setItem("isAuthenticated", true);
         setIsAuthenticated(true);
       } else {

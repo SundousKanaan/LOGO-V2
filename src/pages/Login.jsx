@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Field, Fieldset, Stack, Text } from "@chakra-ui/react";
 
-import InputField from "../components/mini-components/Inputfield";
+import InputField from "../components/mini-components/InputField";
 import ButtonItem from "../components/mini-components/ButtonItem";
 import LinkItem from "../components/mini-components/LinkItem";
 import { useAuth } from "../contexts/AuthContext";
@@ -92,6 +92,7 @@ export default function Login() {
             name="email"
             value={email}
             bg={isAuthenticated ? "statusGreenLight" : "white"}
+            color="secondaryColor"
             onChange={handleChangeValidation}
           />
         </Field.Root>
@@ -105,6 +106,7 @@ export default function Login() {
             name="password"
             value={password}
             bg={isAuthenticated ? "statusGreenLight" : "white"}
+            color="secondaryColor"
             onChange={handleChangeValidation}
           />
         </Field.Root>

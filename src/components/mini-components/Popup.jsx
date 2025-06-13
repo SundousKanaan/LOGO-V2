@@ -33,6 +33,7 @@ function Popup({
                 bg={"themeColor"}
                 onClick={onSave}
                 disabled={disableSaveButton}
+                textTransform={"capitalize"}
               >
                 {ActionButtonText}
               </Button>

@@ -1,16 +1,16 @@
 import { useQuery } from "react-query";
-import { useAuth } from "../contexts/AuthContext";
-import api from "./api";
+import { useAuth } from "../../contexts/AuthContext";
+import api from "../api";
 
 async function getTodolists(id) {
   const userUid = id.id;
   try {
     const response = await api.get(
-      `/todos/todo_lists/user_lists/${userUid}/?expand=items.assignee`
+      `/todos/todo_lists/user_lists/${userUid}/?expand=items.assignee,owner`
     );
     return response.data;
   } catch (error) {
-    console.error("++ API Error:", error.response?.data || error.message);
+    console.error("API Error:", error.response?.data || error.message);
     throw error;
   }
 }

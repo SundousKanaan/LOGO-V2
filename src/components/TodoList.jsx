@@ -2,7 +2,7 @@ import { Flex } from "@chakra-ui/react";
 import { convertPx } from "../hooks/useConvertPx";
 import TodoColumn from "./TodoColumn";
 
-function TodoList({ data, ...props }) {
+function TodoList({ listData, isEditable, ...props }) {
   const colTitels = ["pending", "in_progress", "done"];
 
   return (
@@ -27,8 +27,9 @@ function TodoList({ data, ...props }) {
           <TodoColumn
             key={index}
             title={colTitle}
-            data={data.items}
-            assignedList={{ title: data.title, uid: data.id }}
+            data={listData}
+            assignedList={{ title: listData.title, uid: listData.id }}
+            isEditable={isEditable}
           />
         ))}
       </Flex>

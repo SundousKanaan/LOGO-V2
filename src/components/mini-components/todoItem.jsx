@@ -11,21 +11,24 @@ import {
   Select,
   createListCollection,
 } from "@chakra-ui/react";
-// import { MdOutlineDeleteForever } from "react-icons/md";
 import { IoCloseCircleOutline } from "react-icons/io5";
 import { UsePickRandomColor } from "../../hooks/usePickRandomColor";
 import { convertPx } from "../../hooks/useConvertPx";
 import { FaRegClock } from "react-icons/fa6";
-import { MdUpdate } from "react-icons/md";
+import { MdUpdate, MdModeEdit } from "react-icons/md";
 import { useQueryClient } from "react-query";
-import { putTodoItem } from "../../services/updateTodoItem";
-import { deleteTodoItem } from "../../services/deleteTodoItem";
+import { updateTodoItem } from "../../services/todoItem/updateTodoItem";
+import { deleteTodoItem } from "../../services/todoItem/deleteTodoItem";
 import HeadingItem from "./HeadingItem";
 import Dropdown from "./Dropdown";
 import ButtonItem from "./ButtonItem";
 import Popup from "./Popup";
 
-function TodoItem({ data }) {
+function TodoItem({ data, isEditable }) {
+  const queryClient = useQueryClient();
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [popupTitle, setPopupTitle] = useState("");
+
   const status = createListCollection({
     items: [
       { label: "Todo", value: "pending" },
@@ -33,14 +36,11 @@ function TodoItem({ data }) {
       { label: "Done", value: "done" },
     ],
   });
-  const queryClient = useQueryClient();
   const [currentStatus, setCurrentStatus] = useState(
     status.items.find((item) => item.value === data.status) || status.items[0]
   );
-  const [isPopupOpen, setIsPopupOpen] = useState(false);
-  const [poupTitle, setPopupTitle] = useState("");
 
-  const handleChange = async (newValue) => {
+  async function handleChange(newValue) {
     setCurrentStatus(newValue.items[0]);
     const req = {
       method: "PUT",
@@ -54,9 +54,9 @@ function TodoItem({ data }) {
       },
     };
 
-    await putTodoItem(req);
+    await updateTodoItem(req);
     queryClient.invalidateQueries("dbTodolists");
-  };
+  }
 
   function confirmDelete(name) {
     setIsPopupOpen(true);
@@ -76,6 +76,7 @@ function TodoItem({ data }) {
         <HStack
           borderBottom={`${convertPx(1)} solid var(--chakra-colors-gray-200)`}
           pb={convertPx(8)}
+          gap={convertPx(4)}
           alignItems={"start"}
         >
           <VStack alignItems="start">
@@ -105,8 +106,8 @@ function TodoItem({ data }) {
               borderRadius={convertPx(4)}
               buttonProps={{ borderColor: "transparent" }}
             >
-              {status.items.map((state) => (
-                <Select.Item item={state} key={state.value}>
+              {status.items.map((state, index) => (
+                <Select.Item item={state} key={index}>
                   <Select.ItemText>{state.label}</Select.ItemText>
                 </Select.Item>
               ))}
@@ -119,7 +120,22 @@ function TodoItem({ data }) {
             h={convertPx(30)}
             pl={convertPx(8)}
             pr={convertPx(8)}
+            onClick={() => {
+              // Logic to handle edit action
+              console.log("Edit task:", data.id);
+            }}
+            display={isEditable ? "flex" : "none"}
+          >
+            <Icon as={MdModeEdit} color="secondaryColor" />
+          </ButtonItem>
+          <ButtonItem
+            variant="ghost"
+            size="md"
+            h={convertPx(30)}
+            pl={convertPx(8)}
+            pr={convertPx(8)}
             onClick={() => confirmDelete(data.title)}
+            display={isEditable ? "flex" : "none"}
           >
             <Icon as={IoCloseCircleOutline} color="secondaryColor" />
           </ButtonItem>
@@ -140,20 +156,20 @@ function TodoItem({ data }) {
           mt={convertPx(8)}
         >
           <AvatarGroup>
-            {data.assignee.map((assigneeItem) => (
+            {data.assignee.map((assigneeUser, index) => (
               <Avatar.Root
-                key={assigneeItem.first_name}
+                key={index}
                 size={"2xs"}
                 borderWidth={convertPx(2)}
                 borderColor={"white"}
-                colorPalette={UsePickRandomColor(`${assigneeItem?.first_name}`)}
+                colorPalette={UsePickRandomColor(`${assigneeUser?.first_name}`)}
               >
                 <Avatar.Fallback
-                  name={`${assigneeItem?.first_name} ${assigneeItem?.last_name}`}
+                  name={`${assigneeUser?.first_name} ${assigneeUser?.last_name}`}
                 />
                 <Avatar.Image
-                  src={assigneeItem?.photo}
-                  alt={`${assigneeItem?.first_name} ${assigneeItem?.last_name} profile photo`}
+                  src={assigneeUser?.photo}
+                  alt={`${assigneeUser?.first_name} ${assigneeUser?.last_name} profile photo`}
                 />
               </Avatar.Root>
             ))}
@@ -190,7 +206,7 @@ function TodoItem({ data }) {
       </Flex>
       <Popup
         isOpen={isPopupOpen}
-        title={`Delete ${poupTitle}`}
+        title={`Delete ${popupTitle}`}
         ActionButtonText="Delete task"
         onClose={() => setIsPopupOpen(false)}
         onSave={() => {

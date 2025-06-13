@@ -1,50 +1,25 @@
 import { useEffect, useState } from "react";
 import TodoItem from "./mini-components/todoItem";
-import {
-  VStack,
-  Icon,
-  Center,
-  HStack,
-  Flex,
-  Field,
-  Fieldset,
-  Avatar,
-  Text,
-  Textarea,
-  Select,
-  createListCollection,
-} from "@chakra-ui/react";
+import { VStack, Icon, Center, HStack } from "@chakra-ui/react";
 import { useQueryClient } from "react-query";
 import { FaPlus } from "react-icons/fa";
 import { convertPx } from "../hooks/useConvertPx";
-import { useAuth } from "../contexts/AuthContext";
-import { postTodoItem } from "../services/postTodoItem";
-import { UsePickRandomColor } from "../hooks/usePickRandomColor";
+import { postTodoItem } from "../services/todoItem/postTodoItem";
 
 import HeadingItem from "./mini-components/HeadingItem";
 import ButtonItem from "./mini-components/ButtonItem";
-import InputField from "./mini-components/Inputfield";
-import Dropdown from "./mini-components/Dropdown";
-
+import AddNewTodoItem from "./forms-components/AddNewTodoItem";
 import Popup from "./mini-components/Popup";
 
-function TodoColumn({ title, data, assignedList }) {
+function TodoColumn({ title, data, assignedList, isEditable }) {
+  const queryClient = useQueryClient();
   const [colTitle, setColTitle] = useState();
   const [isPopupOpen, setIsPopupOpen] = useState(false);
-  const { currentUser } = useAuth();
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [newTaskDescription, setNewTaskDescription] = useState("");
-  const queryClient = useQueryClient();
   const [isFormValid, setIsFormValid] = useState(false);
   const [newTaskStatus, setNewTaskStatus] = useState(title);
-
-  const taskStatus = createListCollection({
-    items: [
-      { label: "Todo", value: "pending" },
-      { label: "Doing", value: "in_progress" },
-      { label: "Done", value: "done" },
-    ],
-  });
+  const [assigneeUsers, setAssigneeUsers] = useState([]);
 
   useEffect(() => {
     if (!title) return;
@@ -72,6 +47,16 @@ function TodoColumn({ title, data, assignedList }) {
     }
   }
 
+  function handleCheckboxChange(e) {
+    setAssigneeUsers((prev) => {
+      if (prev.includes(e.target.value)) {
+        return prev.filter((id) => id !== e.target.value);
+      } else {
+        return [...prev, e.target.value];
+      }
+    });
+  }
+
   useEffect(() => {
     setIsFormValid(
       newTaskTitle.trim() !== "" && newTaskDescription.trim() !== ""
@@ -84,7 +69,7 @@ function TodoColumn({ title, data, assignedList }) {
         title: newTaskTitle.trim(),
         description: newTaskDescription.trim(),
         status: newTaskStatus,
-        assignee: [currentUser.uid], // assignee is an array of user IDs
+        assignee: assigneeUsers, // assignee is an array of user IDs
         todo_list: listUid,
       };
       await postTodoItem(req);
@@ -97,110 +82,6 @@ function TodoColumn({ title, data, assignedList }) {
 
   return (
     <>
-      <Popup
-        title={"New Task"}
-        isOpen={isPopupOpen}
-        selectedCol={title}
-        colTitle={colTitle}
-        onSave={() => saveTask(assignedList.uid)}
-        onClose={() => handleOpenPopup()}
-        disableSaveButton={!isFormValid}
-      >
-        <Fieldset.Root>
-          <Fieldset.Content>
-            <HStack gap={convertPx(20)}>
-              <Text w={convertPx(150)}>Status</Text>
-              <Dropdown
-                collection={taskStatus}
-                defaultValue={title}
-                withIndicator
-                handleChange={(value) => {
-                  setNewTaskStatus(value.items[0].value);
-                }}
-                fontWeight={"bold"}
-                buttonProps={{
-                  bg:
-                    newTaskStatus === "pending"
-                      ? "lightThemeColor"
-                      : newTaskStatus === "in_progress"
-                      ? "statusOrangeLight"
-                      : "statusGreenLight",
-                  color:
-                    newTaskStatus === "pending"
-                      ? "themeColor"
-                      : newTaskStatus === "in_progress"
-                      ? "statusOrange"
-                      : "statusGreen",
-                  border: "none",
-                }}
-              >
-                {taskStatus.items.map((taskState) => (
-                  <Select.Item item={taskState} key={taskState.value}>
-                    <Select.ItemText>{taskState.label}</Select.ItemText>
-                  </Select.Item>
-                ))}
-              </Dropdown>
-            </HStack>
-            <HStack gap={convertPx(20)}>
-              <Text w={convertPx(150)}>Assigned to</Text>
-              <HStack>
-                <Avatar.Root
-                  size="xs"
-                  colorPalette={UsePickRandomColor(currentUser.displayName)}
-                >
-                  <Avatar.Fallback />
-                  <Avatar.Image
-                    src={currentUser.photo}
-                    alt={`${currentUser.displayName} profile photo`}
-                  />
-                </Avatar.Root>
-                <Text>{currentUser.displayName}</Text>
-              </HStack>
-            </HStack>
-            <HStack gap={convertPx(20)}>
-              <Text w={convertPx(150)}>Assigned list</Text>
-
-              <Text>{assignedList.title}</Text>
-            </HStack>
-            <Field.Root>
-              <HStack gap={convertPx(20)} align={"start"}>
-                <Field.Label w={convertPx(230)}>Task name</Field.Label>
-                <InputField
-                  w={"100%"}
-                  name="taskTitle"
-                  placeholder="Enter task name"
-                  borderColor="gray.300"
-                  h={"fit-content"}
-                  pt={convertPx(8)}
-                  pb={convertPx(8)}
-                  onChange={handleInputChange}
-                />
-              </HStack>
-            </Field.Root>
-            <Field.Root>
-              <Flex
-                w={"100%"}
-                gap={{ base: convertPx(10), lg: convertPx(22) }}
-                align={"start"}
-                flexDirection={{ base: "column", lg: "row" }}
-              >
-                <Field.Label w={convertPx(242)}>Task description</Field.Label>
-                <Textarea
-                  w={"100%"}
-                  name="taskDescription"
-                  placeholder="Enter task description"
-                  borderColor="gray.300"
-                  h={"fit-content"}
-                  pt={convertPx(8)}
-                  pb={convertPx(8)}
-                  onChange={handleInputChange}
-                />
-              </Flex>
-            </Field.Root>
-          </Fieldset.Content>
-        </Fieldset.Root>
-      </Popup>
-
       <VStack
         w={convertPx(300)}
         h="fit-content"
@@ -218,7 +99,7 @@ function TodoColumn({ title, data, assignedList }) {
           >
             {colTitle}
           </HeadingItem>
-          {data.filter((item) => item.status === title).length !== 0 && (
+          {data.items.filter((item) => item.status === title).length !== 0 && (
             <Center
               ml={convertPx(8)}
               bg={"themeColor"}
@@ -228,14 +109,21 @@ function TodoColumn({ title, data, assignedList }) {
               fontSize={convertPx(14)}
               color="white"
             >
-              {data.filter((item) => item.status === title).length}
+              {data.items.filter((item) => item.status === title).length}
             </Center>
           )}
         </HStack>
 
-        {data.map((item, index) =>
-          item.status === title ? <TodoItem key={index} data={item} /> : null
-        )}
+        {data.items
+          .filter((item) => item.status === title)
+          .map((item, index) => (
+            <TodoItem
+              key={index}
+              data={item}
+              listMembers={data.members}
+              isEditable={isEditable}
+            />
+          ))}
 
         <ButtonItem
           w="100%"
@@ -253,6 +141,24 @@ function TodoColumn({ title, data, assignedList }) {
           </HeadingItem>
         </ButtonItem>
       </VStack>
+
+      <Popup
+        title={"New Task"}
+        isOpen={isPopupOpen}
+        selectedCol={title}
+        colTitle={colTitle}
+        onSave={() => saveTask(assignedList.uid)}
+        onClose={() => handleOpenPopup()}
+        disableSaveButton={!isFormValid}
+      >
+        <AddNewTodoItem
+          title={title}
+          assignedList={assignedList}
+          handleInputChange={handleInputChange}
+          handleStatusChange={(value) => setNewTaskStatus(value)}
+          onChange={handleCheckboxChange}
+        />
+      </Popup>
     </>
   );
 }

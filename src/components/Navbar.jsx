@@ -84,11 +84,12 @@ export default function Navbar({ toggleNavbar }) {
                   fontSize={convertPx(12)}
                   fontWeight="600"
                   right={convertPx(5)}
-                  bg="infoNotic"
+                  bg="redColor"
                   lineHeight={convertPx(13.5)}
                   order="2"
-                  p={`${convertPx(4)} ${convertPx(6)} ${convertPx(4)} ${convertPx(6)}`}
-
+                  p={`${convertPx(4)} ${convertPx(6)} ${convertPx(
+                    4
+                  )} ${convertPx(6)}`}
                 >
                   3{/* TODO: make the amunt dynamic */}
                 </Text>

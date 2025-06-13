@@ -1,5 +1,5 @@
 import { Table } from "@chakra-ui/react";
-import { useUsers } from "../services/getUsers";
+import { useUsers } from "../services/users/getUsers";
 
 function UserManagement() {
   const { data: users, isLoading } = useUsers();
@@ -7,7 +7,6 @@ function UserManagement() {
   if (isLoading) {
     return <div>Loading...</div>;
   } else {
-    console.log("Users data:", users[0]);
     return (
       <Table.Root size="sm">
         <Table.Header>

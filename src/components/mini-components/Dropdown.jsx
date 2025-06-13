@@ -41,7 +41,7 @@ function Dropdown({
       </Select.Control>
       <Portal>
         <Select.Positioner style={{ zIndex: 9000 }}>
-          <Select.Content>{children}</Select.Content>
+          <Select.Content gap={convertPx(8)}>{children}</Select.Content>
         </Select.Positioner>
       </Portal>
     </Select.Root>

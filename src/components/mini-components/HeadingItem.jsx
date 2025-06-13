@@ -7,7 +7,11 @@ export default function HeadingItem({ children, ...props }) {
       fontFamily="body"
       margin="0"
       color="secondaryColor"
-      textTransform="capitalize"
+      css={{
+        _firstLetter: {
+          textTransform: "uppercase",
+        },
+      }}
       {...props}
     >
       {children}

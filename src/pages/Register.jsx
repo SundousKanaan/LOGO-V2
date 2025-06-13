@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Field, Fieldset, Stack, Text, HStack } from "@chakra-ui/react";
 
 import { convertPx } from "../hooks/useConvertPx";
-import InputField from "../components/mini-components/Inputfield";
+import InputField from "../components/mini-components/InputField";
 import ButtonItem from "../components/mini-components/ButtonItem";
 import LinkItem from "../components/mini-components/LinkItem";
 import { useAuth } from "../contexts/AuthContext";
@@ -86,7 +86,6 @@ function Registing() {
       // const userCredential = await registerUser(userName, email, password);
       await registerUser({ firstName, lastName, email, password, birthday });
       setRegisterMessage("");
-      console.log("User registered successfully");
     } catch (error) {
       console.error("Error registering user:", error);
       setRegisterMessage("Error registering user");
@@ -127,6 +126,7 @@ function Registing() {
               name="firstName"
               value={firstName}
               bg="white"
+              color="secondaryColor"
               boxShadow={
                 isUserNameValid === "false"
                   ? "inset 0 0 0 1px var(--chakra-colors-status-red)"
@@ -147,6 +147,7 @@ function Registing() {
               name="lastName"
               value={lastName}
               bg="white"
+              color="secondaryColor"
               boxShadow={
                 isUserNameValid === "false"
                   ? "inset 0 0 0 1px var(--chakra-colors-status-red)"
@@ -168,6 +169,7 @@ function Registing() {
             name="email"
             value={email}
             bg="white"
+            color="secondaryColor"
             boxShadow={
               isEmailValid === "false"
                 ? "inset 0 0 0 1px var(--chakra-colors-status-red)"
@@ -188,6 +190,7 @@ function Registing() {
             name="birthday"
             value={birthday}
             bg="white"
+            color="secondaryColor"
             boxShadow={
               isBirthdayValid === "false"
                 ? "inset 0 0 0 1px var(--chakra-colors-status-red)"
@@ -208,6 +211,7 @@ function Registing() {
             name="password"
             value={password}
             bg="white"
+            color="secondaryColor"
             boxShadow={
               isPasswordValid === "false"
                 ? "inset 0 0 0 1px var(--chakra-colors-status-red)"
@@ -227,6 +231,7 @@ function Registing() {
             name="confirmPassword"
             value={confirmPassword}
             bg="white"
+            color="secondaryColor"
             boxShadow={
               isPasswordValid === "false"
                 ? "inset 0 0 0 1px var(--chakra-colors-status-red)"

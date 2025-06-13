@@ -105,7 +105,7 @@ export const system = createSystem(defaultConfig, {
         lightGray: { value: "#f6f6f8" },
         lightGray2: { value: "#f1f1f1" },
         lightBlue: { value: "#F4F6F7" },
-        infoNotic: { value: "#ff4a4a" },
+        redColor: { value: "#ff4a4a" },
         lightBlack: { value: "#00000050" },
         lightThemeColor: { value: "#c6c6fb" },
 
