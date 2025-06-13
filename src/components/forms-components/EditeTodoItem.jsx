@@ -4,6 +4,7 @@ import {
   VStack,
   Box,
   Text,
+  Avatar,
   Fieldset,
   Field,
   Flex,
@@ -17,16 +18,15 @@ import InputField from "../mini-components/InputField";
 import Checkboxes from "../mini-components/checkboxes";
 import { useUsers } from "../../services/users/getUsers";
 
-function AddNewTodoItem({
-  title,
-  assignedList,
-  handleStatusChange,
-  handleInputChange,
-  onChange,
-}) {
-  const [newStatus, setTaskStatus] = useState(title);
+function EditeTodoItem({ data, assignedList, onChange }) {
+  const [newStatus, setTaskStatus] = useState(data.status);
   const { data: dbUsers, isLoading } = useUsers();
   const [usersData, setUsersData] = useState([]);
+  const [selectedAssignee, setSelectedAssignee] = useState(
+    data.assignee.map((assignee) => assignee.firebase_uid)
+  );
+  const [newDescription, setNewDescription] = useState(data.description);
+  const [newTaskTitle, setNewTaskTitle] = useState(data.title);
 
   const taskStatus = createListCollection({
     items: [
@@ -48,9 +48,42 @@ function AddNewTodoItem({
     }
   }, [isLoading, dbUsers]);
 
+  useEffect(() => {
+    const newData = {
+      ...data,
+      title: newTaskTitle,
+      description: newDescription,
+      assignee: selectedAssignee,
+      status: newStatus,
+    };
+    if (onChange) {
+      onChange(newData);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [newTaskTitle, newDescription, selectedAssignee, newStatus]);
+
   function changeStatus(newValue) {
+    console.log("Status changed:", newValue.items[0].value);
     setTaskStatus(newValue.items[0].value);
-    handleStatusChange(newValue.items[0].value);
+  }
+
+  function handleCheckboxChange(e) {
+    setSelectedAssignee((prev) => {
+      if (prev.includes(e.target.value)) {
+        return prev.filter((id) => id !== e.target.value);
+      } else {
+        return [...prev, e.target.value];
+      }
+    });
+  }
+
+  function handleInputChange(e) {
+    const { name, value } = e.target;
+    if (name === "taskTitle") {
+      setNewTaskTitle(value);
+    } else if (name === "taskDescription") {
+      setNewDescription(value);
+    }
   }
 
   if (isLoading) {
@@ -67,7 +100,7 @@ function AddNewTodoItem({
           <Text w={convertPx(150)}>Status</Text>
           <Dropdown
             collection={taskStatus}
-            defaultValue={title}
+            defaultValue={data.status}
             withIndicator
             handleChange={changeStatus}
             fontWeight={"bold"}
@@ -111,7 +144,10 @@ function AddNewTodoItem({
                 p={`${convertPx(8)} ${convertPx(8)}`}
                 overflow="auto"
                 withIcon
-                onChange={onChange}
+                selectedIds={data.assignee.map(
+                  (assignee) => assignee.firebase_uid
+                )}
+                onChange={handleCheckboxChange}
               />
             )}
           </HStack>
@@ -127,6 +163,7 @@ function AddNewTodoItem({
             <InputField
               w={"100%"}
               name="taskTitle"
+              defaultValue={data.title}
               placeholder="Enter task name"
               borderColor="gray.300"
               h={"fit-content"}
@@ -148,6 +185,7 @@ function AddNewTodoItem({
             <Textarea
               w={"100%"}
               name="taskDescription"
+              defaultValue={data.description}
               placeholder="Enter task description"
               borderColor="gray.300"
               h={"fit-content"}
@@ -164,4 +202,4 @@ function AddNewTodoItem({
   );
 }
 
-export default AddNewTodoItem;
+export default EditeTodoItem;

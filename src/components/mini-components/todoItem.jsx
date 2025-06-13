@@ -1,5 +1,6 @@
 import { useState } from "react";
 import {
+  Box,
   Flex,
   HStack,
   VStack,
@@ -19,15 +20,19 @@ import { MdUpdate, MdModeEdit } from "react-icons/md";
 import { useQueryClient } from "react-query";
 import { updateTodoItem } from "../../services/todoItem/updateTodoItem";
 import { deleteTodoItem } from "../../services/todoItem/deleteTodoItem";
+
 import HeadingItem from "./HeadingItem";
 import Dropdown from "./Dropdown";
 import ButtonItem from "./ButtonItem";
 import Popup from "./Popup";
+import EditeTodoItem from "../forms-components/EditeTodoItem";
 
-function TodoItem({ data, isEditable }) {
+function TodoItem({ data, assignedList, isEditable }) {
   const queryClient = useQueryClient();
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [popupTitle, setPopupTitle] = useState("");
+  const [popupType, setPopupType] = useState("");
+  const [newTaskData, setNewTaskData] = useState();
 
   const status = createListCollection({
     items: [
@@ -40,10 +45,9 @@ function TodoItem({ data, isEditable }) {
     status.items.find((item) => item.value === data.status) || status.items[0]
   );
 
-  async function handleChange(newValue) {
+  async function handleStatusChange(newValue) {
     setCurrentStatus(newValue.items[0]);
     const req = {
-      method: "PUT",
       data: {
         ...data,
         //the assignee is an array of objects,
@@ -58,14 +62,75 @@ function TodoItem({ data, isEditable }) {
     queryClient.invalidateQueries("dbTodolists");
   }
 
-  function confirmDelete(name) {
-    setIsPopupOpen(true);
+  function openDeleteForm(name) {
     setPopupTitle(name);
+    setIsPopupOpen(true);
+    setPopupType("delete");
+    renderPopupContent();
+  }
+
+  function openEditForm(name) {
+    setPopupTitle(name);
+    setIsPopupOpen(true);
+    setPopupType("edit");
+    renderPopupContent();
+  }
+
+  function renderPopupContent() {
+    if (!isPopupOpen) return null;
+    if (popupType === "delete") {
+      return (
+        <Popup
+          isOpen={isPopupOpen}
+          title={`Delete ${popupTitle}`}
+          ActionButtonText="Delete task"
+          onClose={() => setIsPopupOpen(false)}
+          onSave={() => {
+            handleTaskDelete(data.id);
+          }}
+        >
+          <Text>Are you sure you want to delete this task?</Text>
+          <Text color={"redColor"} fontWeight={600} mt={convertPx(16)}>
+            This action cannot be undone. Please confirm to proceed.
+          </Text>
+        </Popup>
+      );
+    }
+    if (popupType === "edit") {
+      return (
+        <Popup
+          isOpen={isPopupOpen}
+          title={`Edit ${popupTitle}`}
+          ActionButtonText="Save changes"
+          onClose={() => setIsPopupOpen(false)}
+          onSave={() => {
+            handleTaskEdit(newTaskData);
+          }}
+        >
+          <EditeTodoItem
+            data={data}
+            assignedList={assignedList}
+            onChange={(updatedData) => setNewTaskData(updatedData)}
+          />
+        </Popup>
+      );
+    }
   }
 
   async function handleTaskDelete(id) {
-    // Logic to delete the task
     await deleteTodoItem({ id });
+    queryClient.invalidateQueries("dbTodolists");
+    setIsPopupOpen(false);
+  }
+
+  async function handleTaskEdit(newData) {
+    const req = {
+      data: {
+        ...newData,
+      },
+    };
+
+    await updateTodoItem(req);
     queryClient.invalidateQueries("dbTodolists");
     setIsPopupOpen(false);
   }
@@ -82,11 +147,12 @@ function TodoItem({ data, isEditable }) {
           <VStack alignItems="start">
             <HeadingItem fontSize={convertPx(16)} lineHeight={1.5}>
               {data.title}
-            </HeadingItem>{" "}
+            </HeadingItem>
+            {/* status dropdown */}
             <Dropdown
               collection={status}
               defaultValue={currentStatus.value}
-              handleChange={handleChange}
+              handleChange={handleStatusChange}
               withIndicator
               fontWeight={600}
               bg={
@@ -122,7 +188,7 @@ function TodoItem({ data, isEditable }) {
             pr={convertPx(8)}
             onClick={() => {
               // Logic to handle edit action
-              console.log("Edit task:", data.id);
+              openEditForm("namee");
             }}
             display={isEditable ? "flex" : "none"}
           >
@@ -134,7 +200,7 @@ function TodoItem({ data, isEditable }) {
             h={convertPx(30)}
             pl={convertPx(8)}
             pr={convertPx(8)}
-            onClick={() => confirmDelete(data.title)}
+            onClick={() => openDeleteForm(data.title)}
             display={isEditable ? "flex" : "none"}
           >
             <Icon as={IoCloseCircleOutline} color="secondaryColor" />
@@ -204,17 +270,8 @@ function TodoItem({ data, isEditable }) {
           </HStack>
         </HStack>
       </Flex>
-      <Popup
-        isOpen={isPopupOpen}
-        title={`Delete ${popupTitle}`}
-        ActionButtonText="Delete task"
-        onClose={() => setIsPopupOpen(false)}
-        onSave={() => {
-          handleTaskDelete(data.id);
-        }}
-      >
-        <Text>Are you sure you want to delete this task?</Text>
-      </Popup>
+
+      <Box>{renderPopupContent()}</Box>
     </>
   );
 }

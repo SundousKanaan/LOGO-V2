@@ -138,7 +138,7 @@ export default function Profile() {
     return (
       <Dropdown
         collection={listDropdownValues}
-        defaultValue={listDropdownValues.items[0].value} // TODO: fix the default value!
+        defaultValue={showedList?.id ?? listDropdownValues.items[0].value} // TODO: fix the default value!
         handleChange={handleChangeList}
         withIndicator
         width={{ base: "100%", lg: convertPx(400) }}

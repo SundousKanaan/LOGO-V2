@@ -1,10 +1,23 @@
 import { Checkbox, CheckboxGroup, Fieldset, Avatar } from "@chakra-ui/react";
 import { UsePickRandomColor } from "../../hooks/usePickRandomColor";
 
-function Checkboxes({ title, variant, options, withIcon, onChange, ...props }) {
+function Checkboxes({
+  title,
+
+  variant,
+  options,
+  withIcon,
+  onChange,
+  selectedIds = [],
+  ...props
+}) {
   return (
     <Fieldset.Root variant={variant} {...props}>
-      <CheckboxGroup name="assignedUsers" onChange={onChange}>
+      <CheckboxGroup
+        name="assignedUsers"
+        onChange={onChange}
+        defaultValue={selectedIds}
+      >
         {title && (
           <Fieldset.Legend fontSize="sm" mb="2">
             {title}

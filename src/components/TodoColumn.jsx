@@ -122,6 +122,7 @@ function TodoColumn({ title, data, assignedList, isEditable }) {
               data={item}
               listMembers={data.members}
               isEditable={isEditable}
+              assignedList={assignedList}
             />
           ))}
 
