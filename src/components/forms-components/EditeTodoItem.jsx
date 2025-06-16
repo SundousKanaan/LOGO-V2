@@ -63,7 +63,6 @@ function EditeTodoItem({ data, assignedList, onChange }) {
   }, [newTaskTitle, newDescription, selectedAssignee, newStatus]);
 
   function changeStatus(newValue) {
-    console.log("Status changed:", newValue.items[0].value);
     setTaskStatus(newValue.items[0].value);
   }
 
@@ -194,6 +193,7 @@ function EditeTodoItem({ data, assignedList, onChange }) {
               bg="white"
               color="secondaryColor"
               onChange={handleInputChange}
+              _required={false}
             />
           </Flex>
         </Field.Root>

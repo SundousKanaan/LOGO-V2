@@ -139,7 +139,10 @@ function TodoItem({ data, assignedList, isEditable }) {
     <>
       <Flex layerStyle="TodoItemLayout">
         <HStack
-          borderBottom={`${convertPx(1)} solid var(--chakra-colors-gray-200)`}
+          borderBottom={
+            data.description !== "" &&
+            `${convertPx(1)} solid var(--chakra-colors-gray-200)`
+          }
           pb={convertPx(8)}
           gap={convertPx(4)}
           alignItems={"start"}

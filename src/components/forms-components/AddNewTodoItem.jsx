@@ -156,6 +156,7 @@ function AddNewTodoItem({
               bg="white"
               color="secondaryColor"
               onChange={handleInputChange}
+              _required={false}
             />
           </Flex>
         </Field.Root>

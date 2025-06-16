@@ -58,9 +58,7 @@ function TodoColumn({ title, data, assignedList, isEditable }) {
   }
 
   useEffect(() => {
-    setIsFormValid(
-      newTaskTitle.trim() !== "" && newTaskDescription.trim() !== ""
-    );
+    setIsFormValid(newTaskTitle.trim() !== "");
   }, [newTaskTitle, newTaskDescription]);
 
   async function saveTask(listUid) {
