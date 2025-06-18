@@ -17,18 +17,15 @@ import InputField from "../mini-components/InputField";
 import Checkboxes from "../mini-components/checkboxes";
 import { useUsers } from "../../services/users/getUsers";
 
-function AddNewTodoItem({
-  title,
-  assignedList,
-  handleStatusChange,
-  handleInputChange,
-  onChange,
-}) {
-  const [newStatus, setTaskStatus] = useState(title);
+function AddNewTodoItem({ defaultStatus, assignedList, onFormChange }) {
+  const [taskStatus, setTaskStatus] = useState(defaultStatus);
   const { data: dbUsers, isLoading } = useUsers();
   const [usersData, setUsersData] = useState([]);
+  const [selectedUserIds, setSelectedUserIds] = useState([]);
+  const [taskTitle, setTaskTitle] = useState("");
+  const [taskDescription, setTaskDescription] = useState("");
 
-  const taskStatus = createListCollection({
+  const statusCollection = createListCollection({
     items: [
       { label: "Todo", value: "pending" },
       { label: "Doing", value: "in_progress" },
@@ -50,44 +47,79 @@ function AddNewTodoItem({
 
   function changeStatus(newValue) {
     setTaskStatus(newValue.items[0].value);
-    handleStatusChange(newValue.items[0].value);
   }
 
-  if (isLoading) {
-    return (
-      <Box p={convertPx(20)} textAlign="center">
-        <Text>Loading...</Text>
-      </Box>
-    );
+  function handleSelectedUsers(event) {
+    const userId = event.target.value;
+    const isChecked = event.target.checked;
+
+    setSelectedUserIds((prevSelected) => {
+      if (isChecked) {
+        return [...prevSelected, userId];
+      } else {
+        return prevSelected.filter((id) => id !== userId);
+      }
+    });
   }
+
+  function handleInputChange(e) {
+    const { name, value } = e.target;
+    if (name === "taskTitle") {
+      setTaskTitle(value);
+    } else if (name === "taskDescription") {
+      setTaskDescription(value);
+    }
+  }
+
+  useEffect(() => {
+    const itemData = {
+      title: taskTitle.trim(),
+      description: taskDescription.trim(),
+      status: taskStatus,
+      assignee: selectedUserIds,
+      todo_list: assignedList.id,
+    };
+
+    if (onFormChange) {
+      onFormChange(itemData);
+    }
+  }, [
+    taskTitle,
+    taskDescription,
+    taskStatus,
+    selectedUserIds,
+    onFormChange,
+    assignedList.id,
+  ]);
+
   return (
     <Fieldset.Root>
       <Fieldset.Content>
         <HStack gap={convertPx(20)}>
           <Text w={convertPx(150)}>Status</Text>
           <Dropdown
-            collection={taskStatus}
-            defaultValue={title}
+            collection={statusCollection}
+            defaultValue={defaultStatus}
             withIndicator
             handleChange={changeStatus}
             fontWeight={"bold"}
             buttonProps={{
               bg:
-                newStatus === "pending"
+                taskStatus === "pending"
                   ? "lightThemeColor"
-                  : newStatus === "in_progress"
+                  : taskStatus === "in_progress"
                   ? "statusOrangeLight"
                   : "statusGreenLight",
               color:
-                newStatus === "pending"
+                taskStatus === "pending"
                   ? "themeColor"
-                  : newStatus === "in_progress"
+                  : taskStatus === "in_progress"
                   ? "statusOrange"
                   : "statusGreen",
               border: "none",
             }}
           >
-            {taskStatus.items.map((taskState) => (
+            {statusCollection.items.map((taskState) => (
               <Select.Item item={taskState} key={taskState.value}>
                 <Select.ItemText>{taskState.label}</Select.ItemText>
               </Select.Item>
@@ -102,7 +134,7 @@ function AddNewTodoItem({
             border={"solid 1px var(--chakra-colors-gray-300)"}
             borderRadius={convertPx(4)}
           >
-            {usersData && (
+            {usersData && ( // todo: add loading state
               <Checkboxes
                 options={usersData}
                 variant={"subtle"}
@@ -111,7 +143,7 @@ function AddNewTodoItem({
                 p={`${convertPx(8)} ${convertPx(8)}`}
                 overflow="auto"
                 withIcon
-                onChange={onChange}
+                onChange={handleSelectedUsers}
               />
             )}
           </HStack>
@@ -123,7 +155,7 @@ function AddNewTodoItem({
         </HStack>
         <Field.Root>
           <HStack gap={convertPx(20)} align={"start"}>
-            <Field.Label w={convertPx(230)}>Task name</Field.Label>
+            <Field.Label w={convertPx(247)}>Task name</Field.Label>
             <InputField
               w={"100%"}
               name="taskTitle"

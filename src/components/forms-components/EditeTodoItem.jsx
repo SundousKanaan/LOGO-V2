@@ -19,8 +19,8 @@ import Checkboxes from "../mini-components/checkboxes";
 import { useUsers } from "../../services/users/getUsers";
 
 function EditeTodoItem({ data, assignedList, onChange }) {
-  const [newStatus, setTaskStatus] = useState(data.status);
   const { data: dbUsers, isLoading } = useUsers();
+  const [newStatus, setTaskStatus] = useState(data.status);
   const [usersData, setUsersData] = useState([]);
   const [selectedAssignee, setSelectedAssignee] = useState(
     data.assignee.map((assignee) => assignee.firebase_uid)
@@ -158,7 +158,7 @@ function EditeTodoItem({ data, assignedList, onChange }) {
         </HStack>
         <Field.Root>
           <HStack gap={convertPx(20)} align={"start"}>
-            <Field.Label w={convertPx(230)}>Task name</Field.Label>
+            <Field.Label w={convertPx(247)}>Task name</Field.Label>
             <InputField
               w={"100%"}
               name="taskTitle"
