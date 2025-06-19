@@ -7,13 +7,14 @@ import {
   HStack,
   Text,
   Box,
+  Skeleton,
 } from "@chakra-ui/react";
 import { useQueryClient } from "react-query";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { convertPx } from "../hooks/useConvertPx";
-import { useTodolists } from "../services/todoList/getTodolists";
-import { useTodolist } from "../services/todoList/getTodoList";
+import { useTodolistsArray } from "../services/todoList/getTodolists";
+import { useListDetails } from "../services/todoList/getListDetails";
 import { postTodoList } from "../services/todoList/postTodoList";
 import { updateTodoList } from "../services/todoList/updateTodoList";
 import { deleteTodoList } from "../services/todoList/deleteTodoList";
@@ -42,7 +43,7 @@ export default function Profile() {
 
   // State
   const [selectedList, setSelectedList] = useState(null);
-  const [listDropdownCollection, setListDropdownCollection] = useState();
+  const [listDropdownCollection, setListDropdownCollection] = useState(null);
   const [openListPopup, setOpenListPopup] = useState(null);
   const [openItemPopup, setOpenItemPopup] = useState(null);
   const [listTitle, setListTitle] = useState("");
@@ -51,14 +52,20 @@ export default function Profile() {
 
   // Data fetching
   const {
-    data: todoLists,
-    isLoading: isListsLoading,
+    data: todoListsArray,
+    isLoading: isListsArrayLoading,
     refetch: refetchTodoLists,
-  } = useTodolists(["id", "title", "owner"]);
+    isFetched: isListsArrayFetched,
+  } = useTodolistsArray(["id", "title", "owner"]);
 
-  const { data: listData, isLoading: isListLoading } = useTodolist(
-    selectedList?.id || null
-  );
+  const {
+    data: listDetails,
+    isLoading: isListDetailsLoading,
+    isFetched: isListDetailsFetched,
+    refetch: refetchListDetails,
+  } = useListDetails(selectedList?.id || null, {
+    enabled: !!selectedList?.id, // only fetch if we have a valid ID
+  });
 
   // Effects
   // Redirect to login if not authenticated
@@ -68,40 +75,52 @@ export default function Profile() {
 
   // Initiële selectie
   useEffect(() => {
-    if (!isListsLoading && todoLists?.length > 0 && !selectedList) {
-      setSelectedList(todoLists[0]);
-      setListTitle(todoLists[0].title);
+    console.log(
+      "== todoListsArray",
+      isListsArrayFetched && todoListsArray.length > 0 && !selectedList
+    );
+
+    if (isListsArrayFetched && todoListsArray.length > 0 && !selectedList) {
+      console.log("Setting initial selected list");
+
+      setSelectedList(todoListsArray[0]);
+      setListTitle(todoListsArray[0].title);
+    } else {
+      console.log("No lists available or already selected a list");
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [todoLists, isListsLoading]);
+  }, [todoListsArray, selectedList, isListsArrayFetched]);
 
   useEffect(() => {
     if (!selectedList) return;
 
     const dropdownCollection = createListCollection({
-      items: todoLists.map((item) => ({
+      items: todoListsArray.map((item) => ({
         label: item.title,
         value: item.id,
       })),
     });
     setListDropdownCollection(dropdownCollection);
-  }, [selectedList, todoLists]);
+    queryClient.invalidateQueries("todolistsArray");
+  }, [selectedList, todoListsArray, queryClient]);
 
   useEffect(() => {
-    if (!selectedList) return;
-    const isEditable = checkPermissions(selectedList);
-    setIsEditable(isEditable);
-    console.log("selectedList", selectedList);
+    if (!selectedList || todoListsArray?.length === 0) return;
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedList]);
+    const found = todoListsArray.find((l) => l.id === selectedList.id);
+    if (!found) return;
+
+    const canBeEdit = checkPermissions(selectedList);
+    setIsEditable(canBeEdit);
+
+    refetchListDetails();
+  }, [selectedList, todoListsArray]);
 
   // Handlers
   async function handleChangeList(data) {
-    const selected = todoLists.find((item) => item.id === data.value[0]);
+    const selected = todoListsArray.find((item) => item.id === data.value[0]);
     setSelectedList(selected);
     setListTitle(selected.title);
-    queryClient.invalidateQueries("dbTodolist");
+    queryClient.invalidateQueries("todolistDetails");
   }
 
   function handleInputChange(e) {
@@ -143,8 +162,6 @@ export default function Profile() {
       owner: selectedList.owner,
     };
     await updateTodoList(updatedListData);
-    queryClient.invalidateQueries("dbTodolists");
-    queryClient.invalidateQueries("dbTodolist");
 
     setSelectedList(updatedListData);
     setOpenListPopup(null);
@@ -152,22 +169,32 @@ export default function Profile() {
 
   async function handleDeleteList() {
     await deleteTodoList(selectedList.id);
+    queryClient.removeQueries(["todolistDetails", selectedList.id]);
+    const { data: updatedData } = await refetchTodoLists();
+
+    if (updatedData?.length > 0) {
+      setSelectedList(updatedData[0]);
+      setListTitle(updatedData[0].title);
+    } else {
+      setSelectedList(null);
+      setListTitle("");
+      setIsEditable(false);
+    }
+
     setOpenListPopup(null);
-    setSelectedList(null);
-    queryClient.invalidateQueries("dbTodolists");
   }
 
   // list items handlers
   async function handleCreateListItem() {
     await postTodoItem(newTaskDetails);
     setOpenItemPopup(null);
-    queryClient.invalidateQueries("dbTodolist");
+    queryClient.invalidateQueries("todolistDetails");
   }
 
   async function handleDeleteListItem(taskId) {
     await deleteTodoItem(taskId);
     setOpenItemPopup(null);
-    queryClient.invalidateQueries("dbTodolist");
+    queryClient.invalidateQueries("todolistDetails");
   }
 
   async function handleEditListItem(newTaskDetails) {
@@ -184,7 +211,7 @@ export default function Profile() {
     await updateTodoItem(req);
     setOpenItemPopup(null);
     setNewTaskDetails(null);
-    queryClient.invalidateQueries("dbTodolist");
+    queryClient.invalidateQueries("todolistDetails");
   }
 
   // Validation
@@ -208,10 +235,10 @@ export default function Profile() {
           placeholder={selectedList?.title}
           handleChange={handleChangeList}
           withIndicator
+          height={convertPx(40)}
           width={{ base: "100%", lg: convertPx(400) }}
           bg="white"
           color="secondaryColor"
-          height={convertPx(40)}
           borderRadius={convertPx(4)}
           buttonProps={{
             height: "100%",
@@ -239,6 +266,7 @@ export default function Profile() {
       <Dropdown
         disabled
         collection={null}
+        placeholder="No lists available"
         withIndicator
         width={{ base: "100%", lg: convertPx(400) }}
         bg="white"
@@ -361,7 +389,9 @@ export default function Profile() {
             onSave={() => handleEditListItem(newTaskDetails)}
           >
             <EditeTodoItem
-              data={listData.items.find((item) => item.id === openItemPopup.id)}
+              data={listDetails.items.find(
+                (item) => item.id === openItemPopup.id
+              )}
               assignedList={selectedList}
               onChange={(updatedData) => {
                 setNewTaskDetails(updatedData);
@@ -386,96 +416,112 @@ export default function Profile() {
         gap={convertPx(20)}
         mb={convertPx(16)}
       >
-        <Box>{renderListsDropdown()}</Box>
+        <Skeleton
+          loading={!isListsArrayFetched}
+          height={convertPx(40)}
+          width={{ base: "100%", lg: convertPx(400) }}
+        >
+          {renderListsDropdown()}
+        </Skeleton>
+
         <Spacer display={{ base: "none", lg: "block" }} />
-        <HStack>
-          <ButtonItem
-            bg="themeColor"
-            color="white"
-            flexGrow={1}
-            onClick={() => setOpenListPopup("edit")}
-            display={isEditable ? "flex" : "none"}
-          >
-            Edit list
-          </ButtonItem>
-          <ButtonItem
-            bg="redColor"
-            color="white"
-            flexGrow={1}
-            onClick={() => setOpenListPopup("delete")}
-            display={isEditable ? "flex" : "none"}
-          >
-            Delete list
-          </ButtonItem>
-          <ButtonItem
-            bg="themeColor"
-            color="white"
-            flexGrow={1}
-            onClick={() => setOpenListPopup("create")}
-            disabled={!isAuthenticated}
-          >
-            Create list
-          </ButtonItem>
-        </HStack>
+        <Skeleton loading={!isListsArrayFetched}>
+          <HStack>
+            <ButtonItem
+              bg="themeColor"
+              color="white"
+              flexGrow={1}
+              onClick={() => setOpenListPopup("edit")}
+              display={isEditable ? "flex" : "none"}
+            >
+              Edit list
+            </ButtonItem>
+            <ButtonItem
+              bg="redColor"
+              color="white"
+              flexGrow={1}
+              onClick={() => setOpenListPopup("delete")}
+              display={isEditable ? "flex" : "none"}
+            >
+              Delete list
+            </ButtonItem>
+            <ButtonItem
+              bg="themeColor"
+              color="white"
+              flexGrow={1}
+              onClick={() => setOpenListPopup("create")}
+              disabled={!isAuthenticated}
+            >
+              Create list
+            </ButtonItem>
+          </HStack>
+        </Skeleton>
       </Flex>
-      {isListLoading ? (
-        <Text color="secondaryColor">Loading...</Text> // todo: loading state
-      ) : (
+
+      {(isListDetailsLoading && isListsArrayLoading) || !isListsArrayFetched ? (
         <TodoList>
-          {
-            !isListLoading &&
-              listData?.items &&
-              ["pending", "in_progress", "done"].map((colTitle, index) => (
-                <TodoColumn
-                  key={index}
-                  title={colTitle}
-                  count={
-                    listData.items.filter((item) => item.status === colTitle)
-                      .length
-                  }
-                  handleOpenPopup={() => openCreateItemPopup(colTitle)}
-                  isEditable={!isEditable}
-                >
-                  {listData.items
-                    .filter((item) => item.status === colTitle)
-                    .map((item, index) => (
-                      <TodoItem
-                        key={index}
-                        data={item}
-                        listMembers={listData.members}
-                        isEditable={isEditable}
-                        handleDeleteItem={() =>
-                          setOpenItemPopup({
-                            case: "delete",
-                            title: item.title,
-                            id: item.id,
-                          })
-                        }
-                        handleEditItem={() =>
-                          setOpenItemPopup({
-                            case: "edit",
-                            title: item.title,
-                            id: item.id,
-                          })
-                        }
-                        handleStatusChange={(newStatus) => {
-                          handleEditListItem({
-                            ...item,
-                            assignee: item.assignee.map(
-                              (user) => user.firebase_uid
-                            ),
-                            status: newStatus["value"][0],
-                          });
-                        }}
-                      />
-                    ))}
-                </TodoColumn>
-              ))
-            // : (
-            //   <Text>No tasks found</Text> // todo: empty List
-            // )
-          }
+          {["pending", "in_progress", "done"].map((_, index) => (
+            <Skeleton
+              loading={true}
+              key={index}
+              h={convertPx(350)}
+              minW={convertPx(300)}
+              flexGrow={{ base: 0, md: 1 }}
+            />
+          ))}
         </TodoList>
+      ) : (
+        isListDetailsFetched &&
+        listDetails?.items?.length >= 0 && (
+          <TodoList>
+            {["pending", "in_progress", "done"].map((colTitle, index) => (
+              <TodoColumn
+                key={index}
+                title={colTitle}
+                count={
+                  listDetails?.items.filter((item) => item.status === colTitle)
+                    .length || 0
+                }
+                handleOpenPopup={() => openCreateItemPopup(colTitle)}
+                isEditable={isEditable}
+              >
+                {listDetails?.items
+                  .filter((item) => item.status === colTitle)
+                  .map((item) => (
+                    <TodoItem
+                      key={item.id}
+                      data={item}
+                      listMembers={listDetails.members}
+                      isEditable={isEditable}
+                      handleDeleteItem={() =>
+                        setOpenItemPopup({
+                          case: "delete",
+                          title: item.title,
+                          id: item.id,
+                        })
+                      }
+                      handleEditItem={() =>
+                        setOpenItemPopup({
+                          case: "edit",
+                          title: item.title,
+                          id: item.id,
+                        })
+                      }
+                      handleStatusChange={(newStatus) => {
+                        handleEditListItem({
+                          ...item,
+                          assignee: item.assignee.map(
+                            (user) => user.firebase_uid
+                          ),
+                          status: newStatus["value"][0],
+                        });
+                      }}
+                    />
+                  ))}
+              </TodoColumn>
+            ))}
+          </TodoList>
+        )
       )}
 
       {/* popups */}

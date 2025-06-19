@@ -1,12 +1,11 @@
 import { useQuery } from "react-query";
 import api from "../api";
 
-async function getTodoList(id) {
+async function getListDetails(id) {
   try {
     const response = await api.get(
       `/todos/todo_lists/list/${id}/?expand=items.assignee,owner`
     );
-    // console.log("API Response:", response.data);
     return response.data;
   } catch (error) {
     console.error("API Error:", error.response?.data || error.message);
@@ -14,11 +13,11 @@ async function getTodoList(id) {
   }
 }
 
-export const useTodolist = (id) => {
+export const useListDetails = (id) => {
   return useQuery({
-    queryKey: ["dbTodolist", id],
-    queryFn: () => getTodoList(id),
+    queryKey: ["todolistDetails", id],
+    queryFn: () => getListDetails(id),
     retry: false,
-    enabled: !!id,
+    enabled: false,
   });
 };

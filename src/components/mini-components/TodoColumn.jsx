@@ -22,24 +22,19 @@ function TodoColumn({ title, count, handleOpenPopup, isEditable, children }) {
   }, [title]);
 
   return (
-    <>
-      <VStack
-        w={convertPx(300)}
-        h="fit-content"
-        borderRadius={convertPx(4)}
-        padding={convertPx(8)}
-        flexShrink={0}
-        flexGrow={{ base: 0, md: 1 }}
-        scrollSnapAlign={"center"}
-      >
-        <HStack w={"100%"} justifyContent={"start"}>
-          <HeadingItem
-            fontSize={convertPx(16)}
-            alignText="left"
-            w="fit-content"
-          >
-            {colTitle}
-          </HeadingItem>
+    <VStack
+      minW={convertPx(300)}
+      h="fit-content"
+      borderRadius={convertPx(4)}
+      padding={convertPx(8)}
+      scrollSnapAlign={"center"}
+      flexGrow={{ base: 0, md: 1 }}
+    >
+      <HStack w={"100%"} justifyContent={"start"}>
+        <HeadingItem fontSize={convertPx(16)} alignText="left" w="fit-content">
+          {colTitle}
+        </HeadingItem>
+        {count > 0 && (
           <Center
             ml={convertPx(8)}
             bg={"themeColor"}
@@ -51,26 +46,27 @@ function TodoColumn({ title, count, handleOpenPopup, isEditable, children }) {
           >
             {count}
           </Center>
-        </HStack>
-        {children}
-        <ButtonItem
-          w="100%"
-          bg="gray.200"
-          border={`dashed ${convertPx(2)} var(--chakra-colors-gray-400)`}
-          _hover={{
-            borderColor: "themeColor",
-            boxShadow: "none",
-          }}
-          onClick={handleOpenPopup}
-          disabled={isEditable}
-        >
-          <Icon as={FaPlus} color="secondaryColor" h={convertPx(16)} />
-          <HeadingItem fontSize={convertPx(13)} color="secondaryColor">
-            Add new
-          </HeadingItem>
-        </ButtonItem>
-      </VStack>
-    </>
+        )}
+      </HStack>
+      {children}
+
+      <ButtonItem
+        w="100%"
+        bg="gray.200"
+        border={`dashed ${convertPx(2)} var(--chakra-colors-gray-400)`}
+        _hover={{
+          borderColor: "themeColor",
+          boxShadow: "none",
+        }}
+        onClick={handleOpenPopup}
+        disabled={!isEditable}
+      >
+        <Icon as={FaPlus} color="secondaryColor" h={convertPx(16)} />
+        <HeadingItem fontSize={convertPx(13)} color="secondaryColor">
+          Add new
+        </HeadingItem>
+      </ButtonItem>
+    </VStack>
   );
 }
 

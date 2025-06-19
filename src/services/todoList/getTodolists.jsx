@@ -2,7 +2,7 @@ import { useQuery } from "react-query";
 import { useAuth } from "../../contexts/AuthContext";
 import api from "../api";
 
-async function getTodolists(data) {
+async function getTodolistsArray(data) {
   const userUid = data.id;
   try {
     const response = await api.get(
@@ -17,12 +17,12 @@ async function getTodolists(data) {
   }
 }
 
-export const useTodolists = (fields) => {
+export const useTodolistsArray = (fields) => {
   const { currentUser } = useAuth();
 
   return useQuery({
-    queryKey: ["dbTodolists", fields],
-    queryFn: () => getTodolists({ id: currentUser?.uid, fields: fields }),
+    queryKey: ["todolistsArray", fields],
+    queryFn: () => getTodolistsArray({ id: currentUser?.uid, fields: fields }),
     retry: false,
     enabled: !!currentUser,
   });
