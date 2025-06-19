@@ -1,8 +1,8 @@
 import { Table } from "@chakra-ui/react";
-import { useUsers } from "../services/users/getUsers";
+import { useGetAllUsers } from "../services/users";
 
 function UserManagement() {
-  const { data: users, isLoading } = useUsers();
+  const { data: users, isLoading } = useGetAllUsers();
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -29,8 +29,8 @@ function UserManagement() {
           </Table.Row>
         </Table.Header>
         <Table.Body>
-          {users.map((item) => (
-            <Table.Row key={item.id}>
+          {users.map((item, index) => (
+            <Table.Row key={index}>
               <Table.Cell>{item.first_name}</Table.Cell>
               <Table.Cell>{item.last_name}</Table.Cell>
               <Table.Cell>{item.email}</Table.Cell>

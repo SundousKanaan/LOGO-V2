@@ -3,14 +3,13 @@ import { loginUser, logoutUser } from "../firebase/authService";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { setAuthToken } from "../services/api";
 // import login function from firebase
-import { postUser } from "../services/users/postUser";
-import { useUsers } from "../services/users/getUsers";
+import { useGetAllUsers, postUser } from "../services/users";
 
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
-  const { data: dbUsers, isLoading } = useUsers();
+  const { data: dbUsers, isLoading } = useGetAllUsers();
   const storedAuthStatus =
     JSON.parse(localStorage.getItem("isAuthenticated")) || false;
 

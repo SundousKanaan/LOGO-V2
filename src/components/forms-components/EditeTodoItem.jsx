@@ -16,10 +16,10 @@ import { convertPx } from "../../hooks/useConvertPx";
 import Dropdown from "../mini-components/Dropdown";
 import InputField from "../mini-components/InputField";
 import Checkboxes from "../mini-components/checkboxes";
-import { useUsers } from "../../services/users/getUsers";
+import { useGetAllUsers } from "../../services/users";
 
 function EditeTodoItem({ data, assignedList, onChange }) {
-  const { data: dbUsers, isLoading } = useUsers();
+  const { data: dbUsers, isLoading } = useGetAllUsers();
   const [newStatus, setTaskStatus] = useState(data.status);
   const [usersData, setUsersData] = useState([]);
   const [selectedAssignee, setSelectedAssignee] = useState(

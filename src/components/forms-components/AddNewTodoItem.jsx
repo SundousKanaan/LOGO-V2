@@ -15,11 +15,11 @@ import { convertPx } from "../../hooks/useConvertPx";
 import Dropdown from "../mini-components/Dropdown";
 import InputField from "../mini-components/InputField";
 import Checkboxes from "../mini-components/checkboxes";
-import { useUsers } from "../../services/users/getUsers";
+import { useGetAllUsers } from "../../services/users";
 
 function AddNewTodoItem({ defaultStatus, assignedList, onFormChange }) {
   const [taskStatus, setTaskStatus] = useState(defaultStatus);
-  const { data: dbUsers, isLoading } = useUsers();
+  const { data: dbUsers, isLoading } = useGetAllUsers();
   const [usersData, setUsersData] = useState([]);
   const [selectedUserIds, setSelectedUserIds] = useState([]);
   const [taskTitle, setTaskTitle] = useState("");

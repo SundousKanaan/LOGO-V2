@@ -6,22 +6,25 @@ import {
   createListCollection,
   HStack,
   Text,
-  Box,
   Skeleton,
 } from "@chakra-ui/react";
 import { useQueryClient } from "react-query";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { convertPx } from "../hooks/useConvertPx";
-import { useTodolistsArray } from "../services/todoList/getTodolists";
-import { useListDetails } from "../services/todoList/getListDetails";
-import { postTodoList } from "../services/todoList/postTodoList";
-import { updateTodoList } from "../services/todoList/updateTodoList";
-import { deleteTodoList } from "../services/todoList/deleteTodoList";
 import { useListPermissions } from "../hooks/usePermissions";
-import { postTodoItem } from "../services/todoItem/postTodoItem";
-import { deleteTodoItem } from "../services/todoItem/deleteTodoItem";
-import { updateTodoItem } from "../services/todoItem/updateTodoItem";
+import {
+  useTodolistsArray,
+  useListDetails,
+  postTodoList,
+  updateTodoList,
+  deleteTodoList,
+} from "../services/todoList";
+import {
+  postTodoItem,
+  deleteTodoItem,
+  updateTodoItem,
+} from "../services/todoItem";
 
 import Dropdown from "../components/mini-components/Dropdown";
 import ButtonItem from "../components/mini-components/ButtonItem";
@@ -75,18 +78,9 @@ export default function Profile() {
 
   // Initiële selectie
   useEffect(() => {
-    console.log(
-      "== todoListsArray",
-      isListsArrayFetched && todoListsArray.length > 0 && !selectedList
-    );
-
     if (isListsArrayFetched && todoListsArray.length > 0 && !selectedList) {
-      console.log("Setting initial selected list");
-
       setSelectedList(todoListsArray[0]);
       setListTitle(todoListsArray[0].title);
-    } else {
-      console.log("No lists available or already selected a list");
     }
   }, [todoListsArray, selectedList, isListsArrayFetched]);
 
