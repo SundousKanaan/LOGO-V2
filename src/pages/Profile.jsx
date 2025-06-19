@@ -70,7 +70,7 @@ export default function Profile() {
     enabled: !!selectedList?.id, // only fetch if we have a valid ID
   });
 
-  // Effects
+  // ==== Effects ====
   // Redirect to login if not authenticated
   useEffect(() => {
     if (!isAuthenticated) navigate("/login", { replace: true });
@@ -84,6 +84,7 @@ export default function Profile() {
     }
   }, [todoListsArray, selectedList, isListsArrayFetched]);
 
+  // Create dropdown collection for lists
   useEffect(() => {
     if (!selectedList) return;
 
@@ -97,6 +98,7 @@ export default function Profile() {
     queryClient.invalidateQueries("todolistsArray");
   }, [selectedList, todoListsArray, queryClient]);
 
+  // Check permissions and set editable state
   useEffect(() => {
     if (!selectedList || todoListsArray?.length === 0) return;
 
@@ -107,9 +109,11 @@ export default function Profile() {
     setIsEditable(canBeEdit);
 
     refetchListDetails();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedList, todoListsArray]);
 
-  // Handlers
+  // ==== Handlers ====
   async function handleChangeList(data) {
     const selected = todoListsArray.find((item) => item.id === data.value[0]);
     setSelectedList(selected);
@@ -130,7 +134,7 @@ export default function Profile() {
     setNewTaskDetails(formData);
   }, []);
 
-  // Popups Actions
+  //  ==== Popups Actions ====
   // list handlers
   async function handlePopupAction() {
     if (openListPopup === "create") return await handleCreateList();
@@ -182,13 +186,15 @@ export default function Profile() {
   async function handleCreateListItem() {
     await postTodoItem(newTaskDetails);
     setOpenItemPopup(null);
-    queryClient.invalidateQueries("todolistDetails");
+    await queryClient.invalidateQueries("todolistDetails");
+    await refetchListDetails();
   }
 
   async function handleDeleteListItem(taskId) {
     await deleteTodoItem(taskId);
     setOpenItemPopup(null);
-    queryClient.invalidateQueries("todolistDetails");
+    await queryClient.invalidateQueries("todolistDetails");
+    await refetchListDetails();
   }
 
   async function handleEditListItem(newTaskDetails) {
@@ -205,17 +211,18 @@ export default function Profile() {
     await updateTodoItem(req);
     setOpenItemPopup(null);
     setNewTaskDetails(null);
-    queryClient.invalidateQueries("todolistDetails");
+    await queryClient.invalidateQueries("todolistDetails");
+    await refetchListDetails();
   }
 
-  // Validation
+  // ==== Validation ====
   function isTaskDetailsValid(form) {
     return (
       form && form.title && form.title.trim() !== "" && form.assignee.length > 0
     );
   }
 
-  // Renderers
+  // ==== Renderers ====
   function renderListsDropdown() {
     if (
       listDropdownCollection &&
