@@ -52,35 +52,62 @@ function TodoItem({
               {data.title}
             </HeadingItem>
             {/* status dropdown */}
-            <Dropdown
-              collection={status}
-              defaultValue={data.status}
-              handleChange={handleStatusChange}
-              withIndicator={isEditable}
-              fontWeight={600}
-              bg={
-                data.status === "pending"
-                  ? "lightThemeColor"
-                  : data.status === "in_progress"
-                  ? "statusOrangeLight"
-                  : "statusGreenLight"
-              }
-              color={
-                data.status === "pending"
-                  ? "themeColor"
-                  : data.status === "in_progress"
-                  ? "statusOrange"
-                  : "statusGreen"
-              }
-              borderRadius={convertPx(4)}
-              buttonProps={{ borderColor: "transparent" }}
-            >
-              {status.items.map((state, index) => (
-                <Select.Item item={state} key={index}>
-                  <Select.ItemText>{state.label}</Select.ItemText>
-                </Select.Item>
-              ))}
-            </Dropdown>
+            {isEditable ? (
+              <Dropdown
+                collection={status}
+                defaultValue={data.status}
+                handleChange={handleStatusChange}
+                withIndicator={isEditable}
+                fontWeight={600}
+                bg={
+                  data.status === "pending"
+                    ? "lightThemeColor"
+                    : data.status === "in_progress"
+                    ? "statusOrangeLight"
+                    : "statusGreenLight"
+                }
+                color={
+                  data.status === "pending"
+                    ? "themeColor"
+                    : data.status === "in_progress"
+                    ? "statusOrange"
+                    : "statusGreen"
+                }
+                borderRadius={convertPx(4)}
+                buttonProps={{ borderColor: "transparent" }}
+              >
+                {status.items.map((state, index) => (
+                  <Select.Item item={state} key={index}>
+                    <Select.ItemText>{state.label}</Select.ItemText>
+                  </Select.Item>
+                ))}
+              </Dropdown>
+            ) : (
+              <Text
+                fontSize={convertPx(14)}
+                fontWeight={600}
+                bg={
+                  data.status === "pending"
+                    ? "lightThemeColor"
+                    : data.status === "in_progress"
+                    ? "statusOrangeLight"
+                    : "statusGreenLight"
+                }
+                color={
+                  data.status === "pending"
+                    ? "themeColor"
+                    : data.status === "in_progress"
+                    ? "statusOrange"
+                    : "statusGreen"
+                }
+                borderRadius={convertPx(4)}
+                px={convertPx(10)}
+                py={convertPx(2)}
+                textTransform="capitalize"
+              >
+                {status.items.find((item) => item.value === data.status)?.label}
+              </Text>
+            )}
           </VStack>
           <Spacer />
           <ButtonItem

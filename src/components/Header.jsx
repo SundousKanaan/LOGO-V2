@@ -7,6 +7,8 @@ import {
   HStack,
   VStack,
   Avatar,
+  Skeleton,
+  SkeletonCircle,
 } from "@chakra-ui/react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { HiMenuAlt2 } from "react-icons/hi";
@@ -24,11 +26,7 @@ export default function Header({ toggleNavbar }) {
   const [pageTitle, setPageTitle] = useState("");
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const { currentUser } = useAuth();
-
-  const [userName, setUserName] = useState("");
-  const [imgSrc, setImgSrc] = useState("");
-  const [role, setRole] = useState("");
+  const { currentUser, isLoading } = useAuth();
 
   useEffect(() => {
     const currentPath = Pathes.find((path) => path.path === pathname);
@@ -40,21 +38,9 @@ export default function Header({ toggleNavbar }) {
     }
   }, [pathname]);
 
-  useEffect(() => {
-    if (currentUser) {
-      setUserName(currentUser.displayName);
-      setImgSrc(currentUser.photo);
-      setRole(currentUser.role);
-    }
-  }, [currentUser]);
-
   function handleToggleNavbar() {
     toggleNavbar();
   }
-
-  // const userName = currentUser?.displayName;
-  // const imgSrc = currentUser?.photo; // !TODO: change to dynamic value
-  // const role = currentUser?.role; // !TODO: change to dynamic value
 
   return (
     <Flex
@@ -104,17 +90,27 @@ export default function Header({ toggleNavbar }) {
       >
         <SearchBar />
 
-        {/* !TODO: change to dynamic values: img.src & texts */}
         <HStack>
-          <Box
-            onClick={() => navigate(`/profile/${userName}`, { replace: true })}
-            cursor="pointer"
-          >
-            <Avatar.Root colorPalette={UsePickRandomColor(userName)}>
-              <Avatar.Fallback />
-              <Avatar.Image src={imgSrc} alt={`${userName} profile photo`} />
-            </Avatar.Root>
-          </Box>
+          <SkeletonCircle loading={isLoading}>
+            <Box
+              onClick={() =>
+                navigate(`/profile/${currentUser?.displayName}`, {
+                  replace: true,
+                })
+              }
+              cursor="pointer"
+            >
+              <Avatar.Root
+                colorPalette={UsePickRandomColor(currentUser?.firstName)}
+              >
+                <Avatar.Fallback />
+                <Avatar.Image
+                  src={currentUser?.photo}
+                  alt={`${currentUser?.displayName} profile photo`}
+                />
+              </Avatar.Root>
+            </Box>
+          </SkeletonCircle>
 
           <VStack
             width={{ base: "fit-content", md: "fit-content" }}
@@ -122,32 +118,42 @@ export default function Header({ toggleNavbar }) {
             gap="0"
             display={{ base: "none", lg: "flex" }}
           >
-            <LinkItem
-              height="fit-content"
-              variant="text"
-              to={`/profile/${userName}`}
+            <Skeleton
+              loading={isLoading}
+              width={convertPx(100)}
+              height={convertPx(20)}
+              mb={convertPx(4)}
             >
-              <HeadingItem
-                fontSize={convertPx(18)}
-                lineHeight={convertPx(16)}
-                fontWeight="500"
-                padding={convertPx(1)}
-                whiteSpace="nowrap"
-                textTransform="capitalize"
+              <LinkItem
+                height="fit-content"
+                variant="text"
+                to={`/profile/${currentUser?.displayName}`}
               >
-                {userName}
-              </HeadingItem>
-            </LinkItem>
-            <Text
-              fontSize={convertPx(14)}
-              fontWeight="400"
-              opacity="0.5"
-              color="secondaryColor"
-              textTransform="capitalize"
-              lineHeight={convertPx(16)}
-            >
-              {role}
-            </Text>
+                <HeadingItem
+                  fontSize={convertPx(18)}
+                  lineHeight={convertPx(16)}
+                  fontWeight="500"
+                  padding={convertPx(1)}
+                  whiteSpace="nowrap"
+                  textTransform="capitalize"
+                >
+                  {currentUser?.displayName}
+                </HeadingItem>
+              </LinkItem>
+            </Skeleton>
+
+            <Skeleton loading={isLoading} width={convertPx(50)}>
+              <Text
+                fontSize={convertPx(14)}
+                fontWeight="400"
+                opacity="0.5"
+                color="secondaryColor"
+                textTransform="capitalize"
+                lineHeight={convertPx(16)}
+              >
+                {currentUser?.role}
+              </Text>
+            </Skeleton>
           </VStack>
         </HStack>
       </Flex>

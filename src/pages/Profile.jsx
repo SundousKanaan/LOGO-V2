@@ -95,7 +95,6 @@ export default function Profile() {
       })),
     });
     setListDropdownCollection(dropdownCollection);
-    queryClient.invalidateQueries("todolistsArray");
   }, [selectedList, todoListsArray, queryClient]);
 
   // Check permissions and set editable state
@@ -144,6 +143,8 @@ export default function Profile() {
 
   async function handleCreateList() {
     await postTodoList({ title: listTitle, owner: currentUser.uid });
+    queryClient.invalidateQueries("todolistsArray");
+
     const { data: updatedData } = await refetchTodoLists();
     const newList = updatedData.find(
       (item) => item.title === listTitle && item.owner === currentUser.uid
@@ -209,10 +210,10 @@ export default function Profile() {
       },
     };
     await updateTodoItem(req);
-    setOpenItemPopup(null);
-    setNewTaskDetails(null);
     await queryClient.invalidateQueries("todolistDetails");
     await refetchListDetails();
+    setOpenItemPopup(null);
+    setNewTaskDetails(null);
   }
 
   // ==== Validation ====
@@ -232,7 +233,7 @@ export default function Profile() {
       return (
         <Dropdown
           collection={listDropdownCollection}
-          defaultValue={selectedList?.id} // todo: fix this
+          // defaultValue={selectedList?.id} // todo: fix this
           placeholder={selectedList?.title}
           handleChange={handleChangeList}
           withIndicator
