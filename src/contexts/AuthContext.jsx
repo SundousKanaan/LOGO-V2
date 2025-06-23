@@ -2,7 +2,6 @@ import { createContext, useContext, useState, useEffect } from "react";
 import { loginUser, logoutUser } from "../firebase/authService";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { setAuthToken } from "../services/api";
-// import login function from firebase
 import { useGetAllUsers, postUser } from "../services/users";
 
 const AuthContext = createContext();
@@ -10,6 +9,7 @@ const AuthContext = createContext();
 export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
   const { data: dbUsers, isLoading } = useGetAllUsers();
+  const [userToken, setUserToken] = useState(null);
   const storedAuthStatus =
     JSON.parse(localStorage.getItem("isAuthenticated")) || false;
 
@@ -35,11 +35,13 @@ export function AuthProvider({ children }) {
           role: matchedUser?.user_type,
         });
         const token = await user.getIdToken();
+        setUserToken(token);
         setAuthToken(token); // set the token in the header
 
         localStorage.setItem("isAuthenticated", true);
         setIsAuthenticated(true);
       } else {
+        setUserToken(null);
         setAuthToken(null); // remove the token from the header
         localStorage.removeItem("isAuthenticated");
         setIsAuthenticated(false);
@@ -113,6 +115,7 @@ export function AuthProvider({ children }) {
         errorMessage,
         currentUser,
         isLoading,
+        userToken,
         login,
         logout,
         registerUser,

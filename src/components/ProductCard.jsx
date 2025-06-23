@@ -1,28 +1,26 @@
-import { Image, Text, VStack, HStack, Card, Spacer } from "@chakra-ui/react";
+import { forwardRef } from "react";
+import { Image, Text, VStack, Card } from "@chakra-ui/react";
 import { convertPx } from "../hooks/useConvertPx";
 import LinkItem from "../components/mini-components/LinkItem";
 import HeadingItem from "../components/mini-components/HeadingItem";
 
-function ProductCard({
-  viewMode,
-  imageSrc,
-  title,
-  url,
-  status,
-  viewDetailsLink,
-  sourceLink,
-}) {
+const ProductCard = forwardRef((props, ref) => {
+  let { viewMode, imageSrc, title, url, status, viewDetailsLink, sourceLink } =
+    props;
+
   if (!viewMode) {
     viewMode = "grid";
   }
+
   return (
     <Card.Root
+      ref={ref}
       layerStyle={
         viewMode === "grid" ? "ProductCardGridLayout" : "ProductCardListLayout"
       }
     >
       <Image
-        src={imageSrc}
+        src={imageSrc || "src/assets/product-placeholder.png"}
         alt="Product Image"
         borderRadius={viewMode === "grid" ? convertPx(24) : convertPx(8)}
         boxSize={viewMode === "grid" ? "100%" : convertPx(68)}
@@ -63,19 +61,20 @@ function ProductCard({
           h="fit-content"
           fontSize={{ base: convertPx(12), md: convertPx(14) }}
           fontWeight="500"
+          textTransform={"capitalize"}
           color={
-            status === "Removed"
-              ? "statusGreen"
-              : status === "Reminder Sent"
+            status === "removed"
+              ? "statusRed"
+              : status === "reminder sent"
               ? "statusOrange"
-              : "statusRed"
+              : "statusGreen"
           }
           bg={
-            status === "Removed"
-              ? "statusGreenLight"
-              : status === "Reminder Sent"
+            status === "removed"
+              ? "statusRedLight"
+              : status === "reminder sent"
               ? "statusOrangeLight"
-              : "statusRedLight"
+              : "statusGreenLight"
           }
           padding={`${convertPx(6)} ${convertPx(12)}`}
           borderRadius={convertPx(8)}
@@ -156,6 +155,6 @@ function ProductCard({
       </Card.Footer>
     </Card.Root>
   );
-}
+});
 
 export default ProductCard;
