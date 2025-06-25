@@ -16,6 +16,7 @@ export function useCreateTodoItem(listId) {
       ]);
 
       const tempId = `temp-${Date.now()}`; // Temporary ID for optimistic update
+
       queryClient.setQueryData(["todolistDetails", listId], (oldData) => ({
         ...oldData,
         items: [
@@ -23,14 +24,15 @@ export function useCreateTodoItem(listId) {
           {
             ...newItem,
             id: tempId,
-            // created_at: new Date().toISOString(),
-            // last_modified: new Date().toISOString(),
+            created_at: new Date().toISOString(),
+            last_modified: new Date().toISOString(),
           },
         ],
       }));
 
       return {
         previousListDetails,
+        tempId,
       };
     },
 
@@ -43,11 +45,12 @@ export function useCreateTodoItem(listId) {
       }
     },
 
-    // eslint-disable-next-line no-unused-vars
-    onSuccess: (realItem, tempItem, context) => {
-      const tempId = tempItem.id;
-      queryClient.setQueriesData(["todolistDetails", listId], (oldData) => {
+    onSuccess: (realItem, _variables, context) => {
+      const tempId = context?.tempId;
+      if (!tempId) return;
+      queryClient.setQueryData(["todolistDetails", listId], (oldData) => {
         if (!oldData) return oldData;
+
         return {
           ...oldData,
           items: oldData.items.map((item) =>

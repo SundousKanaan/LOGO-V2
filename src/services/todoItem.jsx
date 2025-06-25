@@ -11,7 +11,8 @@ export async function updateTodoItem(req) {
 
 export async function postTodoItem(data) {
   try {
-    await api.post("todos/todo_items/", data);
+    const response = await api.post("todos/todo_items/", data);
+    return response.data;
   } catch (error) {
     console.error("API Error:", error);
     throw error;

@@ -21,11 +21,9 @@ import {
   deleteTodoList,
 } from "../services/todoList";
 import {
-  // postTodoItem,
   deleteTodoItem,
   updateTodoItem,
 } from "../services/todoItem";
-// import { useCreateTodoList } from "../hooks/useTodoListEvents";
 import { useCreateTodoItem } from "../hooks/useTodoItemEvents";
 
 import Dropdown from "../components/mini-components/Dropdown";
@@ -188,14 +186,10 @@ export default function Profile() {
 
   // list items handlers
   async function handleCreateListItem() {
-    // await postTodoItem(newTaskDetails);
-    // setOpenItemPopup(null);
-    // await queryClient.invalidateQueries("todolistDetails");
-    // await refetchListDetails();
     if (!newListItemDetails) return;
+    setOpenItemPopup(null);
     createTodoItem.mutate(newListItemDetails, {
       onSuccess: () => {
-        setOpenItemPopup(null);
         setNewListItemDetails(null);
       },
     });
