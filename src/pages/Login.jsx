@@ -88,7 +88,7 @@ export default function Login() {
         width={convertPx(350)}
       >
         <Field.Root>
-          <Field.Label>Email</Field.Label>
+          <Field.Label color="secondaryColor">Email</Field.Label>
           <InputField
             h={convertPx(50)}
             type="email"
@@ -102,7 +102,7 @@ export default function Login() {
         </Field.Root>
 
         <Field.Root>
-          <Field.Label>Password</Field.Label>
+          <Field.Label color="secondaryColor">Password</Field.Label>
           <InputField
             h={convertPx(50)}
             type="password"

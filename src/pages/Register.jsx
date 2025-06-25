@@ -122,7 +122,7 @@ function Registing() {
       >
         <HStack>
           <Field.Root>
-            <Field.Label>First name</Field.Label>
+            <Field.Label color="secondaryColor">First name</Field.Label>
             <InputField
               h={convertPx(50)}
               type="text"
@@ -143,7 +143,7 @@ function Registing() {
           </Field.Root>
 
           <Field.Root>
-            <Field.Label>Last name</Field.Label>
+            <Field.Label color="secondaryColor">Last name</Field.Label>
             <InputField
               h={convertPx(50)}
               type="text"
@@ -165,7 +165,7 @@ function Registing() {
         </HStack>
 
         <Field.Root>
-          <Field.Label>Email</Field.Label>
+          <Field.Label color="secondaryColor">Email</Field.Label>
           <InputField
             h={convertPx(50)}
             type="email"
@@ -186,7 +186,7 @@ function Registing() {
         </Field.Root>
 
         <Field.Root>
-          <Field.Label>Birthday</Field.Label>
+          <Field.Label color="secondaryColor">Birthday</Field.Label>
           <InputField
             h={convertPx(50)}
             type="date"
@@ -207,7 +207,7 @@ function Registing() {
         </Field.Root>
 
         <Field.Root>
-          <Field.Label>Password</Field.Label>
+          <Field.Label color="secondaryColor">Password</Field.Label>
           <InputField
             h={convertPx(50)}
             type="password"
@@ -227,7 +227,7 @@ function Registing() {
           />
         </Field.Root>
         <Field.Root>
-          <Field.Label>Confirm Password</Field.Label>
+          <Field.Label color="secondaryColor">Confirm Password</Field.Label>
           <InputField
             h={convertPx(50)}
             type="password"
