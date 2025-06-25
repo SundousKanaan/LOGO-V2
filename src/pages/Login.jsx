@@ -71,7 +71,11 @@ export default function Login() {
       bg="lightGray"
     >
       <Stack>
-        <Fieldset.Legend fontWeight="800" fontSize={convertPx(30)}>
+        <Fieldset.Legend
+          fontWeight="800"
+          fontSize={convertPx(30)}
+          color="secondaryColor"
+        >
           Login
         </Fieldset.Legend>
       </Stack>
@@ -142,7 +146,7 @@ export default function Login() {
       </ButtonItem>
 
       <Text
-        fontSize={convertPx(10)}
+        fontSize={convertPx(12)}
         fontWeight="600"
         color="secondaryColor"
         textAlign="center"

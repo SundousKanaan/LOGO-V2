@@ -104,7 +104,11 @@ function Registing() {
       bg="lightGray"
     >
       <Stack>
-        <Fieldset.Legend fontWeight="800" fontSize={convertPx(30)}>
+        <Fieldset.Legend
+          fontWeight="800"
+          fontSize={convertPx(30)}
+          color="secondaryColor"
+        >
           Sign up
         </Fieldset.Legend>
       </Stack>
@@ -289,7 +293,7 @@ function Registing() {
       </ButtonItem>
 
       <Text
-        fontSize={convertPx(10)}
+        fontSize={convertPx(12)}
         fontWeight="600"
         color="secondaryColor"
         textAlign="center"

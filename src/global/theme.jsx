@@ -92,35 +92,43 @@ const layerStyles = defineLayerStyles({
   },
 });
 
-export const system = createSystem(defaultConfig, {
-  theme: {
-    tokens: {
-      fonts: {
-        heading: { value: "Urbanist, sans-serif" },
-        body: { value: "Inter, sans-serif" },
-      },
-      colors: {
-        themeColor: { value: "#6f6cf3" },
-        secondaryColor: { value: "#161819" },
-        lightGray: { value: "#f6f6f8" },
-        lightGray2: { value: "#f1f1f1" },
-        lightBlue: { value: "#F4F6F7" },
-        redColor: { value: "#ff4a4a" },
-        lightBlack: { value: "#00000050" },
-        lightThemeColor: { value: "#c6c6fb" },
+const colorModeConfig = {
+  initialColorMode: "light",
+  useSystemColorMode: false,
+};
 
-        statusRed: { value: "#ff4a4a" },
-        statusRedLight: { value: "#FDE8E8" },
-        statusGreen: { value: "#42AA65" },
-        statusGreenLight: { value: "#EBFDEF" },
+export const system = createSystem(
+  { ...defaultConfig, config: colorModeConfig },
+  {
+    theme: {
+      semanticTokens: {
+        fonts: {
+          heading: { value: "Urbanist, sans-serif" },
+          body: { value: "Inter, sans-serif" },
+        },
+        colors: {
+          themeColor: { value: "#6f6cf3" },
+          secondaryColor: { value: "#161819" },
+          lightGray: { value: "#f6f6f8" },
+          lightGray2: { value: "#f1f1f1" },
+          lightBlue: { value: "#F4F6F7" },
+          redColor: { value: "#ff4a4a" },
+          lightBlack: { value: "#00000050" },
+          lightThemeColor: { value: "#c6c6fb" },
 
-        statusOrange: { value: "#FF9600" },
-        statusOrangeLight: { value: "#FFEFE7" },
+          statusRed: { value: "#ff4a4a" },
+          statusRedLight: { value: "#FDE8E8" },
+          statusGreen: { value: "#42AA65" },
+          statusGreenLight: { value: "#EBFDEF" },
+
+          statusOrange: { value: "#FF9600" },
+          statusOrangeLight: { value: "#FFEFE7" },
+        },
       },
+      layerStyles,
     },
-    layerStyles,
-  },
-});
+  }
+);
 
 export const colorsPalette = [
   "red",

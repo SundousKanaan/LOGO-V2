@@ -117,6 +117,8 @@ export default function Navbar({ toggleNavbar }) {
         justifyContent="start"
         gap={convertPx(12)}
         onClick={handleLogout}
+        bg="transparent"
+        color="secondaryColor"
       >
         <LogoutIcon size="lg" />
         Log out

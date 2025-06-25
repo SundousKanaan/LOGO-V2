@@ -44,6 +44,7 @@ export default function InputField({
           top="50%"
           transform="translateY(-50%)"
           bg="transparent"
+          color="secondaryColor"
           onClick={togglePasswordVisibility}
         >
           {showPassword ? <FiEyeOff /> : <FiEye />}

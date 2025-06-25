@@ -121,6 +121,7 @@ function TodoItem({
             h={convertPx(30)}
             pl={convertPx(8)}
             pr={convertPx(8)}
+            bg="transparent"
             onClick={handleEditItem}
             display={isEditable ? "flex" : "none"}
             disabled={isTemporary}
@@ -133,6 +134,7 @@ function TodoItem({
             h={convertPx(30)}
             pl={convertPx(8)}
             pr={convertPx(8)}
+            bg="transparent"
             onClick={handleDeleteItem}
             display={isEditable ? "flex" : "none"}
             disabled={isTemporary}

@@ -28,6 +28,7 @@ export default function SearchBar() {
         variant="filled"
         borderRadius={convertPx(8)}
         bg="white"
+        color="secondaryColor"
         _placeholder={{
           color: "secondaryColor",
           opacity: "0.5",
