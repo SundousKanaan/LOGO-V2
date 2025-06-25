@@ -25,11 +25,6 @@ function Registing() {
   const handleChangeValidation = (e) => {
     const { name, value } = e.target;
 
-    setRegisterMessage("");
-    setIsUserNameValid("none");
-    setIsEmailValid("none");
-    setIsPasswordValid("none");
-
     if (name === "firstName") {
       setFirstName(value);
     } else if (name === "lastName") {

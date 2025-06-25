@@ -30,3 +30,15 @@ export async function postUser(userData) {
     throw error;
   }
 }
+
+// put (update) a user in the API
+export async function putUser(req) {
+  console.log("Updating user with data:", req);
+
+  try {
+    await api.put(`users/api/${req.data.firebase_uid}/`, req);
+  } catch (error) {
+    console.error("API Error:", error);
+    throw error;
+  }
+}
