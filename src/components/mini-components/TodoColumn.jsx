@@ -59,7 +59,7 @@ function TodoColumn({ title, count, handleOpenPopup, isEditable, children }) {
           boxShadow: "none",
         }}
         onClick={handleOpenPopup}
-        disabled={!isEditable}
+        display={isEditable ? "flex" : "none"}
       >
         <Icon as={FaPlus} color="secondaryColor" h={convertPx(16)} />
         <HeadingItem fontSize={convertPx(13)} color="secondaryColor">

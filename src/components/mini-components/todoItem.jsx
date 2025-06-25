@@ -26,6 +26,7 @@ function TodoItem({
   handleEditItem,
   handleStatusChange,
   isEditable,
+  isTemporary = false,
 }) {
   const status = createListCollection({
     items: [
@@ -37,7 +38,11 @@ function TodoItem({
 
   return (
     <>
-      <Flex layerStyle="TodoItemLayout">
+      <Flex
+        layerStyle="TodoItemLayout"
+        id={data.id}
+        opacity={isTemporary ? 0.5 : 1}
+      >
         <HStack
           borderBottom={
             data.description !== "" &&
@@ -57,7 +62,7 @@ function TodoItem({
                 collection={status}
                 defaultValue={data.status}
                 handleChange={handleStatusChange}
-                withIndicator={isEditable}
+                withIndicator={isEditable && !isTemporary}
                 fontWeight={600}
                 bg={
                   data.status === "pending"
@@ -118,6 +123,7 @@ function TodoItem({
             pr={convertPx(8)}
             onClick={handleEditItem}
             display={isEditable ? "flex" : "none"}
+            disabled={isTemporary}
           >
             <Icon as={MdModeEdit} color="secondaryColor" />
           </ButtonItem>
@@ -129,6 +135,7 @@ function TodoItem({
             pr={convertPx(8)}
             onClick={handleDeleteItem}
             display={isEditable ? "flex" : "none"}
+            disabled={isTemporary}
           >
             <Icon as={IoCloseCircleOutline} color="secondaryColor" />
           </ButtonItem>

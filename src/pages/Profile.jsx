@@ -21,10 +21,12 @@ import {
   deleteTodoList,
 } from "../services/todoList";
 import {
-  postTodoItem,
+  // postTodoItem,
   deleteTodoItem,
   updateTodoItem,
 } from "../services/todoItem";
+// import { useCreateTodoList } from "../hooks/useTodoListEvents";
+import { useCreateTodoItem } from "../hooks/useTodoItemEvents";
 
 import Dropdown from "../components/mini-components/Dropdown";
 import ButtonItem from "../components/mini-components/ButtonItem";
@@ -38,12 +40,6 @@ import AddNewTodoItem from "../components/forms-components/AddNewTodoItem";
 import EditeTodoItem from "../components/forms-components/EditeTodoItem";
 
 export default function Profile() {
-  // Hooks
-  const { isAuthenticated, currentUser } = useAuth();
-  const { checkPermissions } = useListPermissions();
-  const navigate = useNavigate();
-  const queryClient = useQueryClient();
-
   // State
   const [selectedList, setSelectedList] = useState(null);
   const [listDropdownCollection, setListDropdownCollection] = useState(null);
@@ -51,7 +47,14 @@ export default function Profile() {
   const [openItemPopup, setOpenItemPopup] = useState(null);
   const [listTitle, setListTitle] = useState("");
   const [isEditable, setIsEditable] = useState(false);
-  const [newTaskDetails, setNewTaskDetails] = useState(null);
+  const [newListItemDetails, setNewListItemDetails] = useState(null);
+
+  // Hooks
+  const { isAuthenticated, currentUser } = useAuth();
+  const { checkPermissions } = useListPermissions();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const createTodoItem = useCreateTodoItem(selectedList?.id);
 
   // Data fetching
   const {
@@ -125,12 +128,12 @@ export default function Profile() {
   }
 
   function openCreateItemPopup(colTitle) {
-    setNewTaskDetails(null);
+    setNewListItemDetails(null);
     setOpenItemPopup({ case: "create", title: colTitle });
   }
 
   const handleNewTaskChange = useCallback((formData) => {
-    setNewTaskDetails(formData);
+    setNewListItemDetails(formData);
   }, []);
 
   //  ==== Popups Actions ====
@@ -185,10 +188,17 @@ export default function Profile() {
 
   // list items handlers
   async function handleCreateListItem() {
-    await postTodoItem(newTaskDetails);
-    setOpenItemPopup(null);
-    await queryClient.invalidateQueries("todolistDetails");
-    await refetchListDetails();
+    // await postTodoItem(newTaskDetails);
+    // setOpenItemPopup(null);
+    // await queryClient.invalidateQueries("todolistDetails");
+    // await refetchListDetails();
+    if (!newListItemDetails) return;
+    createTodoItem.mutate(newListItemDetails, {
+      onSuccess: () => {
+        setOpenItemPopup(null);
+        setNewListItemDetails(null);
+      },
+    });
   }
 
   async function handleDeleteListItem(taskId) {
@@ -213,7 +223,7 @@ export default function Profile() {
     await queryClient.invalidateQueries("todolistDetails");
     await refetchListDetails();
     setOpenItemPopup(null);
-    setNewTaskDetails(null);
+    setNewListItemDetails(null);
   }
 
   // ==== Validation ====
@@ -351,9 +361,9 @@ export default function Profile() {
             onSave={handleCreateListItem}
             onClose={() => {
               setOpenItemPopup(null);
-              setNewTaskDetails(null);
+              setNewListItemDetails(null);
             }}
-            disableSaveButton={!isTaskDetailsValid(newTaskDetails)}
+            disableSaveButton={!isTaskDetailsValid(newListItemDetails)}
           >
             <AddNewTodoItem
               defaultStatus={openItemPopup.title}
@@ -388,7 +398,7 @@ export default function Profile() {
             title={`Edit ${openItemPopup.title}`}
             ActionButtonText="Save changes"
             onClose={() => setOpenItemPopup(null)}
-            onSave={() => handleEditListItem(newTaskDetails)}
+            onSave={() => handleEditListItem(newListItemDetails)}
           >
             <EditeTodoItem
               data={listDetails.items.find(
@@ -396,7 +406,7 @@ export default function Profile() {
               )}
               assignedList={selectedList}
               onChange={(updatedData) => {
-                setNewTaskDetails(updatedData);
+                setNewListItemDetails(updatedData);
               }}
             />
           </Popup>
@@ -476,25 +486,29 @@ export default function Profile() {
         isListDetailsFetched &&
         listDetails?.items?.length >= 0 && (
           <TodoList>
-            {["pending", "in_progress", "done"].map((colTitle, index) => (
+            {["pending", "in_progress", "done"].map((colTitle) => (
               <TodoColumn
-                key={index}
+                key={colTitle}
                 title={colTitle}
                 count={
-                  listDetails?.items.filter((item) => item.status === colTitle)
-                    .length || 0
+                  (
+                    listDetails?.items?.filter(
+                      (item) => item?.status === colTitle
+                    ) || []
+                  ).length
                 }
                 handleOpenPopup={() => openCreateItemPopup(colTitle)}
                 isEditable={isEditable}
               >
                 {listDetails?.items
-                  .filter((item) => item.status === colTitle)
+                  ?.filter((item) => item && item.status === colTitle)
                   .map((item) => (
                     <TodoItem
                       key={item.id}
                       data={item}
                       listMembers={listDetails.members}
                       isEditable={isEditable}
+                      isTemporary={String(item.id).startsWith("temp-")}
                       handleDeleteItem={() =>
                         setOpenItemPopup({
                           case: "delete",
