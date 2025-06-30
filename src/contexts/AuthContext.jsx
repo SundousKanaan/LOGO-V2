@@ -8,11 +8,10 @@ const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
-  const { data: dbUsers, isLoading } = useGetAllUsers();
+  const { data: dbUsers, isLoading, isFetched } = useGetAllUsers();
   const [userToken, setUserToken] = useState(null);
   const storedAuthStatus =
     JSON.parse(localStorage.getItem("isAuthenticated")) || false;
-
   const [isAuthenticated, setIsAuthenticated] = useState(storedAuthStatus);
   const [errorMessage, setErrorMessage] = useState(null);
 
@@ -25,15 +24,18 @@ export function AuthProvider({ children }) {
         const matchedUser = dbUsers?.find(
           (dbUser) => dbUser.firebase_uid === user.uid
         );
-        setCurrentUser({
+        const userData = {
           uid: user.uid,
           email: user.email,
-          firstName: matchedUser?.first_name,
-          lastName: matchedUser?.last_name,
-          displayName: user.displayName,
+          first_name: matchedUser?.first_name,
+          last_name: matchedUser?.last_name,
           photo: matchedUser?.photoURL,
-          role: matchedUser?.user_type,
-        });
+          user_type: matchedUser?.user_type,
+          phone: matchedUser?.phone,
+          birthday: matchedUser?.birthday,
+        };
+        setCurrentUser(userData);
+
         const token = await user.getIdToken();
         setUserToken(token);
         setAuthToken(token); // set the token in the header
@@ -41,10 +43,7 @@ export function AuthProvider({ children }) {
         localStorage.setItem("isAuthenticated", true);
         setIsAuthenticated(true);
       } else {
-        setUserToken(null);
-        setAuthToken(null); // remove the token from the header
-        localStorage.removeItem("isAuthenticated");
-        setIsAuthenticated(false);
+        logout();
       }
     });
 
@@ -55,7 +54,6 @@ export function AuthProvider({ children }) {
   const login = async (email, password) => {
     try {
       await loginUser(email, password);
-      setErrorMessage("Login successful, Welcome back!");
       setIsAuthenticated(true);
       setTimeout(() => {
         setErrorMessage(null);
@@ -72,7 +70,7 @@ export function AuthProvider({ children }) {
     setErrorMessage("Logout successful, see you soon!");
     setIsAuthenticated(false);
 
-    localStorage.removeItem("isAuthenticated");
+    localStorage.clear();
     try {
       await logoutUser();
     } catch (error) {
@@ -115,6 +113,7 @@ export function AuthProvider({ children }) {
         errorMessage,
         currentUser,
         isLoading,
+        isFetched,
         userToken,
         login,
         logout,

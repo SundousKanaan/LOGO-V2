@@ -5,8 +5,10 @@ import {
   Spacer,
   createListCollection,
   HStack,
+  VStack,
   Text,
   Skeleton,
+  Avatar,
 } from "@chakra-ui/react";
 import { useQueryClient } from "react-query";
 import { useNavigate } from "react-router-dom";
@@ -20,11 +22,10 @@ import {
   updateTodoList,
   deleteTodoList,
 } from "../services/todoList";
-import {
-  deleteTodoItem,
-  updateTodoItem,
-} from "../services/todoItem";
+import { deleteTodoItem, updateTodoItem } from "../services/todoItem";
 import { useCreateTodoItem } from "../hooks/useCreateTodoItem";
+import { UsePickRandomColor } from "../hooks/usePickRandomColor";
+import { putUser, deleteUser } from "../services/users";
 
 import Dropdown from "../components/mini-components/Dropdown";
 import ButtonItem from "../components/mini-components/ButtonItem";
@@ -36,6 +37,7 @@ import TodoColumn from "../components/mini-components/TodoColumn";
 import TodoItem from "../components/mini-components/todoItem";
 import AddNewTodoItem from "../components/forms-components/AddNewTodoItem";
 import EditeTodoItem from "../components/forms-components/EditeTodoItem";
+import EditeUser from "../components/forms-components/EditeUser";
 
 export default function Profile() {
   // State
@@ -46,9 +48,13 @@ export default function Profile() {
   const [listTitle, setListTitle] = useState("");
   const [isEditable, setIsEditable] = useState(false);
   const [newListItemDetails, setNewListItemDetails] = useState(null);
+  const [openUserPopup, setOpenUserPopup] = useState(null);
+  const [errorEditMessage, setErrorEditMessage] = useState(null);
 
   // Hooks
-  const { isAuthenticated, currentUser } = useAuth();
+  const { isAuthenticated, currentUser, isFetched, isLoading, logout } =
+    useAuth();
+  const [accountData, setAccountData] = useState();
   const { checkPermissions } = useListPermissions();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -79,7 +85,7 @@ export default function Profile() {
 
   // Initiële selectie
   useEffect(() => {
-    if (isListsArrayFetched && todoListsArray.length > 0 && !selectedList) {
+    if (isListsArrayFetched && todoListsArray?.length > 0 && !selectedList) {
       setSelectedList(todoListsArray[0]);
       setListTitle(todoListsArray[0].title);
     }
@@ -112,6 +118,34 @@ export default function Profile() {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedList, todoListsArray]);
+
+  useEffect(() => {
+    if (!currentUser) return;
+    setAccountData(currentUser);
+    const isValid_F_Name =
+      currentUser.first_name !== "" &&
+      /^[A-Za-z]+$/.test(currentUser.first_name);
+    const isValid_L_Name =
+      currentUser.last_name !== "" && /^[A-Za-z]+$/.test(currentUser.last_name);
+    const isValid_phone =
+      currentUser.phone === "" ||
+      (currentUser.phone && /^\+\d{1,3}\d{6,14}$/.test(currentUser.phone));
+
+    if (!isValid_F_Name || !isValid_L_Name) {
+      setErrorEditMessage({
+        type: "name",
+        message: "Please check the first and last name format.",
+      });
+    } else if (!isValid_phone) {
+      console.log("Valid phone number:", currentUser.phone);
+      setErrorEditMessage({
+        type: "phone",
+        message: "Please check the phone number format.",
+      });
+    } else {
+      setErrorEditMessage(null);
+    }
+  }, [currentUser]);
 
   // ==== Handlers ====
   async function handleChangeList(data) {
@@ -218,6 +252,62 @@ export default function Profile() {
     await refetchListDetails();
     setOpenItemPopup(null);
     setNewListItemDetails(null);
+  }
+
+  // user
+  const handleUserDataChange = (e) => {
+    const { name, value } = e.target;
+
+    if (name === "firstName") {
+      setAccountData((prevData) => ({
+        ...prevData,
+        first_name: value.trim(),
+      }));
+    } else if (name === "lastName") {
+      setAccountData((prevData) => ({
+        ...prevData,
+        last_name: value.trim(),
+      }));
+    } else if (name === "phone") {
+      setAccountData((prevData) => ({
+        ...prevData,
+        phone: value.trim(),
+      }));
+    } else if (name === "birthday") {
+      setAccountData((prevData) => ({
+        ...prevData,
+        birthday: value.trim(),
+      }));
+    }
+  };
+
+  async function handleUpdateUser() {
+    if (!accountData) return;
+    const reqData = {
+      firebase_uid: accountData.uid,
+      first_name: accountData.first_name,
+      last_name: accountData.last_name,
+      email: accountData.email,
+      phone: accountData.phone || "",
+      birthday: accountData.birthday || "",
+      is_active: true,
+      user_type: accountData.user_type,
+    };
+
+    await putUser(reqData);
+    queryClient.invalidateQueries(["allUsers"]);
+    setOpenUserPopup(false);
+    setAccountData(null);
+    setErrorEditMessage(null);
+  }
+
+  async function handleDeleteUser() {
+    if (!accountData) return;
+    await deleteUser(accountData.uid);
+    await logout();
+    setOpenUserPopup(false);
+    setAccountData(null);
+    setErrorEditMessage(null);
   }
 
   // ==== Validation ====
@@ -378,9 +468,16 @@ export default function Profile() {
               handleDeleteListItem(openItemPopup.id);
             }}
           >
-            <Text>Are you sure you want to delete this task?</Text>
-            <Text color={"redColor"} fontWeight={600} mt={convertPx(16)}>
-              This action cannot be undone. Please confirm to proceed.
+            <Text fontSize={convertPx(16)}>
+              Are you sure you want to delete this task?
+            </Text>
+            <Text
+              color={"redColor"}
+              fontSize={convertPx(14)}
+              mt={convertPx(16)}
+            >
+              This action cannot be undone. Please confirm to proceed with the
+              deletion.
             </Text>
           </Popup>
         );
@@ -412,8 +509,130 @@ export default function Profile() {
     }
   }
 
+  function renderUserPopup() {
+    switch (openUserPopup) {
+      case "edit":
+        return (
+          <Popup
+            title={"Edit Account"}
+            isOpen
+            onClose={() => {
+              setOpenUserPopup(false);
+              setErrorEditMessage(null);
+            }}
+            onSave={handleUpdateUser}
+            ActionButtonText="Save"
+          >
+            <EditeUser
+              user={currentUser}
+              errorState={null}
+              handleInputChange={(e) => handleUserDataChange(e)}
+              handleRoleChange={(option) =>
+                setAccountData((prevData) => ({
+                  ...prevData,
+                  user_type: option.value[0],
+                }))
+              }
+            />
+            {errorEditMessage && <Text>{errorEditMessage.message}</Text>}
+          </Popup>
+        );
+
+      case "delete":
+        return (
+          <Popup
+            title={"Delete Account"}
+            isOpen
+            onClose={() => {
+              setOpenUserPopup(false);
+              setErrorEditMessage(null);
+            }}
+            onSave={handleDeleteUser}
+            ActionButtonText="Delete"
+          >
+            <Text>Are you sure you want to delete this account?</Text>
+            <Text
+              color={"redColor"}
+              fontSize={convertPx(14)}
+              mt={convertPx(16)}
+            >
+              This action cannot be undone. Please confirm to proceed with the
+              deletion.
+            </Text>
+          </Popup>
+        );
+
+      default:
+        return null;
+    }
+  }
+
   return (
     <>
+      <Skeleton loading={!isFetched && isLoading}>
+        <Flex
+          bg={"white"}
+          borderRadius={convertPx(7)}
+          padding={`${convertPx(24)} ${convertPx(16)}`}
+          mb={convertPx(24)}
+          flexDirection={{ base: "column", lg: "row" }}
+          alignItems="center"
+          gap={convertPx(14)}
+        >
+          <Avatar.Root
+            boxShadow={`0 0 0 ${convertPx(3)} var(--chakra-colors-gray-100)`}
+            size={"2xl"}
+            colorPalette={UsePickRandomColor(currentUser?.first_name)}
+          >
+            <Avatar.Fallback />
+            <Avatar.Image
+              src={currentUser?.photo}
+              alt={`${currentUser?.first_name} ${currentUser?.last_name} profile photo`}
+            />
+          </Avatar.Root>
+          <VStack gap={0} alignItems={{ base: "center", lg: "start" }}>
+            <Text
+              fontSize={convertPx(16)}
+              fontWeight={600}
+              color="secondaryColor"
+              textTransform="capitalize"
+            >
+              {currentUser?.first_name} {currentUser?.last_name}
+            </Text>
+            <Text fontSize={convertPx(14)} fontWeight={400} color="gray.500">
+              {currentUser?.email}
+            </Text>
+            <Text
+              fontSize={convertPx(14)}
+              fontWeight={400}
+              color="gray.500"
+              textTransform={"capitalize"}
+            >
+              {currentUser?.user_type}
+            </Text>
+          </VStack>
+          <Spacer display={{ base: "none", lg: "block" }} />
+          <HStack>
+            <ButtonItem
+              bg="themeColor"
+              color="white"
+              w={convertPx(100)}
+              onClick={() => setOpenUserPopup("edit")}
+            >
+              Edit
+            </ButtonItem>
+            <ButtonItem
+              bg="redColor"
+              color="white"
+              w={convertPx(100)}
+              onClick={() => setOpenUserPopup("delete")}
+            >
+              Delete
+            </ButtonItem>
+          </HStack>
+        </Flex>
+      </Skeleton>
+
       <Flex
         w="100%"
         flexDirection={{ base: "column", lg: "row" }}
@@ -537,6 +756,7 @@ export default function Profile() {
       {/* popups */}
       {renderListPopup()}
       {renderItemPopup()}
+      {renderUserPopup()}
     </>
   );
 }

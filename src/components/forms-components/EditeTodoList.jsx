@@ -4,6 +4,8 @@ import { UsePickRandomColor } from "../../hooks/usePickRandomColor";
 import InputField from "../mini-components/InputField";
 
 function EditeTodoList({ user, handleInputChange, listTitle }) {
+  console.log("==", user);
+
   return (
     <>
       <Fieldset.Root>
@@ -13,15 +15,19 @@ function EditeTodoList({ user, handleInputChange, listTitle }) {
             <HStack>
               <Avatar.Root
                 size="xs"
-                colorPalette={UsePickRandomColor(user.displayName)}
+                colorPalette={UsePickRandomColor(
+                  user.first_name + user.last_name
+                )}
               >
                 <Avatar.Fallback />
                 <Avatar.Image
                   src={user.photo}
-                  alt={`${user.displayName} profile photo`}
+                  alt={`${user.first_name} ${user.last_name} profile photo`}
                 />
               </Avatar.Root>
-              <Text>{user.displayName}</Text>
+              <Text>
+                {user.first_name} {user.last_name}
+              </Text>
             </HStack>
           </HStack>
 

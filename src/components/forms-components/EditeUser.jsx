@@ -1,15 +1,16 @@
 import {
-  HStack,
   Fieldset,
   Field,
   Select,
   createListCollection,
 } from "@chakra-ui/react";
+import { useAuth } from "../../contexts/AuthContext";
 import { convertPx } from "../../hooks/useConvertPx";
 import InputField from "../mini-components/InputField";
 import Dropdown from "../mini-components/Dropdown";
 
-function EditeUser({ user, errorState, handleRoleChange, handleChangeName }) {
+function EditeUser({ user, errorState, handleRoleChange, handleInputChange }) {
+  const { currentUser } = useAuth();
   const roleCollection = createListCollection({
     items: [
       { value: "admin", label: "Admin" },
@@ -24,7 +25,6 @@ function EditeUser({ user, errorState, handleRoleChange, handleChangeName }) {
           display="flex"
           flexDirection="column"
           alignItems="center"
-          // width={convertPx(350)}
         >
           <Field.Root
             display="flex"
@@ -47,7 +47,7 @@ function EditeUser({ user, errorState, handleRoleChange, handleChangeName }) {
                   ? "inset 0 0 0 1px var(--chakra-colors-status-red)"
                   : "inset 0 0 0 1px var(--chakra-colors-status-green)"
               }
-              onChange={handleChangeName}
+              onChange={handleInputChange}
             />
           </Field.Root>
 
@@ -72,7 +72,7 @@ function EditeUser({ user, errorState, handleRoleChange, handleChangeName }) {
                   ? "inset 0 0 0 1px var(--chakra-colors-status-red)"
                   : "inset 0 0 0 1px var(--chakra-colors-status-green)"
               }
-              onChange={handleChangeName}
+              onChange={handleInputChange}
             />
           </Field.Root>
 
@@ -98,7 +98,7 @@ function EditeUser({ user, errorState, handleRoleChange, handleChangeName }) {
                   ? "inset 0 0 0 1px var(--chakra-colors-status-red)"
                   : "inset 0 0 0 1px var(--chakra-colors-status-green)"
               }
-              onChange={handleChangeName}
+              onChange={handleInputChange}
             />
           </Field.Root>
 
@@ -107,26 +107,55 @@ function EditeUser({ user, errorState, handleRoleChange, handleChangeName }) {
             flexDirection="row"
             gap={convertPx(20)}
             w="100%"
-            h={convertPx(50)}
           >
             <Field.Label w={convertPx(120)} color="secondaryColor">
-              Role
+              Birthday
             </Field.Label>
-            <Dropdown
-              collection={roleCollection}
-              defaultValue={user.user_type}
-              withIndicator
-              handleChange={handleRoleChange}
+            <InputField
+              required
               h={convertPx(50)}
-              w="100%"
-            >
-              {roleCollection.items.map((item) => (
-                <Select.Item item={item} key={item.value}>
-                  <Select.ItemText>{item.label}</Select.ItemText>
-                </Select.Item>
-              ))}
-            </Dropdown>
+              type="date"
+              name="birthday"
+              defaultValue={user.birthday}
+              placeholder={"Birthday: YYYY-MM-DD"}
+              bg="white"
+              color="secondaryColor"
+              boxShadow={
+                errorState?.type === "birthday"
+                  ? "inset 0 0 0 1px var(--chakra-colors-status-red)"
+                  : "inset 0 0 0 1px var(--chakra-colors-status-green)"
+              }
+              onChange={handleInputChange}
+            />
           </Field.Root>
+
+          {currentUser?.user_type === "admin" && (
+            <Field.Root
+              display="flex"
+              flexDirection="row"
+              gap={convertPx(20)}
+              w="100%"
+              h={convertPx(50)}
+            >
+              <Field.Label w={convertPx(120)} color="secondaryColor">
+                Role
+              </Field.Label>
+              <Dropdown
+                collection={roleCollection}
+                defaultValue={user.user_type}
+                withIndicator
+                handleChange={handleRoleChange}
+                h={convertPx(50)}
+                w="100%"
+              >
+                {roleCollection.items.map((item) => (
+                  <Select.Item item={item} key={item.value}>
+                    <Select.ItemText>{item.label}</Select.ItemText>
+                  </Select.Item>
+                ))}
+              </Dropdown>
+            </Field.Root>
+          )}
         </Fieldset.Content>
       )}
     </Fieldset.Root>

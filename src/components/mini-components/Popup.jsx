@@ -7,6 +7,7 @@ function Popup({
   onClose,
   onSave,
   disableSaveButton,
+  withoutButtons = false,
   ActionButtonText = "Save",
   children,
 }) {
@@ -22,22 +23,28 @@ function Popup({
 
             <Dialog.Body>{children}</Dialog.Body>
 
-            <Dialog.Footer justifyContent={"space-between"}>
-              <Dialog.ActionTrigger asChild>
-                <Button w={convertPx(150)} variant="outline" onClick={onClose}>
-                  Cancel
+            {!withoutButtons && (
+              <Dialog.Footer justifyContent={"space-between"}>
+                <Dialog.ActionTrigger asChild>
+                  <Button
+                    w={convertPx(150)}
+                    variant="outline"
+                    onClick={onClose}
+                  >
+                    Cancel
+                  </Button>
+                </Dialog.ActionTrigger>
+                <Button
+                  w={convertPx(150)}
+                  bg={"themeColor"}
+                  onClick={onSave}
+                  disabled={disableSaveButton}
+                  textTransform={"capitalize"}
+                >
+                  {ActionButtonText}
                 </Button>
-              </Dialog.ActionTrigger>
-              <Button
-                w={convertPx(150)}
-                bg={"themeColor"}
-                onClick={onSave}
-                disabled={disableSaveButton}
-                textTransform={"capitalize"}
-              >
-                {ActionButtonText}
-              </Button>
-            </Dialog.Footer>
+              </Dialog.Footer>
+            )}
 
             <Dialog.CloseTrigger asChild>
               <CloseButton size="sm" onClick={onClose} />

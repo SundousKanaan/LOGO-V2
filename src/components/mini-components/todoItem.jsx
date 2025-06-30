@@ -10,11 +10,10 @@ import {
   Select,
   createListCollection,
 } from "@chakra-ui/react";
-import { IoCloseCircleOutline } from "react-icons/io5";
 import { UsePickRandomColor } from "../../hooks/usePickRandomColor";
 import { convertPx } from "../../hooks/useConvertPx";
 import { FaRegClock } from "react-icons/fa6";
-import { MdUpdate, MdModeEdit } from "react-icons/md";
+import { MdUpdate, MdModeEdit, MdOutlineDeleteForever } from "react-icons/md";
 
 import HeadingItem from "./HeadingItem";
 import Dropdown from "./Dropdown";
@@ -139,7 +138,7 @@ function TodoItem({
             display={isEditable ? "flex" : "none"}
             disabled={isTemporary}
           >
-            <Icon as={IoCloseCircleOutline} color="secondaryColor" />
+            <Icon as={MdOutlineDeleteForever} color="secondaryColor" />
           </ButtonItem>
         </HStack>
         <Text

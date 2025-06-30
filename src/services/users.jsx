@@ -33,10 +33,18 @@ export async function postUser(userData) {
 
 // put (update) a user in the API
 export async function putUser(req) {
-  console.log("Updating user with data:", req);
-
   try {
-    await api.put(`users/api/${req.data.firebase_uid}/`, req);
+    await api.put(`users/api/${req.firebase_uid}/`, req);
+  } catch (error) {
+    console.error("API Error:", error);
+    throw error;
+  }
+}
+
+// delete a user from the API
+export async function deleteUser(firebaseUid) {
+  try {
+    await api.delete(`users/api/${firebaseUid}/`);
   } catch (error) {
     console.error("API Error:", error);
     throw error;

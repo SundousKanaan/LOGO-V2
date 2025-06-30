@@ -94,19 +94,22 @@ export default function Header({ toggleNavbar }) {
           <SkeletonCircle loading={isLoading}>
             <Box
               onClick={() =>
-                navigate(`/profile/${currentUser?.displayName}`, {
-                  replace: true,
-                })
+                navigate(
+                  `/profile/${currentUser?.first_name}${currentUser?.last_name}`,
+                  {
+                    replace: true,
+                  }
+                )
               }
               cursor="pointer"
             >
               <Avatar.Root
-                colorPalette={UsePickRandomColor(currentUser?.firstName)}
+                colorPalette={UsePickRandomColor(currentUser?.first_name)}
               >
                 <Avatar.Fallback />
                 <Avatar.Image
                   src={currentUser?.photo}
-                  alt={`${currentUser?.displayName} profile photo`}
+                  alt={`${currentUser?.first_name} ${currentUser?.last_name} profile photo`}
                 />
               </Avatar.Root>
             </Box>
@@ -127,7 +130,7 @@ export default function Header({ toggleNavbar }) {
               <LinkItem
                 height="fit-content"
                 variant="text"
-                to={`/profile/${currentUser?.displayName}`}
+                to={`/profile/${currentUser?.first_name}${currentUser?.last_name}`}
               >
                 <HeadingItem
                   fontSize={convertPx(18)}
@@ -137,7 +140,7 @@ export default function Header({ toggleNavbar }) {
                   whiteSpace="nowrap"
                   textTransform="capitalize"
                 >
-                  {currentUser?.displayName}
+                  {currentUser?.first_name} {currentUser?.last_name}
                 </HeadingItem>
               </LinkItem>
             </Skeleton>
@@ -151,7 +154,7 @@ export default function Header({ toggleNavbar }) {
                 textTransform="capitalize"
                 lineHeight={convertPx(16)}
               >
-                {currentUser?.role}
+                {currentUser?.user_type}
               </Text>
             </Skeleton>
           </VStack>
