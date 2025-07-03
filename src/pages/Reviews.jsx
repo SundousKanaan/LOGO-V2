@@ -124,14 +124,9 @@ export default function Reviews() {
               return (
                 <ProductCard
                   ref={isLastProduct ? lastProductElementRef : null}
+                  data={product}
                   key={index}
                   viewMode={viewMode}
-                  imageSrc={product.image_src}
-                  title={product.title}
-                  url={product.video_url}
-                  status={product.status}
-                  viewDetailsLink="#"
-                  sourceLink={product.source}
                 />
               );
             })}

@@ -4,36 +4,35 @@ import { convertPx } from "../hooks/useConvertPx";
 import LinkItem from "../components/mini-components/LinkItem";
 import HeadingItem from "../components/mini-components/HeadingItem";
 
-const ProductCard = forwardRef((props, ref) => {
-  let { viewMode, imageSrc, title, url, status, viewDetailsLink, sourceLink } =
-    props;
-
+const ProductCard = forwardRef(({ data, viewMode }, ref) => {
   if (!viewMode) {
     viewMode = "grid";
   }
+
+  const isGridMode = viewMode === "grid";
 
   return (
     <Card.Root
       ref={ref}
       layerStyle={
-        viewMode === "grid" ? "ProductCardGridLayout" : "ProductCardListLayout"
+        isGridMode ? "ProductCardGridLayout" : "ProductCardListLayout"
       }
     >
       <Image
-        src={imageSrc || "src/assets/product-placeholder.png"}
+        src={data?.image_src || "src/assets/product-placeholder.png"}
         alt="Product Image"
-        borderRadius={viewMode === "grid" ? convertPx(24) : convertPx(8)}
-        boxSize={viewMode === "grid" ? "100%" : convertPx(68)}
+        borderRadius={isGridMode ? convertPx(24) : convertPx(8)}
+        boxSize={isGridMode ? "100%" : convertPx(68)}
         aspectRatio="1/1"
         layerStyle="ProductCardLayout.img"
       />
       <Card.Body
         p="0"
-        gap={viewMode === "grid" ? convertPx(4) : convertPx(24)}
-        flexDir={viewMode === "grid" ? "column" : "row"}
-        alignItems={viewMode === "grid" ? "start" : "center"}
+        gap={isGridMode ? convertPx(4) : convertPx(24)}
+        flexDir={isGridMode ? "column" : "row"}
+        alignItems={isGridMode ? "start" : "center"}
         justifyContent={{
-          base: viewMode === "grid" ? "start" : "space-between",
+          base: isGridMode ? "start" : "space-between",
           lg: "start",
         }}
       >
@@ -43,7 +42,7 @@ const ProductCard = forwardRef((props, ref) => {
             lineHeight={convertPx(20)}
             lineClamp={2}
           >
-            {title}
+            {data?.title}
           </HeadingItem>
 
           <Text
@@ -52,7 +51,7 @@ const ProductCard = forwardRef((props, ref) => {
             opacity=".6"
             lineClamp={1}
           >
-            {url}
+            {data?.video_url}
           </Text>
         </VStack>
 
@@ -63,52 +62,53 @@ const ProductCard = forwardRef((props, ref) => {
           fontWeight="500"
           textTransform={"capitalize"}
           color={
-            status === "removed"
+            data?.status === "removed"
               ? "statusRed"
-              : status === "reminder sent"
+              : data?.status === "reminder sent"
               ? "statusOrange"
               : "statusGreen"
           }
           bg={
-            status === "removed"
+            data?.status === "removed"
               ? "statusRedLight"
-              : status === "reminder sent"
+              : data?.status === "reminder sent"
               ? "statusOrangeLight"
               : "statusGreenLight"
           }
           padding={`${convertPx(6)} ${convertPx(12)}`}
           borderRadius={convertPx(8)}
-          position={viewMode === "grid" ? "absolute" : "static"}
+          position={isGridMode ? "absolute" : "static"}
           top={convertPx(28)}
           left={convertPx(28)}
         >
-          {status}
+          {data?.status}
         </Text>
       </Card.Body>
 
       <Card.Footer
-        alignItems={viewMode === "grid" ? "end" : "center"}
+        alignItems={isGridMode ? "end" : "center"}
         justifyContent={{
-          base: viewMode === "grid" ? "space-between" : "end",
+          base: isGridMode ? "space-between" : "end",
           lg: "space-between",
         }}
         p="0"
         mt={convertPx(4)}
         width={{
           base: "100%",
-          lg: viewMode === "grid" ? "auto" : "fit-content",
+          lg: isGridMode ? "auto" : "fit-content",
         }}
-        gap={viewMode === "grid" ? "0" : convertPx(16)}
+        gap={isGridMode ? "0" : convertPx(16)}
       >
         <LinkItem
-          href={viewDetailsLink}
+          path={"#"}
+          target="_blank"
           variant="button"
           color="white"
           fontSize={convertPx(14)}
           fontWeight="500"
           bg="themeColor"
           padding={
-            viewMode === "grid"
+            isGridMode
               ? `${convertPx(6)} ${convertPx(12)}`
               : {
                   base: `${convertPx(16)} ${convertPx(12)}`,
@@ -116,7 +116,7 @@ const ProductCard = forwardRef((props, ref) => {
                 }
           }
           height={
-            viewMode === "grid"
+            isGridMode
               ? convertPx(34)
               : { base: convertPx(40), lg: convertPx(54) }
           }
@@ -126,14 +126,14 @@ const ProductCard = forwardRef((props, ref) => {
           View Details
         </LinkItem>
         <LinkItem
-          href={sourceLink}
+          href={data?.source}
           variant="button"
           color="white"
           fontSize={convertPx(14)}
           fontWeight="500"
           bg="secondaryColor"
           padding={
-            viewMode === "grid"
+            isGridMode
               ? `${convertPx(6)} ${convertPx(12)}`
               : {
                   base: `${convertPx(16)} ${convertPx(12)}`,
@@ -141,14 +141,14 @@ const ProductCard = forwardRef((props, ref) => {
                 }
           }
           height={
-            viewMode === "grid"
+            isGridMode
               ? convertPx(34)
               : { base: convertPx(40), lg: convertPx(54) }
           }
           borderRadius={convertPx(8)}
-          order={viewMode === "grid" ? "0" : "-1"}
+          order={isGridMode ? "0" : "-1"}
           whiteSpace="nowrap"
-          visibility={sourceLink ? "visible" : "hidden"}
+          visibility={data?.source ? "visible" : "hidden"}
         >
           Source
         </LinkItem>

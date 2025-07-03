@@ -1,20 +1,9 @@
 import { useEffect, useState, useCallback } from "react";
-import {
-  Select,
-  Flex,
-  Spacer,
-  createListCollection,
-  HStack,
-  VStack,
-  Text,
-  Skeleton,
-  Avatar,
-} from "@chakra-ui/react";
 import { useQueryClient } from "react-query";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
-import { convertPx } from "../hooks/useConvertPx";
 import { useListPermissions } from "../hooks/usePermissions";
+
 import {
   useTodolistsArray,
   useListDetails,
@@ -24,46 +13,53 @@ import {
 } from "../services/todoList";
 import { deleteTodoItem, updateTodoItem } from "../services/todoItem";
 import { useCreateTodoItem } from "../hooks/useCreateTodoItem";
-import { UsePickRandomColor } from "../hooks/usePickRandomColor";
-import { putUser, deleteUser } from "../services/users";
+import { putUser, deleteUser, validateProfile } from "../services/users";
 
-import Dropdown from "../components/mini-components/Dropdown";
-import ButtonItem from "../components/mini-components/ButtonItem";
-import Popup from "../components/mini-components/Popup";
-import AddNewTodoList from "../components/forms-components/AddNewTodoList";
-import EditeTodoList from "../components/forms-components/EditeTodoList";
-import TodoList from "../components/TodoList";
-import TodoColumn from "../components/mini-components/TodoColumn";
-import TodoItem from "../components/mini-components/todoItem";
-import AddNewTodoItem from "../components/forms-components/AddNewTodoItem";
-import EditeTodoItem from "../components/forms-components/EditeTodoItem";
-import EditeUser from "../components/forms-components/EditeUser";
+import {
+  ListPopup,
+  ListItemPopup,
+  UserPopup,
+} from "../components/ProfilePopups";
+import ProfileCard from "../components/ProfileCard";
+import ListsActions from "../components/ListsActions";
+import TodoBoard from "../components/Todo-Board";
 
 export default function Profile() {
-  // State
+  // =====================
+  // States
+  // =====================
+
   const [selectedList, setSelectedList] = useState(null);
-  const [listDropdownCollection, setListDropdownCollection] = useState(null);
-  const [openListPopup, setOpenListPopup] = useState(null);
-  const [openItemPopup, setOpenItemPopup] = useState(null);
   const [listTitle, setListTitle] = useState("");
   const [isEditable, setIsEditable] = useState(false);
-  const [newListItemDetails, setNewListItemDetails] = useState(null);
-  const [openUserPopup, setOpenUserPopup] = useState(null);
-  const [errorEditMessage, setErrorEditMessage] = useState(null);
 
-  // Hooks
-  const { isAuthenticated, currentUser, isFetched, isLoading, logout } =
-    useAuth();
-  const [accountData, setAccountData] = useState();
-  const { checkPermissions } = useListPermissions();
-  const navigate = useNavigate();
+  const [openListPopup, setOpenListPopup] = useState(null); // create | edit | delete | null
+  const [openItemPopup, setOpenItemPopup] = useState(null); // {case: create | edit | delete, title: column_title} | null
+  const [openUserPopup, setOpenUserPopup] = useState(null); // edit | delete | null
+  const [newListItemDetails, setNewListItemDetails] = useState(null);
+
+  const [errorEditMessage, setErrorEditMessage] = useState(null);
+  const [accountData, setAccountData] = useState(null);
+
+  // =====================
+  // Hooks & data fetching
+  // =====================
+
+  const {
+    isAuthenticated,
+    currentUser,
+    isFetched: isCurrentUserFetched,
+    logout,
+  } = useAuth();
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
+
+  const { checkPermissions } = useListPermissions();
   const createTodoItem = useCreateTodoItem(selectedList?.id);
 
-  // Data fetching
   const {
     data: todoListsArray,
-    isLoading: isListsArrayLoading,
+    // isLoading: isListsArrayLoading,
     refetch: refetchTodoLists,
     isFetched: isListsArrayFetched,
   } = useTodolistsArray(["id", "title", "owner"]);
@@ -77,7 +73,10 @@ export default function Profile() {
     enabled: !!selectedList?.id, // only fetch if we have a valid ID
   });
 
-  // ==== Effects ====
+  // =====================
+  // Effects
+  // =====================
+
   // Redirect to login if not authenticated
   useEffect(() => {
     if (!isAuthenticated) navigate("/login", { replace: true });
@@ -91,63 +90,55 @@ export default function Profile() {
     }
   }, [todoListsArray, selectedList, isListsArrayFetched]);
 
-  // Create dropdown collection for lists
-  useEffect(() => {
-    if (!selectedList) return;
-
-    const dropdownCollection = createListCollection({
-      items: todoListsArray.map((item) => ({
-        label: item.title,
-        value: item.id,
-      })),
-    });
-    setListDropdownCollection(dropdownCollection);
-  }, [selectedList, todoListsArray, queryClient]);
-
   // Check permissions and set editable state
   useEffect(() => {
     if (!selectedList || todoListsArray?.length === 0) return;
-
-    const found = todoListsArray.find((l) => l.id === selectedList.id);
+    const found = todoListsArray.find((list) => list.id === selectedList.id);
     if (!found) return;
 
     const canBeEdit = checkPermissions(selectedList);
+
     setIsEditable(canBeEdit);
 
-    refetchListDetails();
+    const fetchListData = async () => {
+      await refetchListDetails();
+    };
+    fetchListData();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedList, todoListsArray]);
 
   useEffect(() => {
-    if (!currentUser) return;
-    setAccountData(currentUser);
-    const isValid_F_Name =
-      currentUser.first_name !== "" &&
-      /^[A-Za-z]+$/.test(currentUser.first_name);
-    const isValid_L_Name =
-      currentUser.last_name !== "" && /^[A-Za-z]+$/.test(currentUser.last_name);
-    const isValid_phone =
-      currentUser.phone === "" ||
-      (currentUser.phone && /^\+\d{1,3}\d{6,14}$/.test(currentUser.phone));
+    if (!accountData) return;
 
-    if (!isValid_F_Name || !isValid_L_Name) {
-      setErrorEditMessage({
-        type: "name",
-        message: "Please check the first and last name format.",
-      });
-    } else if (!isValid_phone) {
-      console.log("Valid phone number:", currentUser.phone);
-      setErrorEditMessage({
-        type: "phone",
-        message: "Please check the phone number format.",
-      });
-    } else {
-      setErrorEditMessage(null);
-    }
-  }, [currentUser]);
+    validateProfile(accountData).then((res) => {
+      if (!res.success) {
+        const errors = res.errors;
+        if (errors.first_name || errors.last_name) {
+          console.log("1 Profile validation errors:", errors);
 
-  // ==== Handlers ====
+          setErrorEditMessage({
+            type: "name",
+            message: errors.first_name?.[0] || errors.last_name?.[0],
+          });
+        } else if (errors.phone) {
+          console.log("2 Profile validation errors:", errors);
+          setErrorEditMessage({
+            type: "phone",
+            message: errors.phone[0],
+          });
+        }
+      } else {
+        setErrorEditMessage(null);
+      }
+    });
+  }, [accountData]);
+
+  // =====================
+  // Handlers
+  // =====================
+
+  // list selection change
   async function handleChangeList(data) {
     const selected = todoListsArray.find((item) => item.id === data.value[0]);
     setSelectedList(selected);
@@ -155,6 +146,7 @@ export default function Profile() {
     queryClient.invalidateQueries("todolistDetails");
   }
 
+  // Input change for list title
   function handleInputChange(e) {
     setListTitle(e.target.value);
   }
@@ -170,19 +162,15 @@ export default function Profile() {
 
   //  ==== Popups Actions ====
   // list handlers
-  async function handlePopupAction() {
-    if (openListPopup === "create") return await handleCreateList();
-    if (openListPopup === "delete") return await handleDeleteList();
-    if (openListPopup === "edit") return await handleEditList();
-  }
 
   async function handleCreateList() {
-    await postTodoList({ title: listTitle, owner: currentUser.uid });
+    await postTodoList({ title: listTitle, owner: currentUser.id });
     queryClient.invalidateQueries("todolistsArray");
 
     const { data: updatedData } = await refetchTodoLists();
     const newList = updatedData.find(
-      (item) => item.title === listTitle && item.owner === currentUser.uid
+      (item) =>
+        item.title === listTitle && item.owner === currentUser.firebase_uid
     );
     setSelectedList(newList);
     setListTitle(listTitle);
@@ -194,10 +182,11 @@ export default function Profile() {
       id: selectedList.id,
       title: listTitle,
       owner: selectedList.owner,
+      items: listDetails?.items.map((item) => item.id) || [],
     };
     await updateTodoList(updatedListData);
-
-    setSelectedList(updatedListData);
+    setSelectedList((prev) => ({ ...prev, title: listTitle }));
+    setListTitle(listTitle);
     setOpenListPopup(null);
   }
 
@@ -284,7 +273,8 @@ export default function Profile() {
   async function handleUpdateUser() {
     if (!accountData) return;
     const reqData = {
-      firebase_uid: accountData.uid,
+      firebase_uid: accountData.firebase_uid,
+      id: accountData.id,
       first_name: accountData.first_name,
       last_name: accountData.last_name,
       email: accountData.email,
@@ -303,7 +293,7 @@ export default function Profile() {
 
   async function handleDeleteUser() {
     if (!accountData) return;
-    await deleteUser(accountData.uid);
+    await deleteUser(accountData.id);
     await logout();
     setOpenUserPopup(false);
     setAccountData(null);
@@ -311,452 +301,77 @@ export default function Profile() {
   }
 
   // ==== Validation ====
-  function isTaskDetailsValid(form) {
-    return (
-      form && form.title && form.title.trim() !== "" && form.assignee.length > 0
-    );
-  }
-
-  // ==== Renderers ====
-  function renderListsDropdown() {
-    if (
-      listDropdownCollection &&
-      Array.isArray(listDropdownCollection.items) &&
-      listDropdownCollection.items.length > 0
-    ) {
-      return (
-        <Dropdown
-          collection={listDropdownCollection}
-          // defaultValue={selectedList?.id} // todo: fix this
-          placeholder={selectedList?.title}
-          handleChange={handleChangeList}
-          withIndicator
-          height={convertPx(40)}
-          width={{ base: "100%", lg: convertPx(400) }}
-          bg="white"
-          color="secondaryColor"
-          borderRadius={convertPx(4)}
-          buttonProps={{
-            height: "100%",
-            border: "none",
-          }}
-        >
-          {listDropdownCollection.items.map((list) => (
-            <Select.Item
-              item={list}
-              key={list.value}
-              flex={"none"}
-              h={convertPx(60)}
-              cursor={"pointer"}
-              borderBottom={`${convertPx(
-                3
-              )} solid var(--chakra-colors-theme-color)`}
-            >
-              <Select.ItemText>{list.label}</Select.ItemText>
-            </Select.Item>
-          ))}
-        </Dropdown>
-      );
-    }
-    return (
-      <Dropdown
-        disabled
-        collection={null}
-        placeholder="No lists available"
-        withIndicator
-        width={{ base: "100%", lg: convertPx(400) }}
-        bg="white"
-        color="secondaryColor"
-        height={convertPx(40)}
-        borderRadius={convertPx(4)}
-        buttonProps={{
-          height: "100%",
-          border: "none",
-        }}
-      />
-    );
-  }
-
-  function renderListPopup() {
-    switch (openListPopup) {
-      case "create":
-        return (
-          <Popup
-            isOpen
-            title={"Create new list"}
-            onClose={() => setOpenListPopup(null)}
-            onSave={handlePopupAction}
-            ActionButtonText={"create"}
-            disableSaveButton={listTitle === ""}
-          >
-            <AddNewTodoList
-              user={currentUser}
-              handleInputChange={handleInputChange}
-            />
-          </Popup>
-        );
-      case "edit":
-        return (
-          <Popup
-            isOpen
-            title={"Edit list"}
-            onClose={() => setOpenListPopup(null)}
-            onSave={handlePopupAction}
-            ActionButtonText={"save"}
-            disableSaveButton={
-              selectedList.title === listTitle || listTitle === ""
-            }
-          >
-            <EditeTodoList
-              user={currentUser}
-              handleInputChange={handleInputChange}
-              listTitle={selectedList.title}
-            />
-          </Popup>
-        );
-      case "delete":
-        return (
-          <Popup
-            isOpen
-            title={"Delete list"}
-            onClose={() => setOpenListPopup(null)}
-            onSave={handlePopupAction}
-            ActionButtonText={"delete"}
-          >
-            <Text>
-              Are you sure you want to delete "{selectedList.title}" list?
-            </Text>
-          </Popup>
-        );
-      default:
-        return null;
-    }
-  }
-
-  function renderItemPopup() {
-    switch (openItemPopup?.case) {
-      case "create": {
-        return (
-          <Popup
-            title={"New Task"}
-            isOpen
-            selectedCol={openItemPopup.title}
-            colTitle={openItemPopup.title}
-            onSave={handleCreateListItem}
-            onClose={() => {
-              setOpenItemPopup(null);
-              setNewListItemDetails(null);
-            }}
-            disableSaveButton={!isTaskDetailsValid(newListItemDetails)}
-          >
-            <AddNewTodoItem
-              defaultStatus={openItemPopup.title}
-              assignedList={selectedList}
-              onFormChange={handleNewTaskChange}
-            />
-          </Popup>
-        );
-      }
-      case "delete": {
-        return (
-          <Popup
-            isOpen={true}
-            title={`Delete ${openItemPopup.title}`}
-            ActionButtonText="Delete task"
-            onClose={() => setOpenItemPopup(null)}
-            onSave={() => {
-              handleDeleteListItem(openItemPopup.id);
-            }}
-          >
-            <Text fontSize={convertPx(16)}>
-              Are you sure you want to delete this task?
-            </Text>
-            <Text
-              color={"redColor"}
-              fontSize={convertPx(14)}
-              mt={convertPx(16)}
-            >
-              This action cannot be undone. Please confirm to proceed with the
-              deletion.
-            </Text>
-          </Popup>
-        );
-      }
-      case "edit": {
-        return (
-          <Popup
-            isOpen={true}
-            title={`Edit ${openItemPopup.title}`}
-            ActionButtonText="Save changes"
-            onClose={() => setOpenItemPopup(null)}
-            onSave={() => handleEditListItem(newListItemDetails)}
-          >
-            <EditeTodoItem
-              data={listDetails.items.find(
-                (item) => item.id === openItemPopup.id
-              )}
-              assignedList={selectedList}
-              onChange={(updatedData) => {
-                setNewListItemDetails(updatedData);
-              }}
-            />
-          </Popup>
-        );
-      }
-
-      default:
-        return null;
-    }
-  }
-
-  function renderUserPopup() {
-    switch (openUserPopup) {
-      case "edit":
-        return (
-          <Popup
-            title={"Edit Account"}
-            isOpen
-            onClose={() => {
-              setOpenUserPopup(false);
-              setErrorEditMessage(null);
-            }}
-            onSave={handleUpdateUser}
-            ActionButtonText="Save"
-          >
-            <EditeUser
-              user={currentUser}
-              errorState={null}
-              handleInputChange={(e) => handleUserDataChange(e)}
-              handleRoleChange={(option) =>
-                setAccountData((prevData) => ({
-                  ...prevData,
-                  user_type: option.value[0],
-                }))
-              }
-            />
-            {errorEditMessage && <Text>{errorEditMessage.message}</Text>}
-          </Popup>
-        );
-
-      case "delete":
-        return (
-          <Popup
-            title={"Delete Account"}
-            isOpen
-            onClose={() => {
-              setOpenUserPopup(false);
-              setErrorEditMessage(null);
-            }}
-            onSave={handleDeleteUser}
-            ActionButtonText="Delete"
-          >
-            <Text>Are you sure you want to delete this account?</Text>
-            <Text
-              color={"redColor"}
-              fontSize={convertPx(14)}
-              mt={convertPx(16)}
-            >
-              This action cannot be undone. Please confirm to proceed with the
-              deletion.
-            </Text>
-          </Popup>
-        );
-
-      default:
-        return null;
-    }
-  }
+  // function isTaskDetailsValid(form) {
+  //   return (
+  //     form && form.title && form.title.trim() !== "" && form.assignee.length > 0
+  //   );
+  // }
 
   return (
     <>
-      <Skeleton loading={!isFetched && isLoading}>
-        <Flex
-          bg={"white"}
-          borderRadius={convertPx(7)}
-          padding={`${convertPx(24)} ${convertPx(16)}`}
-          mb={convertPx(24)}
-          flexDirection={{ base: "column", lg: "row" }}
-          alignItems="center"
-          gap={convertPx(14)}
-        >
-          <Avatar.Root
-            boxShadow={`0 0 0 ${convertPx(3)} var(--chakra-colors-gray-100)`}
-            size={"2xl"}
-            colorPalette={UsePickRandomColor(currentUser?.first_name)}
-          >
-            <Avatar.Fallback />
-            <Avatar.Image
-              src={currentUser?.photo}
-              alt={`${currentUser?.first_name} ${currentUser?.last_name} profile photo`}
-            />
-          </Avatar.Root>
-          <VStack gap={0} alignItems={{ base: "center", lg: "start" }}>
-            <Text
-              fontSize={convertPx(16)}
-              fontWeight={600}
-              color="secondaryColor"
-              textTransform="capitalize"
-            >
-              {currentUser?.first_name} {currentUser?.last_name}
-            </Text>
-            <Text fontSize={convertPx(14)} fontWeight={400} color="gray.500">
-              {currentUser?.email}
-            </Text>
-            <Text
-              fontSize={convertPx(14)}
-              fontWeight={400}
-              color="gray.500"
-              textTransform={"capitalize"}
-            >
-              {currentUser?.user_type}
-            </Text>
-          </VStack>
-          <Spacer display={{ base: "none", lg: "block" }} />
-          <HStack>
-            <ButtonItem
-              bg="themeColor"
-              color="white"
-              w={convertPx(100)}
-              onClick={() => setOpenUserPopup("edit")}
-            >
-              Edit
-            </ButtonItem>
-            <ButtonItem
-              bg="redColor"
-              color="white"
-              w={convertPx(100)}
-              onClick={() => setOpenUserPopup("delete")}
-            >
-              Delete
-            </ButtonItem>
-          </HStack>
-        </Flex>
-      </Skeleton>
+      <ProfileCard
+        user={currentUser}
+        isloading={!isCurrentUserFetched}
+        onEdit={() => setOpenUserPopup("edit")}
+        onDelete={() => setOpenUserPopup("delete")}
+      />
 
-      <Flex
-        w="100%"
-        flexDirection={{ base: "column", lg: "row" }}
-        placeContent="center"
-        justifyContent="start"
-        gap={convertPx(20)}
-        mb={convertPx(16)}
-      >
-        <Skeleton
-          loading={!isListsArrayFetched}
-          height={convertPx(40)}
-          width={{ base: "100%", lg: convertPx(400) }}
-        >
-          {renderListsDropdown()}
-        </Skeleton>
+      <ListsActions
+        todoListsArray={todoListsArray}
+        isLoading={!isListsArrayFetched}
+        isEditable={isEditable}
+        isAuthenticated={isAuthenticated}
+        selectedList={selectedList}
+        onListchange={handleChangeList}
+        onEdit={() => setOpenListPopup("edit")}
+        onDelete={() => setOpenListPopup("delete")}
+        onCreate={() => setOpenListPopup("create")}
+      />
 
-        <Spacer display={{ base: "none", lg: "block" }} />
-        <Skeleton loading={!isListsArrayFetched}>
-          <HStack>
-            <ButtonItem
-              bg="themeColor"
-              color="white"
-              flexGrow={1}
-              onClick={() => setOpenListPopup("edit")}
-              display={isEditable ? "flex" : "none"}
-            >
-              Edit list
-            </ButtonItem>
-            <ButtonItem
-              bg="redColor"
-              color="white"
-              flexGrow={1}
-              onClick={() => setOpenListPopup("delete")}
-              display={isEditable ? "flex" : "none"}
-            >
-              Delete list
-            </ButtonItem>
-            <ButtonItem
-              bg="themeColor"
-              color="white"
-              flexGrow={1}
-              onClick={() => setOpenListPopup("create")}
-              disabled={!isAuthenticated}
-            >
-              Create list
-            </ButtonItem>
-          </HStack>
-        </Skeleton>
-      </Flex>
-
-      {(isListDetailsLoading && isListsArrayLoading) || !isListsArrayFetched ? (
-        <TodoList>
-          {["pending", "in_progress", "done"].map((_, index) => (
-            <Skeleton
-              loading={true}
-              key={index}
-              h={convertPx(350)}
-              minW={convertPx(300)}
-              flexGrow={{ base: 0, md: 1 }}
-            />
-          ))}
-        </TodoList>
-      ) : (
-        isListDetailsFetched &&
-        listDetails?.items?.length >= 0 && (
-          <TodoList>
-            {["pending", "in_progress", "done"].map((colTitle) => (
-              <TodoColumn
-                key={colTitle}
-                title={colTitle}
-                count={
-                  (
-                    listDetails?.items?.filter(
-                      (item) => item?.status === colTitle
-                    ) || []
-                  ).length
-                }
-                handleOpenPopup={() => openCreateItemPopup(colTitle)}
-                isEditable={isEditable}
-              >
-                {listDetails?.items
-                  ?.filter((item) => item && item.status === colTitle)
-                  .map((item) => (
-                    <TodoItem
-                      key={item.id}
-                      data={item}
-                      listMembers={listDetails.members}
-                      isEditable={isEditable}
-                      isTemporary={String(item.id).startsWith("temp-")}
-                      handleDeleteItem={() =>
-                        setOpenItemPopup({
-                          case: "delete",
-                          title: item.title,
-                          id: item.id,
-                        })
-                      }
-                      handleEditItem={() =>
-                        setOpenItemPopup({
-                          case: "edit",
-                          title: item.title,
-                          id: item.id,
-                        })
-                      }
-                      handleStatusChange={(newStatus) => {
-                        handleEditListItem({
-                          ...item,
-                          assignee: item.assignee.map(
-                            (user) => user.firebase_uid
-                          ),
-                          status: newStatus["value"][0],
-                        });
-                      }}
-                    />
-                  ))}
-              </TodoColumn>
-            ))}
-          </TodoList>
-        )
-      )}
+      <TodoBoard
+        isLoading={isListDetailsLoading}
+        isFetched={isListDetailsFetched}
+        listDetails={listDetails}
+        isEditable={isEditable}
+        handleEditListItem={handleEditListItem}
+        openCreateItemPopup={openCreateItemPopup}
+        setOpenItemPopup={setOpenItemPopup}
+      />
 
       {/* popups */}
-      {renderListPopup()}
-      {renderItemPopup()}
-      {renderUserPopup()}
+      <ListPopup
+        user={currentUser}
+        openListPopup={openListPopup}
+        selectedList={selectedList}
+        listTitle={listTitle}
+        handleInputChange={handleInputChange}
+        handleCreateList={handleCreateList}
+        handleEditList={handleEditList}
+        handleDeleteList={handleDeleteList}
+        setOpenListPopup={setOpenListPopup}
+      />
+      <ListItemPopup
+        list={listDetails}
+        openItemPopup={openItemPopup}
+        newListItemDetails={newListItemDetails}
+        handleCreateListItem={handleCreateListItem}
+        handleEditListItem={handleEditListItem}
+        handleDeleteListItem={handleDeleteListItem}
+        setOpenItemPopup={setOpenItemPopup}
+        handleNewTaskChange={handleNewTaskChange}
+      />
+
+      <UserPopup
+        openUserPopup={openUserPopup}
+        user={accountData || currentUser}
+        errorEditMessage={errorEditMessage}
+        handleUpdateUser={handleUpdateUser}
+        handleDeleteUser={handleDeleteUser}
+        setOpenUserPopup={setOpenUserPopup}
+        setAccountData={setAccountData}
+        setErrorEditMessage={setErrorEditMessage}
+        handleUserDataChange={handleUserDataChange}
+      />
     </>
   );
 }

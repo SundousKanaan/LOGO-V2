@@ -4,8 +4,6 @@ import { UsePickRandomColor } from "../../hooks/usePickRandomColor";
 import InputField from "../mini-components/InputField";
 
 function EditeTodoList({ user, handleInputChange, listTitle }) {
-  console.log("==", user);
-
   return (
     <>
       <Fieldset.Root>

@@ -52,7 +52,7 @@ export default function TopSellers() {
         </HeadingItem>
         <Spacer />
         <LinkItem
-          to="/"
+          path="/"
           height="fit-content"
           padding={`${convertPx(5)} ${convertPx(10)}`}
           fontWeight="500"

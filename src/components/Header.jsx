@@ -26,7 +26,7 @@ export default function Header({ toggleNavbar }) {
   const [pageTitle, setPageTitle] = useState("");
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const { currentUser, isLoading } = useAuth();
+  const { currentUser, isFetched } = useAuth();
 
   useEffect(() => {
     const currentPath = Pathes.find((path) => path.path === pathname);
@@ -72,7 +72,7 @@ export default function Header({ toggleNavbar }) {
           <HiMenuAlt2 color="secondaryColor" />
         </ButtonItem>
         <HeadingItem
-          fontSize={convertPx(32)}
+          fontSize={{ base: convertPx(28), md: convertPx(32) }}
           width={{ base: "100%", md: "fit-content" }}
           textAlign={{ base: "center", md: "start" }}
         >
@@ -91,7 +91,7 @@ export default function Header({ toggleNavbar }) {
         <SearchBar />
 
         <HStack>
-          <SkeletonCircle loading={isLoading}>
+          <SkeletonCircle loading={!isFetched}>
             <Box
               onClick={() =>
                 navigate(
@@ -122,7 +122,7 @@ export default function Header({ toggleNavbar }) {
             display={{ base: "none", lg: "flex" }}
           >
             <Skeleton
-              loading={isLoading}
+              loading={!isFetched}
               width={convertPx(100)}
               height={convertPx(20)}
               mb={convertPx(4)}
@@ -130,7 +130,7 @@ export default function Header({ toggleNavbar }) {
               <LinkItem
                 height="fit-content"
                 variant="text"
-                to={`/profile/${currentUser?.first_name}${currentUser?.last_name}`}
+                path={`/profile/${currentUser?.first_name}${currentUser?.last_name}`}
               >
                 <HeadingItem
                   fontSize={convertPx(18)}
@@ -145,7 +145,7 @@ export default function Header({ toggleNavbar }) {
               </LinkItem>
             </Skeleton>
 
-            <Skeleton loading={isLoading} width={convertPx(50)}>
+            <Skeleton loading={!isFetched} width={convertPx(50)}>
               <Text
                 fontSize={convertPx(14)}
                 fontWeight="400"

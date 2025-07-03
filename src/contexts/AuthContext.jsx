@@ -1,54 +1,45 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { loginUser, logoutUser } from "../firebase/authService";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { setAuthToken } from "../services/api";
-import { useGetAllUsers, postUser } from "../services/users";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { useGetUserDetails, postUser } from "../services/users";
+import { useQueryClient } from "react-query";
 
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
-  const [currentUser, setCurrentUser] = useState(null);
-  const { data: dbUsers, isLoading, isFetched } = useGetAllUsers();
-  const [userToken, setUserToken] = useState(null);
   const storedAuthStatus =
     JSON.parse(localStorage.getItem("isAuthenticated")) || false;
   const [isAuthenticated, setIsAuthenticated] = useState(storedAuthStatus);
   const [errorMessage, setErrorMessage] = useState(null);
+  const { data: user, isFetched, refetch: refetchUser } = useGetUserDetails();
+  const [currentUser, setCurrentUser] = useState(user);
+  const queryClient = useQueryClient();
 
   useEffect(() => {
-    if (isLoading) return;
-
     const auth = getAuth();
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        const matchedUser = dbUsers?.find(
-          (dbUser) => dbUser.firebase_uid === user.uid
-        );
-        const userData = {
-          uid: user.uid,
-          email: user.email,
-          first_name: matchedUser?.first_name,
-          last_name: matchedUser?.last_name,
-          photo: matchedUser?.photoURL,
-          user_type: matchedUser?.user_type,
-          phone: matchedUser?.phone,
-          birthday: matchedUser?.birthday,
-        };
-        setCurrentUser(userData);
 
-        const token = await user.getIdToken();
-        setUserToken(token);
-        setAuthToken(token); // set the token in the header
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      if (!firebaseUser) {
+        setIsAuthenticated(false);
+        return;
+      }
 
-        localStorage.setItem("isAuthenticated", true);
+      try {
+        const token = await firebaseUser.getIdToken();
+        setAuthToken(token);
         setIsAuthenticated(true);
-      } else {
-        logout();
+        localStorage.setItem("isAuthenticated", true);
+        const res = await refetchUser();
+        setCurrentUser(res.data[0]);
+      } catch (error) {
+        console.error("Error fetching token:", error);
+        setErrorMessage("Failed to fetch user token, please try again.");
       }
     });
 
     return () => unsubscribe();
-  }, [dbUsers, isLoading]);
+  }, []);
 
   // Handle login logic
   const login = async (email, password) => {
@@ -70,6 +61,7 @@ export function AuthProvider({ children }) {
     setErrorMessage("Logout successful, see you soon!");
     setIsAuthenticated(false);
 
+    queryClient.clear();
     localStorage.clear();
     try {
       await logoutUser();
@@ -112,9 +104,7 @@ export function AuthProvider({ children }) {
         isAuthenticated,
         errorMessage,
         currentUser,
-        isLoading,
         isFetched,
-        userToken,
         login,
         logout,
         registerUser,

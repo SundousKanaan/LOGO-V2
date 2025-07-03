@@ -1,11 +1,30 @@
 import { useQuery } from "react-query";
 import api from "./api";
 
+// get user details
+async function getUserDetails() {
+  try {
+    const response = await api.get("/users/me/");
+    return response.data;
+  } catch (error) {
+    console.error("API Error:", error);
+    throw error;
+  }
+}
+
+export const useGetUserDetails = () => {
+  return useQuery({
+    queryKey: ["userDetails"],
+    queryFn: getUserDetails,
+    retry: false,
+    enabled: false,
+  });
+};
+
 // get all users from the API
 async function getAllUsers() {
   try {
     const response = await api.get("/users/api/");
-
     return response.data;
   } catch (error) {
     console.error("API Error:", error);
@@ -48,5 +67,20 @@ export async function deleteUser(firebaseUid) {
   } catch (error) {
     console.error("API Error:", error);
     throw error;
+  }
+}
+
+// validate user details
+export async function validateProfile(req) {
+  try {
+    await api.post("/users/validate-profile/", req);
+    return {
+      success: true,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      errors: error.response?.data?.errors || {},
+    };
   }
 }

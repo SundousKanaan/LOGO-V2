@@ -9,9 +9,11 @@ export async function updateTodoItem(req) {
   }
 }
 
-export async function postTodoItem(data) {
+export async function postTodoItem(req) {
+  console.log("Posting Todo Item:", req);
+
   try {
-    const response = await api.post("todos/todo_items/", data);
+    const response = await api.post("todos/todo_items/", req);
     return response.data;
   } catch (error) {
     console.error("API Error:", error);

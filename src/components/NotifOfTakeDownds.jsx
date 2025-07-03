@@ -96,7 +96,7 @@ export default function NotifOfTakeDownds() {
         </HeadingItem>
         <Spacer display={{ base: "none", md: "block" }} />
         <LinkItem
-          to="/User-management"
+          path="/User-management"
           height="fit-content"
           padding={`${convertPx(5)} ${convertPx(10)}`}
           fontWeight="500"

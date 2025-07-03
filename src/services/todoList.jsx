@@ -17,6 +17,7 @@ export async function postTodoList(req) {
 }
 
 export async function updateTodoList(req) {
+  console.log("updateTodoList:", req);
   try {
     await api.put(`todos/todo_lists/${req.id}/`, req);
   } catch (error) {
@@ -39,9 +40,8 @@ async function getTodolistsArray(data) {
   const userUid = data.id;
   try {
     const response = await api.get(
-      `/todos/todo_lists/user_lists/${userUid}/?fields=${data.fields.join(",")}`
+      `/todos/todo_lists/user/${userUid}/?fields=${data.fields.join(",")}`
     );
-
     return response.data;
   } catch (error) {
     console.error("API Error:", error.response?.data || error.message);
@@ -54,7 +54,8 @@ export const useTodolistsArray = (fields) => {
 
   return useQuery({
     queryKey: ["todolistsArray", fields],
-    queryFn: () => getTodolistsArray({ id: currentUser?.uid, fields: fields }),
+    queryFn: () =>
+      getTodolistsArray({ id: currentUser?.firebase_uid, fields: fields }),
     retry: false,
     enabled: !!currentUser,
   });
@@ -64,7 +65,7 @@ export const useTodolistsArray = (fields) => {
 async function getListDetails(id) {
   try {
     const response = await api.get(
-      `/todos/todo_lists/list/${id}/?expand=items.assignee,owner`
+      `/todos/todo_lists/${id}/?expand=items.assignee,owner`
     );
     return response.data;
   } catch (error) {

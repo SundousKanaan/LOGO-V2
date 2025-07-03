@@ -5,10 +5,7 @@ export const useListPermissions = () => {
   function checkPermissions(list) {
     if (!list) return false;
 
-    if (
-      currentUser?.user_type === "admin" ||
-      currentUser?.uid === list?.owner
-    ) {
+    if (currentUser?.user_type === "admin" || currentUser?.id === list?.owner) {
       return true;
     }
 
