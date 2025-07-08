@@ -37,12 +37,13 @@ function ProfileCard({ user, isloading, onEdit, onDelete }) {
         </Avatar.Root>
       </SkeletonCircle>
 
-      <VStack gap={1} alignItems={{ base: "center", lg: "start" }}>
+      <VStack gap={1} alignItems={{ base: "center", md: "start" }}>
         <Skeleton loading={isloading} w={convertPx(150)} h={convertPx(20)}>
           <Text
             fontSize={convertPx(16)}
             fontWeight={600}
             color="secondaryColor"
+            textAlign={{ base: "center", md: "left" }}
             textTransform="capitalize"
           >
             {user?.first_name} {user?.last_name}
@@ -50,7 +51,12 @@ function ProfileCard({ user, isloading, onEdit, onDelete }) {
         </Skeleton>
 
         <Skeleton loading={isloading} w={convertPx(200)} h={convertPx(20)}>
-          <Text fontSize={convertPx(14)} fontWeight={400} color="gray.500">
+          <Text
+            fontSize={convertPx(14)}
+            fontWeight={400}
+            color="gray.500"
+            textAlign={{ base: "center", md: "left" }}
+          >
             {user?.email}
           </Text>
         </Skeleton>
@@ -61,6 +67,7 @@ function ProfileCard({ user, isloading, onEdit, onDelete }) {
             fontWeight={400}
             color="gray.500"
             textTransform={"capitalize"}
+            textAlign={{ base: "center", md: "left" }}
           >
             {user?.user_type}
           </Text>

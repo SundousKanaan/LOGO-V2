@@ -7,13 +7,16 @@ import ButtonItem from "../components/mini-components/ButtonItem";
 import LinkItem from "../components/mini-components/LinkItem";
 import { useAuth } from "../contexts/AuthContext";
 import { convertPx } from "../hooks/useConvertPx";
+import { useValidateLogin } from "../services/usersServices";
 
 export default function Login() {
   const [isDisabled, setIsDisabled] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { login, isAuthenticated, errorMessage, setErrorMessage } = useAuth();
+  const { login, isAuthenticated } = useAuth();
+  const [errorMessage, setErrorMessage] = useState(null);
   const navigate = useNavigate();
+  const validateLogin = useValidateLogin();
 
   useEffect(() => {
     if (email != "" && password != "") {
@@ -25,25 +28,31 @@ export default function Login() {
     const { name, value } = e.target;
     if (name === "email") {
       setEmail(value);
-    }
-    if (name === "password") {
+    } else if (name === "password") {
       setPassword(value);
-    }
-
-    const isUserEmailValid = email !== "" && /^[A-Za-z]+$/.test(email);
-    const isPasswordValid = password.length >= 6 && /^\S+$/.test(password);
-
-    if (!isUserEmailValid && isPasswordValid) {
-      setErrorMessage("Invalid Email address");
-    } else if (isUserEmailValid && !isPasswordValid) {
-      setErrorMessage("Invalid password");
-    } else if (!isUserEmailValid && !isPasswordValid) {
-      setErrorMessage("Invalid Email address and password");
     }
   };
 
-  const handleLogin = () => {
-    login(email, password);
+  const handleLogin = async () => {
+    if (email && password) {
+      validateLogin.mutate(
+        { email: email, password: password },
+        {
+          onSuccess: async () => {
+            await login(email, password);
+          },
+
+          onError: (err) => {
+            const error = err.response.data.errors;
+            setErrorMessage(error.email);
+            setIsDisabled(true);
+            setTimeout(() => {
+              setErrorMessage(null);
+            }, "10000");
+          },
+        }
+      );
+    }
   };
 
   useEffect(() => {

@@ -4,7 +4,7 @@ import {
   VStack,
   Box,
   Text,
-  Avatar,
+  Grid,
   Fieldset,
   Field,
   Flex,
@@ -16,14 +16,14 @@ import { convertPx } from "../../hooks/useConvertPx";
 import Dropdown from "../mini-components/Dropdown";
 import InputField from "../mini-components/InputField";
 import Checkboxes from "../mini-components/checkboxes";
-import { useGetAllUsers } from "../../services/users";
+import { useGetAllUsers } from "../../services/usersServices";
 
 function EditeTodoItem({ data, assignedList, onChange }) {
   const { data: dbUsers, isLoading } = useGetAllUsers();
   const [newStatus, setTaskStatus] = useState(data.status);
   const [usersData, setUsersData] = useState([]);
   const [selectedAssignee, setSelectedAssignee] = useState(
-    data.assignee.map((assignee) => assignee.firebase_uid)
+    data.assignee.map((assignee) => assignee.id)
   );
   const [newDescription, setNewDescription] = useState(data.description);
   const [newTaskTitle, setNewTaskTitle] = useState(data.title);
@@ -39,7 +39,7 @@ function EditeTodoItem({ data, assignedList, onChange }) {
   useEffect(() => {
     if (!isLoading) {
       const data = dbUsers.map((user) => ({
-        id: user.firebase_uid,
+        id: user.id,
         displayName: `${user.first_name} ${user.last_name}`,
         photo: user.photo,
       }));
@@ -143,22 +143,23 @@ function EditeTodoItem({ data, assignedList, onChange }) {
                 p={`${convertPx(8)} ${convertPx(8)}`}
                 overflow="auto"
                 withIcon
-                selectedIds={data.assignee.map(
-                  (assignee) => assignee.firebase_uid
-                )}
+                selectedIds={data.assignee.map((assignee) => assignee.id)}
                 onChange={handleCheckboxChange}
               />
             )}
           </HStack>
         </VStack>
-        <HStack gap={convertPx(20)}>
-          <Text w={convertPx(150)}>Assigned list</Text>
-
+        <Grid gap={convertPx(20)} templateColumns={`${convertPx(150)} 1fr`}>
+          <Text>Assigned list</Text>
           <Text>{assignedList.title}</Text>
-        </HStack>
+        </Grid>
         <Field.Root>
-          <HStack gap={convertPx(20)} align={"start"}>
-            <Field.Label w={convertPx(247)}>Task name</Field.Label>
+          <Grid
+            w={"100%"}
+            gap={convertPx(20)}
+            templateColumns={`${convertPx(150)} 1fr`}
+          >
+            <Field.Label>Task name</Field.Label>
             <InputField
               w={"100%"}
               name="taskTitle"
@@ -171,16 +172,15 @@ function EditeTodoItem({ data, assignedList, onChange }) {
               color="secondaryColor"
               onChange={handleInputChange}
             />
-          </HStack>
+          </Grid>
         </Field.Root>
         <Field.Root>
-          <Flex
-            w={"100%"}
-            gap={{ base: convertPx(10), lg: convertPx(22) }}
-            align={"start"}
-            flexDirection={{ base: "column", lg: "row" }}
+          <Grid
+            width={"100%"}
+            gap={convertPx(20)}
+            templateColumns={{ base: "1fr", sm: `${convertPx(150)} 1fr` }}
           >
-            <Field.Label w={convertPx(242)}>Task description</Field.Label>
+            <Field.Label>Task description</Field.Label>
             <Textarea
               w={"100%"}
               name="taskDescription"
@@ -195,7 +195,7 @@ function EditeTodoItem({ data, assignedList, onChange }) {
               onChange={handleInputChange}
               _required={false}
             />
-          </Flex>
+          </Grid>
         </Field.Root>
       </Fieldset.Content>
     </Fieldset.Root>

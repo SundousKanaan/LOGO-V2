@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Field, Fieldset, Stack, Text, HStack } from "@chakra-ui/react";
 
 import { convertPx } from "../hooks/useConvertPx";
@@ -6,85 +6,109 @@ import InputField from "../components/mini-components/InputField";
 import ButtonItem from "../components/mini-components/ButtonItem";
 import LinkItem from "../components/mini-components/LinkItem";
 import { useAuth } from "../contexts/AuthContext";
+import { useValidateProfile } from "../services/usersServices.jsx";
 
 function Registing() {
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [birthday, setBirthday] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [registerMessage, setRegisterMessage] = useState("");
-  const [isUserNameValid, setIsUserNameValid] = useState("none");
-  const [isEmailValid, setIsEmailValid] = useState("none");
-  const [isPasswordValid, setIsPasswordValid] = useState("none");
-  const [isBirthdayValid, setIsBirthdayValid] = useState("none");
+  const [registerErrorMessage, setRegisterErrorMessage] = useState(null);
 
-  const { registerUser, errorMessage } = useAuth();
+  const [accountData, setAccountData] = useState({
+    first_name: "",
+    last_name: "",
+    email: "",
+    password: "",
+    birthday: "",
+  });
+  const { signUp, errorMessage } = useAuth();
+  const [passwordValue, setPasswordValue] = useState(null);
+  const [confirmPasswordValue, setConfirmPasswordValue] = useState(null);
 
-  const handleChangeValidation = (e) => {
+  const validateProfile = useValidateProfile();
+
+  // handelers
+  const handleInputChange = (e) => {
     const { name, value } = e.target;
 
     if (name === "firstName") {
-      setFirstName(value);
+      setAccountData((prevData) => ({
+        ...prevData,
+        first_name: value,
+      }));
     } else if (name === "lastName") {
-      setLastName(value);
+      setAccountData((prevData) => ({
+        ...prevData,
+        last_name: value,
+      }));
     } else if (name === "email") {
-      setEmail(value);
-    } else if (name === "password") {
-      setPassword(value);
-    } else if (name === "confirmPassword") {
-      setConfirmPassword(value);
+      setAccountData((prevData) => ({
+        ...prevData,
+        email: value,
+      }));
     } else if (name === "birthday") {
-      setBirthday(value);
+      setAccountData((prevData) => ({
+        ...prevData,
+        birthday: value,
+      }));
+    } else if (name === "password") {
+      setPasswordValue(value);
+    } else if (name === "confirmPassword") {
+      setConfirmPasswordValue(value);
     }
   };
 
-  const handleRegister = async () => {
-    // check the validity of the inputs
-    const isValid_F_Name = firstName !== "" && /^[A-Za-z]+$/.test(firstName);
-    const isValid_L_Name = lastName !== "" && /^[A-Za-z]+$/.test(lastName);
-    const isValid_UserName = isValid_F_Name && isValid_L_Name;
-    const isValid_Email = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-    const isValid_Password = password.length >= 6 && /^\S+$/.test(password);
-    const isPasswordsMatch = password === confirmPassword;
-
-    // set the validity of the inputs
-    setIsUserNameValid(isValid_UserName ? "true" : "false");
-    setIsEmailValid(isValid_Email ? "true" : "false");
-    if (!isPasswordsMatch) {
-      setIsPasswordValid("false");
-      setRegisterMessage("Passwords do not match");
-      return;
-    }
-    setIsPasswordValid(isValid_Password ? "true" : "false");
-    setIsBirthdayValid(birthday !== "" ? "true" : "false");
-
-    // show error messages according to the validity of the inputs
-    if (!isValid_UserName || !isValid_Email || !isValid_Password) {
-      if (!isValid_UserName && isValid_Email && isValid_Password) {
-        setRegisterMessage("Invalid username");
-      } else if (isValid_UserName && !isValid_Email && isValid_Password) {
-        setRegisterMessage("Invalid email address");
-      } else if (isValid_UserName && isValid_Email && !isValid_Password) {
-        setRegisterMessage(
-          "Password must be at least 6 characters and no spaces"
-        );
+  useEffect(() => {
+    if (passwordValue && confirmPasswordValue) {
+      if (passwordValue !== confirmPasswordValue) {
+        setRegisterErrorMessage({
+          type: "password",
+          message: "Passwords do not match",
+        });
       } else {
-        setRegisterMessage("Please fill the fields correctly");
+        setRegisterErrorMessage(null);
+        setAccountData((prevData) => ({
+          ...prevData,
+          password: passwordValue,
+        }));
       }
-      return;
     }
+  }, [passwordValue, confirmPasswordValue]);
 
-    // if all inputs are valid, register the user
-    try {
-      // const userCredential = await registerUser(userName, email, password);
-      await registerUser({ firstName, lastName, email, password, birthday });
-      setRegisterMessage("");
-    } catch (error) {
-      console.error("Error registering user:", error);
-      setRegisterMessage("Error registering user");
-    }
+  const handleRegister = async () => {
+    validateProfile.mutate(accountData, {
+      onSuccess: async () => {
+        await signUp(accountData);
+        setRegisterErrorMessage(null);
+      },
+
+      onError: (err) => {
+        const error = err.response.data.errors;
+        if (error.first_name || error.last_name) {
+          setRegisterErrorMessage({
+            type: error.first_name?.[0] ? "first_name" : "last_name",
+            message: error.first_name?.[0] || error.last_name?.[0],
+          });
+        } else if (error.phone) {
+          setRegisterErrorMessage({
+            type: "phone",
+            message: error.phone[0],
+          });
+        } else if (error.birthday) {
+          setRegisterErrorMessage({
+            type: "birthday",
+            message: error.birthday[0],
+          });
+        } else if (error.email) {
+          setRegisterErrorMessage({
+            type: "email",
+            message: error.email[0] || "Invalid email",
+          });
+        } else {
+          setRegisterErrorMessage({
+            type: "general",
+            message: "Registration failed. Please try again.",
+          });
+        }
+      },
+    });
   };
 
   return (
@@ -123,17 +147,16 @@ function Registing() {
               type="text"
               placeholder="Example: John"
               name="firstName"
-              value={firstName}
               bg="white"
               color="secondaryColor"
               boxShadow={
-                isUserNameValid === "false"
+                !registerErrorMessage
+                  ? ""
+                  : registerErrorMessage?.type === "first_name"
                   ? "inset 0 0 0 1px var(--chakra-colors-status-red)"
-                  : isUserNameValid === "true"
-                  ? "inset 0 0 0 1px var(--chakra-colors-status-green)"
-                  : ""
+                  : "inset 0 0 0 1px var(--chakra-colors-status-green)"
               }
-              onChange={handleChangeValidation}
+              onChange={handleInputChange}
             />
           </Field.Root>
 
@@ -144,17 +167,16 @@ function Registing() {
               type="text"
               placeholder="Example: Doe"
               name="lastName"
-              value={lastName}
               bg="white"
               color="secondaryColor"
               boxShadow={
-                isUserNameValid === "false"
+                !registerErrorMessage
+                  ? ""
+                  : registerErrorMessage?.type === "last_name"
                   ? "inset 0 0 0 1px var(--chakra-colors-status-red)"
-                  : isUserNameValid === "true"
-                  ? "inset 0 0 0 1px var(--chakra-colors-status-green)"
-                  : ""
+                  : "inset 0 0 0 1px var(--chakra-colors-status-green)"
               }
-              onChange={handleChangeValidation}
+              onChange={handleInputChange}
             />
           </Field.Root>
         </HStack>
@@ -166,17 +188,16 @@ function Registing() {
             type="email"
             placeholder="Example: email.address@example.com"
             name="email"
-            value={email}
             bg="white"
             color="secondaryColor"
             boxShadow={
-              isEmailValid === "false"
+              !registerErrorMessage
+                ? ""
+                : registerErrorMessage?.type === "email"
                 ? "inset 0 0 0 1px var(--chakra-colors-status-red)"
-                : isEmailValid === "true"
-                ? "inset 0 0 0 1px var(--chakra-colors-status-green)"
-                : ""
+                : "inset 0 0 0 1px var(--chakra-colors-status-green)"
             }
-            onChange={handleChangeValidation}
+            onChange={handleInputChange}
           />
         </Field.Root>
 
@@ -187,17 +208,16 @@ function Registing() {
             type="date"
             placeholder="Birthday"
             name="birthday"
-            value={birthday}
             bg="white"
             color="secondaryColor"
             boxShadow={
-              isBirthdayValid === "false"
+              !registerErrorMessage
+                ? ""
+                : registerErrorMessage?.type === "birthday"
                 ? "inset 0 0 0 1px var(--chakra-colors-status-red)"
-                : isBirthdayValid === "true"
-                ? "inset 0 0 0 1px var(--chakra-colors-status-green)"
-                : ""
+                : "inset 0 0 0 1px var(--chakra-colors-status-green)"
             }
-            onChange={handleChangeValidation}
+            onChange={handleInputChange}
           />
         </Field.Root>
 
@@ -208,17 +228,16 @@ function Registing() {
             type="password"
             placeholder="Password"
             name="password"
-            value={password}
             bg="white"
             color="secondaryColor"
             boxShadow={
-              isPasswordValid === "false"
+              !registerErrorMessage
+                ? ""
+                : registerErrorMessage?.type === "password"
                 ? "inset 0 0 0 1px var(--chakra-colors-status-red)"
-                : isPasswordValid === "true"
-                ? "inset 0 0 0 1px var(--chakra-colors-status-green)"
-                : ""
+                : "inset 0 0 0 1px var(--chakra-colors-status-green)"
             }
-            onChange={handleChangeValidation}
+            onChange={handleInputChange}
           />
         </Field.Root>
         <Field.Root>
@@ -228,20 +247,19 @@ function Registing() {
             type="password"
             placeholder="Confirm Password"
             name="confirmPassword"
-            value={confirmPassword}
             bg="white"
             color="secondaryColor"
             boxShadow={
-              isPasswordValid === "false"
+              !registerErrorMessage
+                ? ""
+                : registerErrorMessage?.type === "password"
                 ? "inset 0 0 0 1px var(--chakra-colors-status-red)"
-                : isPasswordValid === "true"
-                ? "inset 0 0 0 1px var(--chakra-colors-status-green)"
-                : ""
+                : "inset 0 0 0 1px var(--chakra-colors-status-green)"
             }
-            onChange={handleChangeValidation}
+            onChange={handleInputChange}
           />
         </Field.Root>
-        {registerMessage !== "" && (
+        {registerErrorMessage && (
           <Text
             color="red"
             fontSize={convertPx(12)}
@@ -250,7 +268,7 @@ function Registing() {
             textAlign="center"
             width="100%"
           >
-            {registerMessage}
+            {registerErrorMessage.message}
           </Text>
         )}
         {errorMessage !== "" && (

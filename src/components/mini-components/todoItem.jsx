@@ -55,7 +55,6 @@ function TodoItem({
             <HeadingItem fontSize={convertPx(16)} lineHeight={1.5}>
               {data.title}
             </HeadingItem>
-            {/* status dropdown */}
             {isEditable ? (
               <Dropdown
                 collection={status}
@@ -206,7 +205,6 @@ function TodoItem({
         </HStack>
       </Flex>
 
-      {/* <Box>{renderPopupContent()}</Box> */}
     </>
   );
 }

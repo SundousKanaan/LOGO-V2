@@ -7,13 +7,21 @@ import { useListPermissions } from "../hooks/usePermissions";
 import {
   useTodolistsArray,
   useListDetails,
-  postTodoList,
-  updateTodoList,
-  deleteTodoList,
-} from "../services/todoList";
-import { deleteTodoItem, updateTodoItem } from "../services/todoItem";
-import { useCreateTodoItem } from "../hooks/useCreateTodoItem";
-import { putUser, deleteUser, validateProfile } from "../services/users";
+  useUpdateTodoList,
+  useDeleteTodoList,
+  useCreateTodoList,
+} from "../services/todoListServices";
+
+import {
+  useUpdateTodoItem,
+  useCreateTodoItem,
+  useDeleteTodoItem,
+} from "../services/todoItemServices";
+import {
+  useUpdateUser,
+  useDeleteUser,
+  useValidateProfile,
+} from "../services/usersServices";
 
 import {
   ListPopup,
@@ -55,11 +63,9 @@ export default function Profile() {
   const navigate = useNavigate();
 
   const { checkPermissions } = useListPermissions();
-  const createTodoItem = useCreateTodoItem(selectedList?.id);
 
   const {
     data: todoListsArray,
-    // isLoading: isListsArrayLoading,
     refetch: refetchTodoLists,
     isFetched: isListsArrayFetched,
   } = useTodolistsArray(["id", "title", "owner"]);
@@ -73,6 +79,22 @@ export default function Profile() {
     enabled: !!selectedList?.id, // only fetch if we have a valid ID
   });
 
+  const { mutate: createTodoList, isLoading: isCreatingList } =
+    useCreateTodoList();
+  const { mutate: updateTodoList, isLoading: isUpdatingList } =
+    useUpdateTodoList();
+  const { mutate: deleteTodoList, isLoading: isDeletingList } =
+    useDeleteTodoList();
+  const { mutate: createTodoItem, isLoading: isCreatingItem } =
+    useCreateTodoItem(selectedList?.id);
+  const { mutate: deleteTodoItem, isLoading: isDeletingItem } =
+    useDeleteTodoItem();
+  const { mutate: updateTodoItem, isLoading: isUpdatingItem } =
+    useUpdateTodoItem();
+  const { mutate: updateUser, isLoading: isUpdatingUser } = useUpdateUser();
+  const { mutate: deleteUser, isLoading: isDeletingUser } = useDeleteUser();
+  const validateProfile = useValidateProfile();
+
   // =====================
   // Effects
   // =====================
@@ -81,6 +103,13 @@ export default function Profile() {
   useEffect(() => {
     if (!isAuthenticated) navigate("/login", { replace: true });
   }, [isAuthenticated, navigate]);
+
+  // set account data from current user
+  useEffect(() => {
+    if (isCurrentUserFetched) {
+      setAccountData(currentUser);
+    }
+  }, [isCurrentUserFetched, currentUser]);
 
   // Initiële selectie
   useEffect(() => {
@@ -110,27 +139,29 @@ export default function Profile() {
 
   useEffect(() => {
     if (!accountData) return;
-
-    validateProfile(accountData).then((res) => {
-      if (!res.success) {
-        const errors = res.errors;
-        if (errors.first_name || errors.last_name) {
-          console.log("1 Profile validation errors:", errors);
-
+    validateProfile.mutate(accountData, {
+      onSuccess: () => {
+        setErrorEditMessage(null);
+      },
+      onError: (err) => {
+        const error = err.response.data.errors;
+        if (error.first_name || error.last_name) {
           setErrorEditMessage({
-            type: "name",
-            message: errors.first_name?.[0] || errors.last_name?.[0],
+            type: error.first_name?.[0] ? "first_name" : "last_name",
+            message: error.first_name?.[0] || error.last_name?.[0],
           });
-        } else if (errors.phone) {
-          console.log("2 Profile validation errors:", errors);
+        } else if (error.phone) {
           setErrorEditMessage({
             type: "phone",
-            message: errors.phone[0],
+            message: error.phone[0],
+          });
+        } else if (error.birthday) {
+          setErrorEditMessage({
+            type: "birthday",
+            message: error.birthday[0],
           });
         }
-      } else {
-        setErrorEditMessage(null);
-      }
+      },
     });
   }, [accountData]);
 
@@ -164,17 +195,22 @@ export default function Profile() {
   // list handlers
 
   async function handleCreateList() {
-    await postTodoList({ title: listTitle, owner: currentUser.id });
-    queryClient.invalidateQueries("todolistsArray");
+    createTodoList(
+      { title: listTitle, owner: currentUser.id },
+      {
+        onSuccess: async () => {
+          queryClient.invalidateQueries("todolistsArray");
 
-    const { data: updatedData } = await refetchTodoLists();
-    const newList = updatedData.find(
-      (item) =>
-        item.title === listTitle && item.owner === currentUser.firebase_uid
+          const { data: updatedData } = await refetchTodoLists();
+          const newList = updatedData.find(
+            (item) => item.title === listTitle && item.owner === currentUser.id
+          );
+          setSelectedList(newList);
+          setListTitle(listTitle);
+          setOpenListPopup(null);
+        },
+      }
     );
-    setSelectedList(newList);
-    setListTitle(listTitle);
-    setOpenListPopup(null);
   }
 
   async function handleEditList() {
@@ -184,63 +220,74 @@ export default function Profile() {
       owner: selectedList.owner,
       items: listDetails?.items.map((item) => item.id) || [],
     };
-    await updateTodoList(updatedListData);
-    setSelectedList((prev) => ({ ...prev, title: listTitle }));
-    setListTitle(listTitle);
-    setOpenListPopup(null);
+    updateTodoList(updatedListData, {
+      onSuccess: () => {
+        setSelectedList((prev) => ({ ...prev, title: listTitle }));
+        setListTitle(listTitle);
+        setOpenListPopup(null);
+      },
+    });
   }
 
   async function handleDeleteList() {
-    await deleteTodoList(selectedList.id);
-    queryClient.removeQueries(["todolistDetails", selectedList.id]);
-    const { data: updatedData } = await refetchTodoLists();
+    deleteTodoList(selectedList.id, {
+      onSuccess: async () => {
+        queryClient.removeQueries(["todolistDetails", selectedList.id]);
+        const { data: updatedData } = await refetchTodoLists();
 
-    if (updatedData?.length > 0) {
-      setSelectedList(updatedData[0]);
-      setListTitle(updatedData[0].title);
-    } else {
-      setSelectedList(null);
-      setListTitle("");
-      setIsEditable(false);
-    }
+        if (updatedData?.length > 0) {
+          setSelectedList(updatedData[0]);
+          setListTitle(updatedData[0].title);
+        } else {
+          setSelectedList(null);
+          setListTitle("");
+          setIsEditable(false);
+        }
 
-    setOpenListPopup(null);
+        setOpenListPopup(null);
+      },
+    });
   }
 
   // list items handlers
   async function handleCreateListItem() {
     if (!newListItemDetails) return;
     setOpenItemPopup(null);
-    createTodoItem.mutate(newListItemDetails, {
-      onSuccess: () => {
+    createTodoItem(newListItemDetails, {
+      onSuccess: async () => {
         setNewListItemDetails(null);
       },
     });
   }
 
   async function handleDeleteListItem(taskId) {
-    await deleteTodoItem(taskId);
-    setOpenItemPopup(null);
-    await queryClient.invalidateQueries("todolistDetails");
-    await refetchListDetails();
+    deleteTodoItem(taskId, {
+      onSuccess: async () => {
+        setOpenItemPopup(null);
+        await refetchListDetails();
+        queryClient.invalidateQueries("todolistDetails");
+      },
+    });
   }
 
   async function handleEditListItem(newTaskDetails) {
     const req = {
-      data: {
-        id: newTaskDetails.id,
-        title: newTaskDetails.title,
-        description: newTaskDetails.description,
-        status: newTaskDetails.status,
-        assignee: newTaskDetails.assignee,
-        todo_list: newTaskDetails.todo_list,
-      },
+      id: newTaskDetails.id,
+      title: newTaskDetails.title,
+      description: newTaskDetails.description,
+      status: newTaskDetails.status,
+      assignee: newTaskDetails.assignee,
+      todo_list: newTaskDetails.todo_list,
     };
-    await updateTodoItem(req);
-    await queryClient.invalidateQueries("todolistDetails");
-    await refetchListDetails();
-    setOpenItemPopup(null);
-    setNewListItemDetails(null);
+
+    updateTodoItem(req, {
+      onSuccess: async () => {
+        await refetchListDetails();
+        setOpenItemPopup(null);
+        queryClient.invalidateQueries("todolistDetails");
+        setNewListItemDetails(null);
+      },
+    });
   }
 
   // user
@@ -272,8 +319,7 @@ export default function Profile() {
 
   async function handleUpdateUser() {
     if (!accountData) return;
-    const reqData = {
-      firebase_uid: accountData.firebase_uid,
+    const data = {
       id: accountData.id,
       first_name: accountData.first_name,
       last_name: accountData.last_name,
@@ -284,28 +330,28 @@ export default function Profile() {
       user_type: accountData.user_type,
     };
 
-    await putUser(reqData);
-    queryClient.invalidateQueries(["allUsers"]);
-    setOpenUserPopup(false);
-    setAccountData(null);
-    setErrorEditMessage(null);
+    updateUser(data, {
+      onSuccess: () => {
+        queryClient.invalidateQueries(["allUsers"]);
+        setAccountData(data);
+        setOpenUserPopup(false);
+        setErrorEditMessage(null);
+      },
+    });
   }
 
   async function handleDeleteUser() {
     if (!accountData) return;
-    await deleteUser(accountData.id);
-    await logout();
-    setOpenUserPopup(false);
-    setAccountData(null);
-    setErrorEditMessage(null);
-  }
 
-  // ==== Validation ====
-  // function isTaskDetailsValid(form) {
-  //   return (
-  //     form && form.title && form.title.trim() !== "" && form.assignee.length > 0
-  //   );
-  // }
+    deleteUser(accountData.id, {
+      onSuccess: async () => {
+        await logout();
+        setOpenUserPopup(false);
+        setAccountData(null);
+        setErrorEditMessage(null);
+      },
+    });
+  }
 
   return (
     <>
@@ -349,6 +395,14 @@ export default function Profile() {
         handleEditList={handleEditList}
         handleDeleteList={handleDeleteList}
         setOpenListPopup={setOpenListPopup}
+        isProcessing={
+          openListPopup &&
+          (openListPopup === "create"
+            ? isCreatingList
+            : openListPopup === "delete"
+            ? isDeletingList
+            : isUpdatingList)
+        }
       />
       <ListItemPopup
         list={listDetails}
@@ -359,6 +413,13 @@ export default function Profile() {
         handleDeleteListItem={handleDeleteListItem}
         setOpenItemPopup={setOpenItemPopup}
         handleNewTaskChange={handleNewTaskChange}
+        isProcessing={
+          openItemPopup?.case === "create"
+            ? isCreatingItem
+            : openItemPopup?.case === "delete"
+            ? isDeletingItem
+            : isUpdatingItem
+        }
       />
 
       <UserPopup
@@ -371,6 +432,9 @@ export default function Profile() {
         setAccountData={setAccountData}
         setErrorEditMessage={setErrorEditMessage}
         handleUserDataChange={handleUserDataChange}
+        isProcessing={
+          openUserPopup === "edite" ? isUpdatingUser : isDeletingUser
+        }
       />
     </>
   );

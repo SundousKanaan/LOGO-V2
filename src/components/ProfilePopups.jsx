@@ -18,6 +18,7 @@ export function ListPopup({
   handleEditList,
   handleDeleteList,
   setOpenListPopup,
+  isProcessing,
 }) {
   if (!openListPopup) return;
   const titles = {
@@ -48,7 +49,8 @@ export function ListPopup({
       }}
       ActionButtonText={saveButtonTexts[openListPopup]}
       disableSaveButton={
-        !isDelete && (selectedList?.title === listTitle || listTitle === "")
+        isProcessing ||
+        (!isDelete && (selectedList?.title === listTitle || listTitle === ""))
       }
     >
       {isCreate && (
@@ -79,9 +81,9 @@ export function ListItemPopup({
   handleDeleteListItem,
   setOpenItemPopup,
   handleNewTaskChange,
+  isProcessing,
 }) {
   if (!openItemPopup) return;
-
   const { case: type, title, id } = openItemPopup;
 
   const isCreate = type === "create";
@@ -103,28 +105,33 @@ export function ListItemPopup({
       onSave={() => {
         if (isCreate) return handleCreateListItem();
         if (isEdit) return handleEditListItem(newListItemDetails);
-        if (isDelete) return handleDeleteListItem(id); // check the id value!
+        if (isDelete) {
+          return handleDeleteListItem(id);
+        }
       }}
       onClose={() => {
         setOpenItemPopup(null);
       }}
       ActionButtonText={isCreate ? "Create" : isEdit ? "Save" : "Delete"}
       disableSaveButton={
-        (isCreate || isEdit) &&
-        (!newListItemDetails || newListItemDetails.title === "")
+        isProcessing ||
+        ((isCreate || isEdit) &&
+          (newListItemDetails?.title === "" ||
+            !Array.isArray(newListItemDetails?.assignee) ||
+            newListItemDetails?.assignee.length === 0))
       }
     >
       {isCreate && (
         <AddNewTodoItem
           defaultStatus={title}
-          assignedList={list.id}
+          assignedList={{ id: list.id, title: list.title }}
           onFormChange={handleNewTaskChange}
         />
       )}
       {isEdit && (
         <EditeTodoItem
           data={list.items.find((item) => item.id === id)}
-          assignedList={list}
+          assignedList={{ id: list.id, title: list.title }}
           onChange={handleNewTaskChange}
         />
       )}
@@ -153,6 +160,7 @@ export function UserPopup({
   handleUserDataChange,
   setAccountData,
   setErrorEditMessage,
+  isProcessing,
 }) {
   if (!openUserPopup) return;
 
@@ -166,9 +174,11 @@ export function UserPopup({
       onClose={() => {
         setOpenUserPopup(false);
         setErrorEditMessage(null);
+        setAccountData(null);
       }}
       onSave={isEdit ? handleUpdateUser : handleDeleteUser}
       ActionButtonText={isEdit ? "Save" : "Delete"}
+      disableSaveButton={errorEditMessage || isProcessing}
     >
       {isEdit && (
         <>
@@ -183,7 +193,11 @@ export function UserPopup({
               }))
             }
           />
-          {errorEditMessage && <Text>{errorEditMessage.message}</Text>}
+          {errorEditMessage && (
+            <Text color={"redColor"} mt={convertPx(16)} textAlign={"center"}>
+              {errorEditMessage.message}
+            </Text>
+          )}
         </>
       )}
       {isDelete && (

@@ -105,7 +105,7 @@ export default function Navbar({ toggleNavbar }) {
           </List.Item>
         ))}
       </List.Root>
-      <Spacer display={{ base: "none", lg: "block" }} />
+      <Spacer display={{ base: "none", md: "block" }} />
       <ButtonItem
         variant="ghost"
         width="100%"

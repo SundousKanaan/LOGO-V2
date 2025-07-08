@@ -1,23 +1,24 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   HStack,
   VStack,
-  Box,
   Text,
   Fieldset,
   Field,
-  Flex,
   Textarea,
   Select,
   createListCollection,
+  Grid,
+  Skeleton,
 } from "@chakra-ui/react";
 import { convertPx } from "../../hooks/useConvertPx";
 import Dropdown from "../mini-components/Dropdown";
 import InputField from "../mini-components/InputField";
 import Checkboxes from "../mini-components/checkboxes";
-import { useGetAllUsers } from "../../services/users";
+import { useGetAllUsers } from "../../services/usersServices";
 
 function AddNewTodoItem({ defaultStatus, assignedList, onFormChange }) {
+  const prevFormDataRef = useRef({});
   const [taskStatus, setTaskStatus] = useState(defaultStatus);
   const { data: dbUsers, isLoading } = useGetAllUsers();
   const [usersData, setUsersData] = useState([]);
@@ -36,7 +37,7 @@ function AddNewTodoItem({ defaultStatus, assignedList, onFormChange }) {
   useEffect(() => {
     if (!isLoading) {
       const data = dbUsers.map((user) => ({
-        id: user.firebase_uid,
+        id: user.id,
         displayName: `${user.first_name} ${user.last_name}`,
         photo: user.photo,
       }));
@@ -72,7 +73,9 @@ function AddNewTodoItem({ defaultStatus, assignedList, onFormChange }) {
   }
 
   useEffect(() => {
-    const itemData = {
+    if (!assignedList) return;
+
+    const currentFormData = {
       title: taskTitle.trim(),
       description: taskDescription.trim(),
       status: taskStatus,
@@ -80,16 +83,22 @@ function AddNewTodoItem({ defaultStatus, assignedList, onFormChange }) {
       todo_list: assignedList.id,
     };
 
-    if (onFormChange) {
-      onFormChange(itemData);
+    const prevFormData = prevFormDataRef.current;
+
+    const hasChanged =
+      JSON.stringify(prevFormData) !== JSON.stringify(currentFormData);
+
+    if (hasChanged) {
+      prevFormDataRef.current = currentFormData; // Update the ref with the current form data
+      if (onFormChange) onFormChange(currentFormData);
     }
   }, [
+    assignedList,
     taskTitle,
     taskDescription,
     taskStatus,
     selectedUserIds,
     onFormChange,
-    assignedList.id,
   ]);
 
   return (
@@ -128,13 +137,14 @@ function AddNewTodoItem({ defaultStatus, assignedList, onFormChange }) {
         </HStack>
         <VStack gap={convertPx(20)} align={"start"}>
           <Text w={convertPx(150)}>Assigned to</Text>
-          <HStack
-            overflow={"auto"}
-            w={"100%"}
-            border={"solid 1px var(--chakra-colors-gray-300)"}
-            borderRadius={convertPx(4)}
-          >
-            {usersData && ( // todo: add loading state
+
+          <Skeleton loading={isLoading && !usersData} w={"100%"}>
+            <HStack
+              overflow={"auto"}
+              w={"100%"}
+              border={"solid 1px var(--chakra-colors-gray-300)"}
+              borderRadius={convertPx(4)}
+            >
               <Checkboxes
                 options={usersData}
                 variant={"subtle"}
@@ -145,17 +155,21 @@ function AddNewTodoItem({ defaultStatus, assignedList, onFormChange }) {
                 withIcon
                 onChange={handleSelectedUsers}
               />
-            )}
-          </HStack>
+            </HStack>
+          </Skeleton>
         </VStack>
-        <HStack gap={convertPx(20)}>
-          <Text w={convertPx(150)}>Assigned list</Text>
+        <Grid gap={convertPx(20)} templateColumns={`${convertPx(150)} 1fr`}>
+          <Text>Assigned list</Text>
 
           <Text>{assignedList.title}</Text>
-        </HStack>
+        </Grid>
         <Field.Root>
-          <HStack gap={convertPx(20)} align={"start"}>
-            <Field.Label w={convertPx(247)}>Task name</Field.Label>
+          <Grid
+            w={"100%"}
+            gap={convertPx(20)}
+            templateColumns={`${convertPx(150)} 1fr`}
+          >
+            <Field.Label>Task name</Field.Label>
             <InputField
               w={"100%"}
               name="taskTitle"
@@ -167,16 +181,15 @@ function AddNewTodoItem({ defaultStatus, assignedList, onFormChange }) {
               color="secondaryColor"
               onChange={handleInputChange}
             />
-          </HStack>
+          </Grid>
         </Field.Root>
         <Field.Root>
-          <Flex
-            w={"100%"}
-            gap={{ base: convertPx(10), lg: convertPx(22) }}
-            align={"start"}
-            flexDirection={{ base: "column", lg: "row" }}
+          <Grid
+            width={"100%"}
+            gap={convertPx(20)}
+            templateColumns={{ base: "1fr", sm: `${convertPx(150)} 1fr` }}
           >
-            <Field.Label w={convertPx(242)}>Task description</Field.Label>
+            <Field.Label>Task description</Field.Label>
             <Textarea
               w={"100%"}
               name="taskDescription"
@@ -190,7 +203,7 @@ function AddNewTodoItem({ defaultStatus, assignedList, onFormChange }) {
               onChange={handleInputChange}
               _required={false}
             />
-          </Flex>
+          </Grid>
         </Field.Root>
       </Fieldset.Content>
     </Fieldset.Root>

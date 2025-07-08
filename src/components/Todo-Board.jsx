@@ -29,7 +29,6 @@ function TodoBoard({
     );
   }
   if (isFetched && !listDetails) return null;
-
   return (
     <TodoList>
       {["pending", "in_progress", "done"].map((colTitle) => (
@@ -71,7 +70,7 @@ function TodoBoard({
                 handleStatusChange={(newStatus) => {
                   handleEditListItem({
                     ...item,
-                    assignee: item.assignee.map((user) => user.firebase_uid),
+                    assignee: item.assignee.map((user) => user.id),
                     status: newStatus["value"][0],
                   });
                 }}

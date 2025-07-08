@@ -2,7 +2,7 @@ import { createContext, useContext, useState, useEffect } from "react";
 import { loginUser, logoutUser } from "../firebase/authService";
 import { setAuthToken } from "../services/api";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { useGetUserDetails, postUser } from "../services/users";
+import { useGetUserDetails, useCreateUser } from "../services/usersServices";
 import { useQueryClient } from "react-query";
 
 const AuthContext = createContext();
@@ -15,6 +15,7 @@ export function AuthProvider({ children }) {
   const { data: user, isFetched, refetch: refetchUser } = useGetUserDetails();
   const [currentUser, setCurrentUser] = useState(user);
   const queryClient = useQueryClient();
+  const createUser = useCreateUser();
 
   useEffect(() => {
     const auth = getAuth();
@@ -76,26 +77,24 @@ export function AuthProvider({ children }) {
     }, 2500);
   };
 
-  const registerUser = async (data) => {
+  const signUp = async (data) => {
     const req = {
-      method: "POST",
-      data: {
-        email: data.email,
-        password: data.password,
-        first_name: data.firstName,
-        last_name: data.lastName,
-        birthday: data.birthday,
-      },
+      email: data.email,
+      password: data.password,
+      first_name: data.first_name,
+      last_name: data.last_name,
+      birthday: data.birthday,
     };
 
-    try {
-      await postUser(req);
-      login(data.email, data.password);
-    } catch (error) {
-      console.error("Error registering user:", error);
-      setErrorMessage("Registration failed, please try again.");
-      return;
-    }
+    createUser.mutate(req, {
+      onSuccess: async () => {
+        await loginUser(data.email, data.password);
+      },
+      onError: (err) => {
+        console.error("Error registering user:", err);
+        setErrorMessage("Registration failed, please try again.");
+      },
+    });
   };
 
   return (
@@ -107,7 +106,7 @@ export function AuthProvider({ children }) {
         isFetched,
         login,
         logout,
-        registerUser,
+        signUp,
         setErrorMessage,
       }}
     >

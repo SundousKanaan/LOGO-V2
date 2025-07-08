@@ -43,7 +43,7 @@ function EditeUser({ user, errorState, handleRoleChange, handleInputChange }) {
               bg="white"
               color="secondaryColor"
               boxShadow={
-                errorState?.type === "name"
+                errorState?.type === "first_name"
                   ? "inset 0 0 0 1px var(--chakra-colors-status-red)"
                   : "inset 0 0 0 1px var(--chakra-colors-status-green)"
               }
@@ -68,7 +68,7 @@ function EditeUser({ user, errorState, handleRoleChange, handleInputChange }) {
               bg="white"
               color="secondaryColor"
               boxShadow={
-                errorState?.type === "name"
+                errorState?.type === "last_name"
                   ? "inset 0 0 0 1px var(--chakra-colors-status-red)"
                   : "inset 0 0 0 1px var(--chakra-colors-status-green)"
               }
@@ -87,7 +87,7 @@ function EditeUser({ user, errorState, handleRoleChange, handleInputChange }) {
             </Field.Label>
             <InputField
               h={convertPx(50)}
-              type="text"
+              type="tel"
               name="phone"
               defaultValue={user.phone}
               placeholder={"Phone: +31612345678"}

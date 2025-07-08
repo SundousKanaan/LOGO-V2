@@ -10,7 +10,7 @@ import {
   Skeleton,
 } from "@chakra-ui/react";
 import { convertPx } from "../hooks/useConvertPx";
-import { useProducts } from "../services/products";
+import { useProducts } from "../services/productsServices";
 
 import ProductCard from "../components/ProductCard";
 import ButtonItem from "../components/mini-components/ButtonItem";
@@ -130,16 +130,6 @@ export default function Reviews() {
                 />
               );
             })}
-        {/* {isLoading &&
-          Array.from({ length: 10 }).map((_, index) => (
-            <Skeleton
-              key={index}
-              loading={isLoading}
-              borderRadius={convertPx(24)}
-            >
-              <ProductCard viewMode={viewMode} />
-            </Skeleton>
-          ))} */}
       </Box>
     </>
   );

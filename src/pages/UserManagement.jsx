@@ -1,10 +1,14 @@
 import { useState, useEffect } from "react";
 import { Table, Icon, Skeleton, Avatar, Text, HStack } from "@chakra-ui/react";
-import { useGetAllUsers } from "../services/users";
 import { MdModeEdit, MdOutlineDeleteForever } from "react-icons/md";
 import { convertPx } from "../hooks/useConvertPx";
 import { useAuth } from "../contexts/AuthContext";
-import { putUser, deleteUser } from "../services/users";
+import {
+  useUpdateUser,
+  useDeleteUser,
+  useGetAllUsers,
+  useValidateProfile,
+} from "../services/usersServices";
 import { useQueryClient } from "react-query";
 import { UsePickRandomColor } from "../hooks/usePickRandomColor";
 
@@ -20,10 +24,14 @@ function UserManagement() {
   const [errorEditeMessage, setErrorEditeMessage] = useState(null);
   const [canBeUpdated, setCanBeUpdated] = useState(false);
   const queryClient = useQueryClient();
+  const { mutate: updateUser, isLoading: isUpdatingUser } = useUpdateUser();
+  const { mutate: deleteUser, isLoading: isDeletingUser } = useDeleteUser();
+
+  const validateProfile = useValidateProfile();
 
   const handleOpenEditPopup = (user) => {
     setSelectedUser(user);
-    setIsPopupOpen("edite");
+    setIsPopupOpen("edit");
   };
 
   const handleInputChange = (e) => {
@@ -54,41 +62,39 @@ function UserManagement() {
 
   useEffect(() => {
     if (!selectedUser) return;
-    const isValid_F_Name =
-      selectedUser.first_name !== "" &&
-      /^[A-Za-z]+$/.test(selectedUser.first_name);
-    const isValid_L_Name =
-      selectedUser.last_name !== "" &&
-      /^[A-Za-z]+$/.test(selectedUser.last_name);
+    validateProfile.mutate(selectedUser, {
+      onSuccess: () => {
+        setCanBeUpdated(true);
+        setErrorEditeMessage(null);
+      },
 
-    const isValid_phone =
-      (selectedUser.phone && /^\+\d{1,3}\d{6,14}$/.test(selectedUser.phone)) ||
-      selectedUser.phone === "";
-
-    if (!isValid_F_Name || !isValid_L_Name) {
-      setErrorEditeMessage({
-        type: "name",
-        message: "Please check the first and last name format.",
-      });
-      setCanBeUpdated(false);
-    } else if (!isValid_phone) {
-      console.log("Valid phone number:", selectedUser.phone);
-      setErrorEditeMessage({
-        type: "phone",
-        message: "Please check the phone number format.",
-      });
-      setCanBeUpdated(false);
-    } else {
-      setCanBeUpdated(true);
-      setErrorEditeMessage(null);
-    }
+      onError: (err) => {
+        const error = err.response.data.errors;
+        setCanBeUpdated(false);
+        if (error.first_name || error.last_name) {
+          setErrorEditeMessage({
+            type: error.first_name?.[0] ? "first_name" : "last_name",
+            message: error.first_name?.[0] || error.last_name?.[0],
+          });
+        } else if (error.phone) {
+          setErrorEditeMessage({
+            type: "phone",
+            message: error.phone[0],
+          });
+        } else if (error.birthday) {
+          setErrorEditeMessage({
+            type: "birthday",
+            message: error.birthday[0],
+          });
+        }
+      },
+    });
   }, [selectedUser]);
 
   async function handleUpdateUser() {
-    console.log("Updating user:", selectedUser);
     if (!selectedUser) return;
-    const reqData = {
-      firebase_uid: selectedUser.firebase_uid,
+    const data = {
+      id: selectedUser.id,
       first_name: selectedUser.first_name,
       last_name: selectedUser.last_name,
       email: selectedUser.email,
@@ -98,11 +104,14 @@ function UserManagement() {
       user_type: selectedUser.user_type,
     };
 
-    await putUser(reqData);
-    queryClient.invalidateQueries(["allUsers"]);
-    setIsPopupOpen(false);
-    setSelectedUser(null);
-    setErrorEditeMessage(null);
+    updateUser(data, {
+      onSuccess: () => {
+        queryClient.invalidateQueries(["allUsers"]);
+        setIsPopupOpen(false);
+        setSelectedUser(null);
+        setErrorEditeMessage(null);
+      },
+    });
   }
 
   function handleOpenDeletePopup(user) {
@@ -112,28 +121,35 @@ function UserManagement() {
 
   async function handleDeleteUser() {
     if (!selectedUser) return;
-    await deleteUser(selectedUser.firebase_uid);
-    queryClient.invalidateQueries(["allUsers"]);
-    setIsPopupOpen(null);
-    setSelectedUser(null);
+    deleteUser(selectedUser.id, {
+      onSuccess: () => {
+        queryClient.invalidateQueries(["allUsers"]);
+        setIsPopupOpen(null);
+        setSelectedUser(null);
+      },
+    });
   }
 
   function rerenderPopup() {
-    switch (isPopupOpen) {
-      case "edite":
-        return (
-          <Popup
-            isOpen
-            title={"Edit User"}
-            onClose={() => {
-              setIsPopupOpen(false);
-              setSelectedUser(null);
-              setErrorEditeMessage(null);
-            }}
-            onSave={handleUpdateUser}
-            ActionButtonText={"Save"}
-            disableSaveButton={!canBeUpdated}
-          >
+    return (
+      <Popup
+        isOpen
+        title={isPopupOpen === "edit" ? "Edit User" : "Delete user"}
+        onClose={() => {
+          setIsPopupOpen(false);
+          setSelectedUser(null);
+          setErrorEditeMessage(null);
+        }}
+        onSave={isPopupOpen === "edit" ? handleUpdateUser : handleDeleteUser}
+        ActionButtonText={isPopupOpen === "edit" ? "Save" : "Delete"}
+        disableSaveButton={
+          (isPopupOpen === "edit" && !canBeUpdated) ||
+          isDeletingUser ||
+          isUpdatingUser
+        }
+      >
+        {isPopupOpen === "edit" && (
+          <>
             <EditeUser
               user={selectedUser}
               errorState={errorEditeMessage}
@@ -145,23 +161,18 @@ function UserManagement() {
                 }))
               }
             />
-            {errorEditeMessage && <Text>{errorEditeMessage.message}</Text>}
-          </Popup>
-        );
-      case "delete":
-        return (
-          <Popup
-            isOpen
-            title={"Delete User"}
-            onClose={() => {
-              setIsPopupOpen(null);
-              setSelectedUser(null);
-            }}
-            onSave={handleDeleteUser}
-            ActionButtonText={"Delete"}
-          >
+            {errorEditeMessage && (
+              <Text color={"redColor"} mt={convertPx(16)} textAlign={"center"}>
+                {errorEditeMessage.message}
+              </Text>
+            )}
+          </>
+        )}
+
+        {isPopupOpen === "delete" && (
+          <>
             <Text fontSize={convertPx(16)}>
-              Are you sure you want to delete{" "}
+              Are you sure you want to delete
               <Text
                 as={"span"}
                 fontWeight={"bold"}
@@ -169,7 +180,7 @@ function UserManagement() {
                 textDecor={"underline"}
               >
                 {selectedUser?.first_name} {selectedUser?.last_name}
-              </Text>{" "}
+              </Text>
               from the users list?
             </Text>
             <Text
@@ -180,12 +191,10 @@ function UserManagement() {
               This action cannot be undone. Please confirm to proceed with the
               deletion.
             </Text>
-          </Popup>
-        );
-
-      default:
-        return null;
-    }
+          </>
+        )}
+      </Popup>
+    );
   }
 
   return (
