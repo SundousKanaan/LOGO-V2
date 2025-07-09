@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
-import { useQueryClient } from "react-query";
+import { useQueryClient, useMutation } from "react-query";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { useListPermissions } from "../hooks/usePermissions";
@@ -13,10 +13,11 @@ import {
 } from "../services/todoListServices";
 
 import {
-  useUpdateTodoItem,
-  useCreateTodoItem,
-  useDeleteTodoItem,
-} from "../services/todoItemServices";
+  deleteTodoItemAPI,
+  updateTodoItemAPI,
+  postTodoItemAPI,
+} from "../services/api";
+
 import {
   useUpdateUser,
   useDeleteUser,
@@ -85,12 +86,7 @@ export default function Profile() {
     useUpdateTodoList();
   const { mutate: deleteTodoList, isLoading: isDeletingList } =
     useDeleteTodoList();
-  const { mutate: createTodoItem, isLoading: isCreatingItem } =
-    useCreateTodoItem(selectedList?.id);
-  const { mutate: deleteTodoItem, isLoading: isDeletingItem } =
-    useDeleteTodoItem();
-  const { mutate: updateTodoItem, isLoading: isUpdatingItem } =
-    useUpdateTodoItem();
+
   const { mutate: updateUser, isLoading: isUpdatingUser } = useUpdateUser();
   const { mutate: deleteUser, isLoading: isDeletingUser } = useDeleteUser();
   const validateProfile = useValidateProfile();
@@ -250,28 +246,172 @@ export default function Profile() {
   }
 
   // list items handlers
+  const { mutate: createTodoItem, isLoading: isCreatingItem } = useMutation({
+    // const { data: allUsers } = useGetAllUsers();
+
+    mutationFn: async (data) => {
+      const response = await postTodoItemAPI(data);
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      return response;
+    },
+    onMutate: async (newItem) => {
+      await queryClient.cancelQueries(["todolistDetails", newItem.todo_list]);
+      const previousListDetails = queryClient.getQueryData([
+        "todolistDetails",
+        newItem.todo_list,
+      ]);
+
+      // const assigneeUsers =
+      //   allUsers?.filter((user) => newItem.assignee.includes(user.id)) || [];
+
+      // You can use assigneeData as needed, e.g., attach to the optimistic item if required
+      const tempId = `temp-${Date.now()}`; // Temporary ID for optimistic update
+
+      queryClient.setQueryData(
+        ["todolistDetails", newItem.todo_list],
+        (oldData) => ({
+          ...oldData,
+          items: [
+            ...(oldData?.items || []),
+            {
+              ...newItem,
+              id: tempId,
+              // assignee: assigneeUsers,
+              created_at: new Date().toISOString(),
+              last_modified: new Date().toISOString(),
+            },
+          ],
+        })
+      );
+
+      return {
+        previousListDetails,
+        tempId,
+      };
+    },
+
+    onSuccess: (realItem, _variables, context) => {
+      const tempId = context?.tempId;
+
+      if (!tempId) return;
+      queryClient.setQueryData(
+        ["todolistDetails", realItem.todo_list],
+        (oldData) => {
+          if (!oldData) return oldData;
+
+          // const assigneeUsers =
+          //   allUsers?.filter((user) => realItem.assignee.includes(user.id)) ||
+          //   [];
+
+          // realItem.assignee = assigneeUsers;
+
+          return {
+            ...oldData,
+            items: oldData.items.map((item) =>
+              item.id === tempId ? realItem : item
+            ),
+          };
+        }
+      );
+    },
+
+    onSettled: () => {
+      setNewListItemDetails(null);
+    },
+
+    onError: (error, newItem, context) => {
+      if (context?.previousListDetails) {
+        queryClient.setQueryData(
+          ["todolistDetails", newItem.todo_list],
+          context.previousListDetails
+        );
+      }
+    },
+  });
+
   async function handleCreateListItem() {
     if (!newListItemDetails) return;
     setOpenItemPopup(null);
-    createTodoItem(newListItemDetails, {
-      onSuccess: async () => {
-        setNewListItemDetails(null);
-      },
-    });
+    createTodoItem(newListItemDetails);
   }
+
+  const { mutate: deleteTodoItem, isLoading: isDeletingItem } = useMutation({
+    mutationFn: async (id) => {
+      const response = await deleteTodoItemAPI(id);
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      return response;
+    },
+
+    onSuccess: async () => {
+      await refetchListDetails();
+      // queryClient.invalidateQueries("todolistDetails");
+      setOpenItemPopup(null);
+    },
+
+    onError: (err) => {
+      console.error(
+        "Error with Item deleting",
+        err.response?.data || err.message
+      );
+    },
+  });
 
   async function handleDeleteListItem(taskId) {
-    deleteTodoItem(taskId, {
-      onSuccess: async () => {
-        setOpenItemPopup(null);
-        await refetchListDetails();
-        queryClient.invalidateQueries("todolistDetails");
-      },
-    });
+    deleteTodoItem(taskId);
   }
 
+  const { mutate: updateTodoItem, isLoading: isUpdatingItem } = useMutation({
+    mutationFn: async ({ id, ...data }) => {
+      const response = await updateTodoItemAPI(id, data);
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      return response;
+    },
+
+    onMutate: async (data) => {
+      setOpenItemPopup(null);
+      await queryClient.cancelQueries(["todolistDetails", data.todo_list]);
+      const previousListDetails = queryClient.getQueryData([
+        "todolistDetails",
+        data.todo_list,
+      ]);
+      const tempId = `temp-${data.id}`;
+      queryClient.setQueryData(
+        ["todolistDetails", data.todo_list],
+        (oldData) => ({
+          ...oldData,
+          items: (oldData?.items || []).map((item) =>
+            item.id === data.id
+              ? {
+                  ...data,
+                  id: tempId,
+                  assignee: item.assignee,
+                  last_modified: new Date().toISOString(),
+                }
+              : item
+          ),
+        })
+      );
+
+      return {
+        previousListDetails,
+      };
+    },
+
+    onSuccess: async () => {
+      await refetchListDetails();
+      queryClient.invalidateQueries("todolistDetails");
+      setNewListItemDetails(null);
+    },
+    onError: (err) => {
+      console.error(
+        "Error updating todo item:",
+        err.response?.data || err.message
+      );
+    },
+  });
+
   async function handleEditListItem(newTaskDetails) {
-    const req = {
+    const data = {
       id: newTaskDetails.id,
       title: newTaskDetails.title,
       description: newTaskDetails.description,
@@ -280,14 +420,7 @@ export default function Profile() {
       todo_list: newTaskDetails.todo_list,
     };
 
-    updateTodoItem(req, {
-      onSuccess: async () => {
-        await refetchListDetails();
-        setOpenItemPopup(null);
-        queryClient.invalidateQueries("todolistDetails");
-        setNewListItemDetails(null);
-      },
-    });
+    updateTodoItem(data);
   }
 
   // user

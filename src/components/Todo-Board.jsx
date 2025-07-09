@@ -29,6 +29,7 @@ function TodoBoard({
     );
   }
   if (isFetched && !listDetails) return null;
+
   return (
     <TodoList>
       {["pending", "in_progress", "done"].map((colTitle) => (
@@ -52,7 +53,9 @@ function TodoBoard({
                 data={item}
                 listMembers={listDetails.members}
                 isEditable={isEditable}
-                isTemporary={String(item.id).startsWith("temp-")}
+                isTemporary={
+                  String(item.id).startsWith("temp-") 
+                }
                 handleDeleteItem={() =>
                   setOpenItemPopup({
                     case: "delete",

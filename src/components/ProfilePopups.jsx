@@ -47,7 +47,10 @@ export function ListPopup({
         if (isEdit) return handleEditList();
         if (isDelete) return handleDeleteList();
       }}
-      ActionButtonText={saveButtonTexts[openListPopup]}
+      ActionButtonText={
+        saveButtonTexts[openListPopup] ||
+        (isDelete && isProcessing && "Deleting...")
+      }
       disableSaveButton={
         isProcessing ||
         (!isDelete && (selectedList?.title === listTitle || listTitle === ""))
@@ -112,7 +115,15 @@ export function ListItemPopup({
       onClose={() => {
         setOpenItemPopup(null);
       }}
-      ActionButtonText={isCreate ? "Create" : isEdit ? "Save" : "Delete"}
+      ActionButtonText={
+        isCreate
+          ? "Create"
+          : isEdit
+          ? "Save"
+          : isDelete && isProcessing
+          ? "Deleting..."
+          : "Delete"
+      }
       disableSaveButton={
         isProcessing ||
         ((isCreate || isEdit) &&
