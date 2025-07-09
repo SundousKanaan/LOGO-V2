@@ -3,7 +3,7 @@ import { useAuth } from "../contexts/AuthContext";
 import api from "./api";
 
 // get all todo lists for a user
-async function getTodolistsArray(data) {
+async function getAllTodolistsAPI(data) {
   try {
     const response = await api.get(
       `/todos/todo_lists/user/${data.id}/?fields=${data.fields.join(",")}`
@@ -15,23 +15,21 @@ async function getTodolistsArray(data) {
   }
 }
 
-export const useTodolistsArray = (fields) => {
+export const useGetAllTodolistsAPI = (fields) => {
   const { currentUser } = useAuth();
 
   return useQuery({
     queryKey: ["todolistsArray", fields],
-    queryFn: () => getTodolistsArray({ id: currentUser?.id, fields: fields }),
+    queryFn: () => getAllTodolistsAPI({ id: currentUser?.id, fields: fields }),
     retry: false,
     enabled: !!currentUser,
   });
 };
 
 // get details of a specific todo list
-async function getListDetails(id) {
+async function getListDetailsAPI(id) {
   try {
-    setTimeout(() => {
-
-    }, 5000)
+    setTimeout(() => {}, 5000);
     const response = await api.get(
       `/todos/todo_lists/${id}/?expand=items.assignee,owner`
     );
@@ -42,28 +40,27 @@ async function getListDetails(id) {
   }
 }
 
-export const useListDetails = (id) => {
+export const useListDetailsAPI = (id) => {
   return useQuery({
     queryKey: ["todolistDetails", id],
-    queryFn: () => getListDetails(id),
+    queryFn: () => getListDetailsAPI(id),
     retry: false,
     enabled: false,
   });
 };
 
+export async function postTodoListAPI(req) {
+  const postRequest = {
+    title: req?.title,
+    owner: req?.owner,
+    items: [],
+  };
+
+  await api.post("todos/todo_lists/", postRequest);
+}
 export function useCreateTodoList() {
-  async function postTodoList(req) {
-    const postRequest = {
-      title: req?.title,
-      owner: req?.owner,
-      items: [],
-    };
-
-    await api.post("todos/todo_lists/", postRequest);
-  }
-
   return useMutation({
-    mutationFn: postTodoList,
+    mutationFn: postTodoListAPI,
     onError: (err) => {
       console.error(
         "Error with creating new list",

@@ -5,8 +5,8 @@ import { useAuth } from "../contexts/AuthContext";
 import { useListPermissions } from "../hooks/usePermissions";
 
 import {
-  useTodolistsArray,
-  useListDetails,
+  useGetAllTodolistsAPI,
+  useListDetailsAPI,
   useUpdateTodoList,
   useDeleteTodoList,
   useCreateTodoList,
@@ -69,14 +69,14 @@ export default function Profile() {
     data: todoListsArray,
     refetch: refetchTodoLists,
     isFetched: isListsArrayFetched,
-  } = useTodolistsArray(["id", "title", "owner"]);
+  } = useGetAllTodolistsAPI(["id", "title", "owner"]);
 
   const {
     data: listDetails,
     isLoading: isListDetailsLoading,
     isFetched: isListDetailsFetched,
     refetch: refetchListDetails,
-  } = useListDetails(selectedList?.id || null, {
+  } = useListDetailsAPI(selectedList?.id || null, {
     enabled: !!selectedList?.id, // only fetch if we have a valid ID
   });
 
