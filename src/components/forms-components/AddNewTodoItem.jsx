@@ -22,7 +22,7 @@ function AddNewTodoItem({ defaultStatus, assignedList, onFormChange }) {
   const [taskStatus, setTaskStatus] = useState(defaultStatus);
   const { data: dbUsers, isLoading } = useGetAllUsers();
   const [usersData, setUsersData] = useState([]);
-  const [selectedUserIds, setSelectedUserIds] = useState([]);
+  const [selectedUsers, setSelectedUsers] = useState([]);
   const [taskTitle, setTaskTitle] = useState("");
   const [taskDescription, setTaskDescription] = useState("");
 
@@ -41,10 +41,9 @@ function AddNewTodoItem({ defaultStatus, assignedList, onFormChange }) {
         displayName: `${user.first_name} ${user.last_name}`,
         photo: user.photo,
       }));
-
       setUsersData(data);
     }
-  }, [isLoading, dbUsers]);
+  }, [isLoading]);
 
   function changeStatus(newValue) {
     setTaskStatus(newValue.items[0].value);
@@ -52,13 +51,22 @@ function AddNewTodoItem({ defaultStatus, assignedList, onFormChange }) {
 
   function handleSelectedUsers(event) {
     const userId = event.target.value;
+    const userData = dbUsers.find((user) => user.id === userId);
+
     const isChecked = event.target.checked;
 
-    setSelectedUserIds((prevSelected) => {
+    setSelectedUsers((prevSelected) => {
       if (isChecked) {
-        return [...prevSelected, userId];
+        return [
+          ...prevSelected,
+          {
+            id: userId,
+            first_name: userData.first_name,
+            last_name: userData.last_name,
+          },
+        ];
       } else {
-        return prevSelected.filter((id) => id !== userId);
+        return prevSelected.filter((user) => user.id !== userId);
       }
     });
   }
@@ -79,7 +87,7 @@ function AddNewTodoItem({ defaultStatus, assignedList, onFormChange }) {
       title: taskTitle.trim(),
       description: taskDescription.trim(),
       status: taskStatus,
-      assignee: selectedUserIds,
+      assignee: selectedUsers,
       todo_list: assignedList.id,
     };
 
@@ -97,7 +105,7 @@ function AddNewTodoItem({ defaultStatus, assignedList, onFormChange }) {
     taskTitle,
     taskDescription,
     taskStatus,
-    selectedUserIds,
+    selectedUsers,
     onFormChange,
   ]);
 
@@ -135,29 +143,34 @@ function AddNewTodoItem({ defaultStatus, assignedList, onFormChange }) {
             ))}
           </Dropdown>
         </HStack>
-        <VStack gap={convertPx(20)} align={"start"}>
-          <Text w={convertPx(150)}>Assigned to</Text>
+        <Grid
+          gap={convertPx(20)}
+          templateColumns={{
+            base: `1fr`,
+            sm: `${convertPx(150)} 1fr`,
+          }}
+        >
+          <Text>Assigned to</Text>
 
-          <Skeleton loading={isLoading && !usersData} w={"100%"}>
-            <HStack
-              overflow={"auto"}
-              w={"100%"}
-              border={"solid 1px var(--chakra-colors-gray-300)"}
-              borderRadius={convertPx(4)}
-            >
-              <Checkboxes
-                options={usersData}
-                variant={"subtle"}
-                minH={"fit-content"}
-                maxH={convertPx(100)}
-                p={`${convertPx(8)} ${convertPx(8)}`}
-                overflow="auto"
-                withIcon
-                onChange={handleSelectedUsers}
-              />
-            </HStack>
-          </Skeleton>
-        </VStack>
+          <HStack
+            overflow={"auto"}
+            w={"100%"}
+            border={"solid 1px var(--chakra-colors-gray-300)"}
+            borderRadius={convertPx(4)}
+          >
+            <Checkboxes
+              options={usersData}
+              variant={"subtle"}
+              h={"fit-content"}
+              maxH={convertPx(100)}
+              p={`${convertPx(8)} ${convertPx(8)}`}
+              overflow="auto"
+              withIcon
+              onChange={handleSelectedUsers}
+              isLoading={isLoading}
+            />
+          </HStack>
+        </Grid>
         <Grid gap={convertPx(20)} templateColumns={`${convertPx(150)} 1fr`}>
           <Text>Assigned list</Text>
 

@@ -1,14 +1,23 @@
-import { Checkbox, CheckboxGroup, Fieldset, Avatar } from "@chakra-ui/react";
+import {
+  Flex,
+  Checkbox,
+  CheckboxGroup,
+  Fieldset,
+  Avatar,
+  Skeleton,
+  SkeletonCircle,
+} from "@chakra-ui/react";
 import { UsePickRandomColor } from "../../hooks/usePickRandomColor";
+import { convertPx } from "../../hooks/useConvertPx";
 
 function Checkboxes({
   title,
-
   variant,
   options,
   withIcon,
   onChange,
   selectedIds = [],
+  isLoading,
   ...props
 }) {
   return (
@@ -23,29 +32,40 @@ function Checkboxes({
             {title}
           </Fieldset.Legend>
         )}
-        <Fieldset.Content>
-          {options.map((option) => (
-            <Checkbox.Root key={option.id} value={option.id}>
-              <Checkbox.HiddenInput />
-              <Checkbox.Control
-                borderRadius={"full"}
-                colorPalette={UsePickRandomColor(option.displayName)}
-              />
+        <Fieldset.Content h={isLoading && convertPx(80)}>
+          {isLoading ? (
+            <Flex pl={convertPx(35)} gap={convertPx(8)} alignItems={"center"}>
               {withIcon && (
-                <Avatar.Root
-                  size="2xs"
-                  colorPalette={UsePickRandomColor(option.displayName)}
-                >
-                  <Avatar.Fallback />
-                  <Avatar.Image
-                    src={option.photo}
-                    alt={`${option.displayName} profile photo`}
-                  />
-                </Avatar.Root>
+                <SkeletonCircle size={convertPx(30)}></SkeletonCircle>
               )}
-              <Checkbox.Label>{option.displayName}</Checkbox.Label>
-            </Checkbox.Root>
-          ))}
+              <Skeleton h={convertPx(24)} w={convertPx(170)}></Skeleton>
+            </Flex>
+          ) : (
+            options &&
+            options.map((option) => (
+              <Checkbox.Root key={option.id} value={option.id}>
+                <Checkbox.HiddenInput />
+                <Checkbox.Control
+                  visibility={isLoading && "hidden"}
+                  borderRadius={"full"}
+                  colorPalette={UsePickRandomColor(option.displayName)}
+                />
+                {withIcon && (
+                  <Avatar.Root
+                    size="2xs"
+                    colorPalette={UsePickRandomColor(option.displayName)}
+                  >
+                    <Avatar.Fallback />
+                    <Avatar.Image
+                      src={option.photo}
+                      alt={`${option.displayName} profile photo`}
+                    />
+                  </Avatar.Root>
+                )}
+                <Checkbox.Label>{option.displayName}</Checkbox.Label>
+              </Checkbox.Root>
+            ))
+          )}
         </Fieldset.Content>
       </CheckboxGroup>
     </Fieldset.Root>

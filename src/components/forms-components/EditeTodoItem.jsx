@@ -18,13 +18,11 @@ import InputField from "../mini-components/InputField";
 import Checkboxes from "../mini-components/checkboxes";
 import { useGetAllUsers } from "../../services/usersServices";
 
-function EditeTodoItem({ data, assignedList, onChange }) {
+function EditeTodoItem({ data, onChange }) {
   const { data: dbUsers, isLoading } = useGetAllUsers();
   const [newStatus, setTaskStatus] = useState(data.status);
   const [usersData, setUsersData] = useState([]);
-  const [selectedAssignee, setSelectedAssignee] = useState(
-    data.assignee.map((assignee) => assignee.id)
-  );
+  const [selectedAssignee, setSelectedAssignee] = useState(data.assignee);
   const [newDescription, setNewDescription] = useState(data.description);
   const [newTaskTitle, setNewTaskTitle] = useState(data.title);
 
@@ -59,19 +57,30 @@ function EditeTodoItem({ data, assignedList, onChange }) {
     if (onChange) {
       onChange(newData);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [newTaskTitle, newDescription, selectedAssignee, newStatus]);
 
   function changeStatus(newValue) {
     setTaskStatus(newValue.items[0].value);
   }
 
-  function handleCheckboxChange(e) {
-    setSelectedAssignee((prev) => {
-      if (prev.includes(e.target.value)) {
-        return prev.filter((id) => id !== e.target.value);
+  function handleCheckboxChange(event) {
+    const userId = event.target.value;
+    const userData = dbUsers.find((user) => user.id === userId);
+
+    const isChecked = event.target.checked;
+
+    setSelectedAssignee((prevSelected) => {
+      if (isChecked) {
+        return [
+          ...prevSelected,
+          {
+            id: userId,
+            first_name: userData.first_name,
+            last_name: userData.last_name,
+          },
+        ];
       } else {
-        return [...prev, e.target.value];
+        return prevSelected.filter((user) => user.id !== userId);
       }
     });
   }
@@ -151,7 +160,7 @@ function EditeTodoItem({ data, assignedList, onChange }) {
         </VStack>
         <Grid gap={convertPx(20)} templateColumns={`${convertPx(150)} 1fr`}>
           <Text>Assigned list</Text>
-          <Text>{assignedList.title}</Text>
+          <Text>{data.todo_list.title}</Text>
         </Grid>
         <Field.Root>
           <Grid

@@ -39,7 +39,6 @@ export default function Reviews() {
       });
       if (node) observer.current.observe(node);
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [isLoading, hasNextPage, isFetching, isFetchingNextPage, fetchNextPage]
   );
 

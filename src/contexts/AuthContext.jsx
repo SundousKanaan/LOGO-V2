@@ -2,7 +2,10 @@ import { createContext, useContext, useState, useEffect } from "react";
 import { loginUser, logoutUser } from "../firebase/authService";
 import { setAuthToken } from "../services/api";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { useGetUserDetails, useCreateUser } from "../services/usersServices";
+import {
+  useCurrentUserDetails,
+  useCreateUser,
+} from "../services/usersServices";
 import { useQueryClient } from "react-query";
 
 const AuthContext = createContext();
@@ -12,7 +15,11 @@ export function AuthProvider({ children }) {
     JSON.parse(localStorage.getItem("isAuthenticated")) || false;
   const [isAuthenticated, setIsAuthenticated] = useState(storedAuthStatus);
   const [errorMessage, setErrorMessage] = useState(null);
-  const { data: user, isFetched, refetch: refetchUser } = useGetUserDetails();
+  const {
+    data: user,
+    isFetched,
+    refetch: refetchUser,
+  } = useCurrentUserDetails();
   const [currentUser, setCurrentUser] = useState(user);
   const queryClient = useQueryClient();
   const createUser = useCreateUser();
@@ -115,5 +122,4 @@ export function AuthProvider({ children }) {
   );
 }
 
-// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => useContext(AuthContext);

@@ -48,8 +48,10 @@ export function ListPopup({
         if (isDelete) return handleDeleteList();
       }}
       ActionButtonText={
-        saveButtonTexts[openListPopup] ||
-        (isDelete && isProcessing && "Deleting...")
+        (isCreate && isProcessing && "Creating...") ||
+        (isEdit && isProcessing && "Editing...") ||
+        (isDelete && isProcessing && "Deleting...") ||
+        saveButtonTexts[openListPopup]
       }
       disableSaveButton={
         isProcessing ||
@@ -142,7 +144,6 @@ export function ListItemPopup({
       {isEdit && (
         <EditeTodoItem
           data={list.items.find((item) => item.id === id)}
-          assignedList={{ id: list.id, title: list.title }}
           onChange={handleNewTaskChange}
         />
       )}

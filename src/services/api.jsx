@@ -20,11 +20,20 @@ export default api;
 
 // todo Items
 export async function updateTodoItemAPI(id, data) {
-  await api.put(`todos/todo_items/${id}/`, data);
+  const fixedData = {
+    ...data,
+    assignee: data.assignee.map((user) => user.id),
+  };
+  await api.put(`todos/todo_items/${id}/`, fixedData);
 }
 
 export async function postTodoItemAPI(data) {
-  const response = await api.post("todos/todo_items/", data);
+  const fixedData = {
+    ...data,
+    assignee: data.assignee.map((user) => user.id),
+  };
+
+  const response = await api.post("todos/todo_items/", fixedData);
   return response.data;
 }
 

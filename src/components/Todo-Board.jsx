@@ -51,11 +51,8 @@ function TodoBoard({
               <TodoItem
                 key={item.id}
                 data={item}
-                listMembers={listDetails.members}
                 isEditable={isEditable}
-                isTemporary={
-                  String(item.id).startsWith("temp-") 
-                }
+                isTemporary={String(item.id).startsWith("temp-")}
                 handleDeleteItem={() =>
                   setOpenItemPopup({
                     case: "delete",
@@ -73,7 +70,7 @@ function TodoBoard({
                 handleStatusChange={(newStatus) => {
                   handleEditListItem({
                     ...item,
-                    assignee: item.assignee.map((user) => user.id),
+                    assignee: item.assignee,
                     status: newStatus["value"][0],
                   });
                 }}

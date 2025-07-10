@@ -1,9 +1,10 @@
 import { useQuery, useMutation } from "react-query";
 import api from "./api";
 
-// get user details
-async function getUserDetails() {
+// get current user details
+async function getCurrentUserDetails() {
   try {
+    await new Promise((resolve) => setTimeout(resolve, 1500));
     const response = await api.get("/users/me/");
     return response.data;
   } catch (error) {
@@ -12,10 +13,10 @@ async function getUserDetails() {
   }
 }
 
-export const useGetUserDetails = () => {
+export const useCurrentUserDetails = () => {
   return useQuery({
     queryKey: ["userDetails"],
-    queryFn: getUserDetails,
+    queryFn: getCurrentUserDetails,
     retry: false,
     enabled: false,
   });
@@ -25,6 +26,7 @@ export const useGetUserDetails = () => {
 async function getAllUsers() {
   try {
     const response = await api.get("/users/api/");
+    await new Promise((resolve) => setTimeout(resolve, 2000));
     return response.data;
   } catch (error) {
     console.error("getAllUsers API Error:", error);
@@ -37,6 +39,25 @@ export const useGetAllUsers = () => {
     queryKey: ["allUsers"],
     queryFn: getAllUsers,
     retry: false,
+  });
+};
+
+// get user details
+export async function getUserData(id) {
+  if (!id) return;
+  const response = await api.get(`/users/api/${id}`);
+  return response.data;
+}
+
+export const useUserData = (id) => {
+  return useQuery({
+    queryKey: ["userDetails", id],
+    queryFn: () => getUserData(id),
+    onError: (error) => {
+      console.error("getUserDetails API Error:", error);
+    },
+    retry: false,
+    enabled: !!id,
   });
 };
 

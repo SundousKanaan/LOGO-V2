@@ -114,7 +114,7 @@ export const system = createSystem(
           lightBlue: { value: "#F4F6F7" },
           redColor: { value: "#ff4a4a" },
           lightBlack: { value: "#00000050" },
-          lightThemeColor: { value: "#c6c6fb" },
+          lightThemeColor: { value: "#ebebff" }, // the old one c6c6fd
 
           statusRed: { value: "#ff4a4a" },
           statusRedLight: { value: "#FDE8E8" },
