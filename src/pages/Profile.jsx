@@ -1,18 +1,10 @@
 import { useEffect, useState } from "react";
-import { useQueryClient } from "react-query";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
-
-import {
-  useUpdateUser,
-  useDeleteUser,
-  useValidateProfile,
-} from "../services/usersServices";
-
-import { useGetAllTodolistsAPI } from "../services/todoListServices";
-
+import { useFetchAllTodolists } from "../hooks/useFetchAllTodolists";
 import { useTodoItemHandlers } from "../hooks/useTodoItemHandlers";
 import { useTodoListHandlers } from "../hooks/useTodoListHandlers";
+import { useUserHandlers } from "../hooks/useUserHandlers";
 
 import {
   ListPopup,
@@ -31,10 +23,6 @@ export default function Profile() {
   const [selectedList, setSelectedList] = useState(null);
 
   const [openListPopup, setOpenListPopup] = useState(null); // create | edit | delete | null
-  const [openUserPopup, setOpenUserPopup] = useState(null); // edit | delete | null
-
-  const [errorEditMessage, setErrorEditMessage] = useState(null);
-  const [accountData, setAccountData] = useState(null);
 
   // =====================
   // Hooks & data fetching
@@ -51,19 +39,19 @@ export default function Profile() {
     refetch: refetchTodoLists,
     isLoading: isListsArrayLoading,
     isFetched: isListsArrayFetched,
-  } = useGetAllTodolistsAPI();
+  } = useFetchAllTodolists();
 
   const {
     listTitle,
-    setListTitle,
     isEditable,
+    isCreatingList,
+    isUpdatingList,
+    isDeletingList,
+    setListTitle,
     handleChangeList,
     handleCreateList,
     handleEditList,
     handleDeleteList,
-    isCreatingList,
-    isUpdatingList,
-    isDeletingList,
   } = useTodoListHandlers(
     currentUser,
     selectedList,
@@ -78,23 +66,35 @@ export default function Profile() {
   const {
     newListItemDetails,
     openItemPopup,
-    setOpenItemPopup,
     isCreatingItem,
     isDeletingItem,
     isUpdatingItem,
     openCreateItemPopup,
+    setOpenItemPopup,
     handleCreateListItem,
     handleDeleteListItem,
     handleEditListItem,
     handleNewTaskChange,
   } = useTodoItemHandlers();
 
-  const queryClient = useQueryClient();
-  const navigate = useNavigate();
+  const {
+    handledUser,
+    UserErrorMessage,
+    openUserPopup,
+    isDeletingUser,
+    isUpdatingUser,
+    setUserErrorMessage,
+    setHandledUser,
+    setOpenUserPopup,
+    handleDeleteUser,
+    handleUpdateUser,
+    handleUserDataChange,
+  } = useUserHandlers({
+    initialUser: currentUser,
+    logout,
+  });
 
-  const { mutate: updateUser, isLoading: isUpdatingUser } = useUpdateUser();
-  const { mutate: deleteUser, isLoading: isDeletingUser } = useDeleteUser();
-  const validateProfile = useValidateProfile();
+  const navigate = useNavigate();
 
   // =====================
   // Effects
@@ -105,121 +105,14 @@ export default function Profile() {
     if (!isAuthenticated) navigate("/login", { replace: true });
   }, [isAuthenticated, navigate]);
 
-  // set account data from current user
-  useEffect(() => {
-    if (isCurrentUserFetched) {
-      setAccountData(currentUser);
-    }
-  }, [isCurrentUserFetched, currentUser]);
-
-  useEffect(() => {
-    if (!accountData) return;
-    validateProfile.mutate(accountData, {
-      onSuccess: () => {
-        setErrorEditMessage(null);
-      },
-      onError: (err) => {
-        const error = err.response.data.errors;
-        if (error.first_name || error.last_name) {
-          setErrorEditMessage({
-            type: error.first_name?.[0] ? "first_name" : "last_name",
-            message: error.first_name?.[0] || error.last_name?.[0],
-          });
-        } else if (error.phone) {
-          setErrorEditMessage({
-            type: "phone",
-            message: error.phone[0],
-          });
-        } else if (error.birthday) {
-          setErrorEditMessage({
-            type: "birthday",
-            message: error.birthday[0],
-          });
-        }
-      },
-    });
-  }, [accountData]);
-
-  // =====================
-  // Handlers
-  // =====================
-
-  // Input change for list title
-  function handleInputChange(e) {
-    setListTitle(e.target.value);
-  }
-
-  //  ==== Popups Actions ====
-  // user handlers
-  const handleUserDataChange = (e) => {
-    const { name, value } = e.target;
-
-    if (name === "firstName") {
-      setAccountData((prevData) => ({
-        ...prevData,
-        first_name: value.trim(),
-      }));
-    } else if (name === "lastName") {
-      setAccountData((prevData) => ({
-        ...prevData,
-        last_name: value.trim(),
-      }));
-    } else if (name === "phone") {
-      setAccountData((prevData) => ({
-        ...prevData,
-        phone: value.trim(),
-      }));
-    } else if (name === "birthday") {
-      setAccountData((prevData) => ({
-        ...prevData,
-        birthday: value.trim(),
-      }));
-    }
-  };
-
-  async function handleUpdateUser() {
-    if (!accountData) return;
-    const data = {
-      id: accountData.id,
-      first_name: accountData.first_name,
-      last_name: accountData.last_name,
-      email: accountData.email,
-      phone: accountData.phone || "",
-      birthday: accountData.birthday || "",
-      is_active: true,
-      user_type: accountData.user_type,
-    };
-
-    updateUser(data, {
-      onSuccess: () => {
-        queryClient.invalidateQueries(["allUsers"]);
-        setAccountData(data);
-        setOpenUserPopup(false);
-        setErrorEditMessage(null);
-      },
-    });
-  }
-
-  async function handleDeleteUser() {
-    if (!accountData) return;
-
-    deleteUser(accountData.id, {
-      onSuccess: async () => {
-        await logout();
-        setOpenUserPopup(false);
-        setAccountData(null);
-        setErrorEditMessage(null);
-      },
-    });
-  }
-
   return (
     <>
       <ProfileCard
-        user={currentUser}
+        user={handledUser}
         isloading={!isCurrentUserFetched}
         onEdit={() => setOpenUserPopup("edit")}
         onDelete={() => setOpenUserPopup("delete")}
+        isProcessing={isUpdatingUser || isDeletingUser}
       />
 
       <ListsActions
@@ -250,7 +143,7 @@ export default function Profile() {
         openListPopup={openListPopup}
         selectedList={selectedList}
         listTitle={listTitle}
-        handleInputChange={handleInputChange}
+        handleInputChange={(e) => setListTitle(e.target.value)}
         handleCreateList={handleCreateList}
         handleEditList={handleEditList}
         handleDeleteList={handleDeleteList}
@@ -285,16 +178,16 @@ export default function Profile() {
 
       <UserPopup
         openUserPopup={openUserPopup}
-        user={accountData || currentUser}
-        errorEditMessage={errorEditMessage}
+        user={handledUser || currentUser}
+        errorEditMessage={UserErrorMessage}
         handleUpdateUser={handleUpdateUser}
         handleDeleteUser={handleDeleteUser}
         setOpenUserPopup={setOpenUserPopup}
-        setAccountData={setAccountData}
-        setErrorEditMessage={setErrorEditMessage}
+        setAccountData={setHandledUser}
+        setErrorEditMessage={setUserErrorMessage}
         handleUserDataChange={handleUserDataChange}
         isProcessing={
-          openUserPopup === "edite" ? isUpdatingUser : isDeletingUser
+          openUserPopup === "edit" ? isUpdatingUser : isDeletingUser
         }
       />
     </>

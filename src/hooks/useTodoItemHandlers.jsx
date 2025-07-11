@@ -126,9 +126,10 @@ export function useTodoItemHandlers() {
       };
     },
 
-    onSuccess: async () => {
+    onSuccess: () => {
       queryClient.invalidateQueries(["todolistsArray"]);
     },
+
     onError: (err, context) => {
       if (context?.prevData) {
         queryClient.setQueryData("todolistsArray", context.prevData);

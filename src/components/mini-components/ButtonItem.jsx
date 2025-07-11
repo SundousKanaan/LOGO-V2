@@ -1,12 +1,19 @@
 import { Button } from "@chakra-ui/react";
 import { convertPx } from "../../hooks/useConvertPx";
 
-export default function ButtonItem({ children, variant, onClick, ...props }) {
+export default function ButtonItem({
+  children,
+  variant,
+  onClick,
+  isDisabled = false,
+  ...props
+}) {
   return (
     <Button
       variant={variant}
       transition={`transform .1s`}
       onClick={onClick}
+      disabled={isDisabled}
       _hover={{
         boxShadow: `0 0 0 ${convertPx(1)} var(--chakra-colors-theme-color)`,
       }}

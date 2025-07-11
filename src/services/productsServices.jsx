@@ -1,5 +1,5 @@
 import { useInfiniteQuery } from "react-query";
-import api from "./api";
+import { api } from "./api";
 import { useAuth } from "../contexts/AuthContext";
 
 async function getProducts({ pageParam = 1 }) {

@@ -1,8 +1,8 @@
 import { useQuery, useMutation } from "react-query";
-import api from "./api";
+import { api } from "./api";
 
 // get current user details
-async function getCurrentUserDetails() {
+async function getCurrentUser() {
   try {
     await new Promise((resolve) => setTimeout(resolve, 1500));
     const response = await api.get("/users/me/");
@@ -13,10 +13,10 @@ async function getCurrentUserDetails() {
   }
 }
 
-export const useCurrentUserDetails = () => {
+export const useCurrentUser = () => {
   return useQuery({
     queryKey: ["userDetails"],
-    queryFn: getCurrentUserDetails,
+    queryFn: getCurrentUser,
     retry: false,
     enabled: false,
   });
@@ -42,33 +42,14 @@ export const useGetAllUsers = () => {
   });
 };
 
-// get user details
-export async function getUserData(id) {
-  if (!id) return;
-  const response = await api.get(`/users/api/${id}`);
-  return response.data;
+// post a new user to the API
+export async function createtUser(userData) {
+  await api.post("users/api/", userData);
 }
 
-export const useUserData = (id) => {
-  return useQuery({
-    queryKey: ["userDetails", id],
-    queryFn: () => getUserData(id),
-    onError: (error) => {
-      console.error("getUserDetails API Error:", error);
-    },
-    retry: false,
-    enabled: !!id,
-  });
-};
-
-// post a new user to the API
 export function useCreateUser() {
-  async function postUser(userData) {
-    await api.post("users/api/", userData);
-  }
-
   return useMutation({
-    mutationFn: postUser,
+    mutationFn: createtUser,
     onError: (err) => {
       console.error(
         "Error with creating new user",
@@ -79,52 +60,32 @@ export function useCreateUser() {
 }
 
 // put (update) a user in the API
-export function useUpdateUser() {
-  async function putUser(req) {
-    await api.put(`users/api/${req.id}/`, req);
-  }
-
-  return useMutation({
-    mutationFn: putUser,
-    onError: (err) => {
-      console.error(
-        "Error with updating the user",
-        err.response?.data || err.message
-      );
-    },
-  });
+export async function updateUserAPI(req) {
+  const res = await api.put(`users/api/${req.id}/`, req);
+  return res.data;
 }
 
 // delete a user from the API
-export function useDeleteUser() {
-  async function deleteUser(id) {
-    await api.delete(`users/api/${id}/`);
-  }
+export async function deleteUserAPI(id) {
+  const req = await api.delete(`users/api/${id}/`);
+  console.log({ req });
 
-  return useMutation({
-    mutationFn: deleteUser,
-    onError: (err) => {
-      console.error(
-        "Error with deleting this user.",
-        err.response?.data || err.message
-      );
-    },
-  });
+  return req;
+}
+
+export async function validateProfile(req) {
+  const data = {
+    first_name: req.first_name,
+    last_name: req.last_name,
+    phone: req.phone || "",
+    birthday: req.birthday,
+    email: req.email,
+  };
+  await api.post("/users/validate-profile/", data);
 }
 
 // validate user details
 export function useValidateProfile() {
-  async function validateProfile(req) {
-    const data = {
-      first_name: req.first_name,
-      last_name: req.last_name,
-      phone: req.phone || "",
-      birthday: req.birthday,
-      email: req.email,
-    };
-    await api.post("/users/validate-profile/", data);
-  }
-
   return useMutation({
     mutationFn: validateProfile,
     onSuccess: () => {

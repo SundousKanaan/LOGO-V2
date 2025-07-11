@@ -12,7 +12,7 @@ import { convertPx } from "../hooks/useConvertPx";
 import { UsePickRandomColor } from "../hooks/usePickRandomColor";
 import ButtonItem from "./mini-components/ButtonItem";
 
-function ProfileCard({ user, isloading, onEdit, onDelete }) {
+function ProfileCard({ user, isloading, onEdit, onDelete, isProcessing }) {
   return (
     <Flex
       bg={"white"}
@@ -28,6 +28,7 @@ function ProfileCard({ user, isloading, onEdit, onDelete }) {
           boxShadow={`0 0 0 ${convertPx(3)} var(--chakra-colors-gray-100)`}
           size={"2xl"}
           colorPalette={UsePickRandomColor(user?.first_name)}
+          opacity={isProcessing && 0.5}
         >
           <Avatar.Fallback />
           <Avatar.Image
@@ -45,6 +46,7 @@ function ProfileCard({ user, isloading, onEdit, onDelete }) {
             color="secondaryColor"
             textAlign={{ base: "center", md: "left" }}
             textTransform="capitalize"
+            opacity={isProcessing && 0.5}
           >
             {user?.first_name} {user?.last_name}
           </Text>
@@ -56,6 +58,7 @@ function ProfileCard({ user, isloading, onEdit, onDelete }) {
             fontWeight={400}
             color="gray.500"
             textAlign={{ base: "center", md: "left" }}
+            opacity={isProcessing && 0.5}
           >
             {user?.email}
           </Text>
@@ -68,6 +71,7 @@ function ProfileCard({ user, isloading, onEdit, onDelete }) {
             color="gray.500"
             textTransform={"capitalize"}
             textAlign={{ base: "center", md: "left" }}
+            opacity={isProcessing && 0.5}
           >
             {user?.user_type}
           </Text>
@@ -83,6 +87,7 @@ function ProfileCard({ user, isloading, onEdit, onDelete }) {
               color="white"
               w={convertPx(100)}
               onClick={onEdit}
+              isDisabled={isProcessing}
             >
               Edit
             </ButtonItem>
@@ -91,6 +96,7 @@ function ProfileCard({ user, isloading, onEdit, onDelete }) {
               color="white"
               w={convertPx(100)}
               onClick={onDelete}
+              isDisabled={isProcessing}
             >
               Delete
             </ButtonItem>

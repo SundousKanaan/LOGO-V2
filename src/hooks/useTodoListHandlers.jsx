@@ -2,12 +2,11 @@ import { useState, useEffect } from "react";
 import { useMutation } from "react-query";
 import { useQueryClient } from "react-query";
 import {
-  // useGetAllTodolistsAPI,
   postTodoListAPI,
   updateTodoListAPI,
   deleteTodoListAPI,
-} from "../services/todoListServices";
-import { useListPermissions } from "./usePermissions";
+} from "../services/api";
+import { usePermissions } from "./usePermissions";
 
 export function useTodoListHandlers(
   currentUser,
@@ -23,7 +22,7 @@ export function useTodoListHandlers(
 
   const [listTitle, setListTitle] = useState("");
   const [isEditable, setIsEditable] = useState(false);
-  const { checkPermissions } = useListPermissions();
+  const { checkListPermissions } = usePermissions();
 
   // CREATE todo list mutation
   const { mutate: createTodoList, isLoading: isCreatingList } = useMutation({
@@ -122,8 +121,8 @@ export function useTodoListHandlers(
 
   useEffect(() => {
     if (!selectedList) return;
-    setIsEditable(checkPermissions(selectedList));
-  }, [selectedList, checkPermissions]);
+    setIsEditable(checkListPermissions(selectedList));
+  }, [selectedList, checkListPermissions]);
 
   // Action handlers
   async function handleChangeList(data) {
