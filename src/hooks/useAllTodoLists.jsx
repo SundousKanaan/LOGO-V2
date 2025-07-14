@@ -1,14 +1,14 @@
 import { useQuery } from "react-query";
 import { useAuth } from "../contexts/AuthContext";
-import { getAllTodolistsAPI } from "../services/api";
+import { fetchAllTodolists } from "../services/api";
 
-export const useFetchAllTodolists = () => {
+export const useAllTodoLists = () => {
   const { currentUser } = useAuth();
 
   return useQuery({
-    queryKey: ["todolistsArray"],
+    queryKey: ["allTodoLists"],
     queryFn: () => {
-      return getAllTodolistsAPI(currentUser?.id);
+      return fetchAllTodolists(currentUser?.id);
     },
     onError: (error) =>
       console.error("API Error:", error.response?.data || error.message),

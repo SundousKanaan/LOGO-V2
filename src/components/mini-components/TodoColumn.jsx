@@ -5,7 +5,14 @@ import { convertPx } from "../../hooks/useConvertPx";
 import HeadingItem from "./HeadingItem";
 import ButtonItem from "./ButtonItem";
 
-function TodoColumn({ title, count, handleOpenPopup, isEditable, children }) {
+function TodoColumn({
+  title,
+  count,
+  handleOpenPopup,
+  isEditable,
+  children,
+  ...props
+}) {
   const [colTitle, setColTitle] = useState();
 
   useEffect(() => {
@@ -29,6 +36,7 @@ function TodoColumn({ title, count, handleOpenPopup, isEditable, children }) {
       padding={convertPx(8)}
       scrollSnapAlign={"center"}
       flexGrow={{ base: 0, md: 1 }}
+      {...props}
     >
       <HStack w={"100%"} justifyContent={"start"}>
         <HeadingItem fontSize={convertPx(16)} alignText="left" w="fit-content">

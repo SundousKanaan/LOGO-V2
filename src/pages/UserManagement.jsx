@@ -2,14 +2,14 @@ import { useState, useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { UserPopup } from "../components/ProfilePopups";
 import { useUserHandlers } from "../hooks/useUserHandlers";
-import { useGetAllUsers } from "../services/usersServices";
+import { useAllUsers } from "../hooks/useUserHooks";
 import { usePermissions } from "../hooks/usePermissions";
 import UsersTable from "../components/UsersTabel";
 
 function UserManagement() {
   const { currentUser, logout } = useAuth();
   const { checkUserEditPermissions } = usePermissions();
-  const { data: users, isLoading, isFetched } = useGetAllUsers();
+  const { data: users, isLoading, isFetched } = useAllUsers();
   const [selectedUser, setSelectedUser] = useState(null);
   const [canBeUpdated, setCanBeUpdated] = useState(true);
 
@@ -32,27 +32,21 @@ function UserManagement() {
   } = useUserHandlers({
     initialUser: selectedUser,
     queryKey: "allUsers",
-    logout: () => {
-      if (selectedUser?.id === currentUser?.id) {
-        logout();
-      }
-    },
+    logout,
   });
-
-  const handleOpenEditPopup = (user) => {
-    setSelectedUser(user);
-    setOpenUserPopup("edit");
-  };
-
-  function handleOpenDeletePopup(user) {
-    setSelectedUser(user);
-    setOpenUserPopup("delete");
-  }
 
   return (
     <>
       <UsersTable
         data={users}
+        headerTitles={[
+          "Avatar",
+          "First Name",
+          "Last Name",
+          "Email",
+          "Birthday",
+          "Role",
+        ]}
         isDataLoading={isLoading}
         isDataFetched={isFetched}
         canBeUpdated={canBeUpdated}
@@ -60,10 +54,14 @@ function UserManagement() {
         isUpdating={isUpdatingUser}
         isDeleting={isDeletingUser}
         onEdit={(user) => {
-          handleOpenEditPopup(user);
+          setHandledUser(user);
+          setSelectedUser(user);
+          setOpenUserPopup("edit");
         }}
         onDelete={(user) => {
-          handleOpenDeletePopup(user);
+          setHandledUser(user);
+          setSelectedUser(user);
+          setOpenUserPopup("delete");
         }}
       />
 

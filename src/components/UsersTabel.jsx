@@ -1,4 +1,4 @@
-import { Table, Icon, Skeleton, Avatar, HStack } from "@chakra-ui/react";
+import { Table, Icon, Skeleton, Avatar, HStack, Flex } from "@chakra-ui/react";
 import { MdModeEdit, MdOutlineDeleteForever } from "react-icons/md";
 import { UsePickRandomColor } from "../hooks/usePickRandomColor";
 import { convertPx } from "../hooks/useConvertPx";
@@ -6,6 +6,7 @@ import ButtonItem from "./mini-components/ButtonItem";
 
 export default function UsersTable({
   data,
+  headerTitles,
   canBeUpdated,
   isDataLoading,
   isDataFetched,
@@ -19,7 +20,7 @@ export default function UsersTable({
     <Table.Root size="sm">
       <Table.Header>
         <Table.Row background={"themeColor"} borderRadius={"md"}>
-          <Table.ColumnHeader></Table.ColumnHeader>
+          <Table.ColumnHeader w={convertPx(16)}></Table.ColumnHeader>
           {canBeUpdated && (
             <Table.ColumnHeader
               color={"white"}
@@ -29,40 +30,17 @@ export default function UsersTable({
               Actions
             </Table.ColumnHeader>
           )}
-          <Table.ColumnHeader color={"white"} fontWeight={"600"}>
-            Avatar
-          </Table.ColumnHeader>
-          <Table.ColumnHeader
-            color={"white"}
-            fontWeight={"600"}
-            textWrap={"nowrap"}
-          >
-            First Name
-          </Table.ColumnHeader>
-          <Table.ColumnHeader
-            color={"white"}
-            fontWeight={"600"}
-            textWrap={"nowrap"}
-          >
-            Last Name
-          </Table.ColumnHeader>
-          <Table.ColumnHeader
-            color={"white"}
-            fontWeight={"600"}
-            textWrap={"nowrap"}
-          >
-            Email
-          </Table.ColumnHeader>
-          <Table.ColumnHeader
-            color={"white"}
-            fontWeight={"600"}
-            textWrap={"nowrap"}
-          >
-            Birthday
-          </Table.ColumnHeader>
-          <Table.ColumnHeader color={"white"} fontWeight={"600"}>
-            Role
-          </Table.ColumnHeader>
+          {headerTitles?.map((title, i) => (
+            <Table.ColumnHeader
+              key={i}
+              color={"white"}
+              fontWeight={"600"}
+              textWrap={"nowrap"}
+              w={title === "Avatar" && "fit-content"}
+            >
+              {title}
+            </Table.ColumnHeader>
+          ))}
         </Table.Row>
       </Table.Header>
 
@@ -76,8 +54,7 @@ export default function UsersTable({
               </Table.Row>
             ))
           : isDataFetched &&
-            data &&
-            data.map((user, index) => (
+            data?.map((user, index) => (
               <Table.Row
                 key={index}
                 h={convertPx(60)}
@@ -90,12 +67,12 @@ export default function UsersTable({
                 <Table.Cell pl={convertPx(24)}>{index + 1}</Table.Cell>
 
                 {canBeUpdated && (
-                  <Table.Cell width={convertPx(70)}>
-                    <HStack gap={0}>
+                  <Table.Cell w={convertPx(110)}>
+                    <HStack gap={1} justifyContent={"space-around"}>
                       <ButtonItem
                         variant="solid"
                         size="md"
-                        h={convertPx(30)}
+                        h={convertPx(40)}
                         p={convertPx(8)}
                         pr={convertPx(8)}
                         bg="transparent"
@@ -110,7 +87,7 @@ export default function UsersTable({
                       <ButtonItem
                         variant="solid"
                         size="md"
-                        h={convertPx(30)}
+                        h={convertPx(40)}
                         p={convertPx(8)}
                         pr={convertPx(8)}
                         bg="transparent"

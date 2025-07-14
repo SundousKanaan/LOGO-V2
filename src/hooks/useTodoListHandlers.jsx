@@ -1,21 +1,16 @@
 import { useState, useEffect } from "react";
 import { useMutation } from "react-query";
 import { useQueryClient } from "react-query";
-import {
-  postTodoListAPI,
-  updateTodoListAPI,
-  deleteTodoListAPI,
-} from "../services/api";
+import { postTodoList, updateTodoList, deleteTodoList } from "../services/api";
 import { usePermissions } from "./usePermissions";
 
 export function useTodoListHandlers(
   currentUser,
   selectedList,
-  todoListsArray,
-  isisListsArrayLoading,
-  isListsArrayFetched,
+  allTodoLists,
+  isAllTodoListsLoading,
+  isAllTodoListsFetched,
   setSelectedList,
-  setOpenListPopup,
   refetchTodoLists
 ) {
   const queryClient = useQueryClient();
@@ -23,45 +18,96 @@ export function useTodoListHandlers(
   const [listTitle, setListTitle] = useState("");
   const [isEditable, setIsEditable] = useState(false);
   const { checkListPermissions } = usePermissions();
+  const [openListPopup, setOpenListPopup] = useState(null); // create | edit | delete | null
 
   // CREATE todo list mutation
   const { mutate: createTodoList, isLoading: isCreatingList } = useMutation({
     mutationFn: async (data) => {
-      const respones = await postTodoListAPI(data);
+      const respones = await postTodoList(data);
       await new Promise((resolve) => setTimeout(resolve, 1500));
       return respones;
     },
-    onSuccess: async () => {
-      queryClient.invalidateQueries("todolistsArray");
+    onMutate: (data) => {
+      queryClient.cancelQueries(["allTodoLists"]);
+      const prevList = queryClient.getQueriesData(["allTodoLists"]);
+      const tempList = {
+        id: `temp-${Date.now()}`,
+        title: data.title,
+        owner: data.owner,
+        items: [],
+        isTemp: true,
+      };
+      queryClient.setQueryData(["allTodoLists"], (old = []) => [
+        ...old,
+        tempList,
+      ]);
 
-      const { data: updatedData } = await refetchTodoLists();
-      const newList = updatedData.find(
-        (item) => item.title === listTitle && item.owner === currentUser.id
-      );
-      setSelectedList(newList);
-      setListTitle(listTitle);
-      setOpenListPopup(null);
+      return {
+        prevList,
+        tempId: tempList.id,
+      };
     },
-    onError: (err) => {
+
+    onSuccess: async (realList, _variables, context) => {
+      setSelectedList(realList);
+      queryClient.setQueriesData([
+        "allTodoLists",
+        (old = []) =>
+          old.map((list) => (list.id === context.tempId ? realList : list)),
+      ]);
+    },
+
+    onError: (err, _newList, context) => {
+      if (context?.prev) {
+        queryClient.setQueryData(["allTodoLists"], context.prev);
+      }
       console.error(
         "Error with creating new list",
         err.response?.data || err.message
       );
+    },
+
+    onSettled: () => {
+      setListTitle(listTitle);
+      setOpenListPopup(null);
     },
   });
 
   // EDIT todo list mutation
-  const { mutate: updateTodoList, isLoading: isUpdatingList } = useMutation({
+  const { mutate: update_todoList, isLoading: isUpdatingList } = useMutation({
     mutationFn: async (data) => {
-      const response = await updateTodoListAPI(data);
+      const response = await updateTodoList(data);
       await new Promise((resolve) => setTimeout(resolve, 1500));
+
       return response;
     },
-    onSuccess: async () => {
-      await refetchTodoLists();
-      setSelectedList((prev) => ({ ...prev, title: listTitle }));
-      setListTitle(listTitle);
-      setOpenListPopup(null);
+    onMutate: (data) => {
+      queryClient.cancelQueries(["allTodoLists"]);
+      const prevList = queryClient.getQueriesData(["allTodoLists"]);
+
+      const tempId = `temp-${data.id}`;
+
+      // Find the target list to update
+      const tempList = {
+        ...data,
+        id: tempId,
+      };
+      queryClient.setQueryData(["allTodoLists"], (old = []) =>
+        old.map((list) => (list.id === data.id ? tempList : list))
+      );
+
+      return {
+        prevList,
+        tempId: tempId,
+      };
+    },
+
+    onSuccess: async (realList, _variables, context) => {
+      queryClient.setQueryData(["allTodoLists"], (old = []) =>
+        old.map((list) => (list.id === context.tempId ? realList : list))
+      );
+      setSelectedList(realList);
+      queryClient.invalidateQueries(["allTodoLists"]);
     },
     onError: (err) => {
       console.error(
@@ -69,13 +115,18 @@ export function useTodoListHandlers(
         err.response?.data || err.message
       );
     },
+
+    onSettled: () => {
+      setListTitle(listTitle);
+      setOpenListPopup(null);
+    },
   });
 
   // DELETE todo list mutation
-  const { mutate: deleteTodoList, isLoading: isDeletingList } = useMutation({
+  const { mutate: delete_todoList, isLoading: isDeletingList } = useMutation({
     mutationFn: async (id) => {
       await new Promise((resolve) => setTimeout(resolve, 1500));
-      const response = await deleteTodoListAPI(id);
+      const response = await deleteTodoList(id);
       return response;
     },
     onSettled: () => {
@@ -102,31 +153,31 @@ export function useTodoListHandlers(
   });
 
   // USE EFFECTS
+
   // Initiële selectie
   useEffect(() => {
     if (
-      !isisListsArrayLoading &&
-      isListsArrayFetched &&
-      todoListsArray?.length > 0 &&
+      !isAllTodoListsLoading &&
+      isAllTodoListsFetched &&
+      allTodoLists?.length > 0 &&
       !selectedList
     ) {
-      setSelectedList(todoListsArray[0]);
-      setListTitle(todoListsArray[0].title);
+      setSelectedList(allTodoLists[0]);
+      setListTitle(allTodoLists[0].title);
     }
   }, [
-    todoListsArray,
+    allTodoLists,
     selectedList,
-    isisListsArrayLoading && isListsArrayFetched,
+    isAllTodoListsLoading && isAllTodoListsFetched,
   ]);
 
   useEffect(() => {
-    if (!selectedList) return;
     setIsEditable(checkListPermissions(selectedList));
-  }, [selectedList, checkListPermissions]);
+  }, [selectedList]);
 
   // Action handlers
   async function handleChangeList(data) {
-    const selected = todoListsArray.find((item) => item.id === data.value[0]);
+    const selected = allTodoLists.find((item) => item.id === data.value[0]);
     setSelectedList(selected);
     setListTitle(selected.title);
     queryClient.invalidateQueries("todolistDetails");
@@ -143,20 +194,19 @@ export function useTodoListHandlers(
       owner: selectedList.owner,
       items: selectedList?.items.map((item) => item.id) || [],
     };
-    updateTodoList(updatedListData);
+    update_todoList(updatedListData);
   }
 
   async function handleDeleteList() {
-    deleteTodoList(selectedList.id);
+    delete_todoList(selectedList.id);
   }
 
   return {
     listTitle,
     setListTitle,
     isEditable,
-    // todoListsArray,
-    // isisListsArrayLoading,
-    // isListsArrayFetched,
+    openListPopup,
+    setOpenListPopup,
     handleChangeList,
     handleCreateList,
     handleEditList,

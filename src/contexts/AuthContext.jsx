@@ -2,8 +2,10 @@ import { createContext, useContext, useState, useEffect } from "react";
 import { loginUser, logoutUser } from "../firebase/authService";
 import { setAuthToken } from "../services/api";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { useCurrentUser, useCreateUser } from "../services/usersServices";
-import { useQueryClient } from "react-query";
+import { useCurrentUser } from "../hooks/useUserHooks";
+import { useMutation, useQueryClient } from "react-query";
+
+import { postUser } from "../services/api";
 
 const AuthContext = createContext();
 
@@ -12,10 +14,9 @@ export function AuthProvider({ children }) {
     JSON.parse(localStorage.getItem("isAuthenticated")) || false;
   const [isAuthenticated, setIsAuthenticated] = useState(storedAuthStatus);
   const [errorMessage, setErrorMessage] = useState(null);
-  const { data: user, isFetched, refetch: refetchUser } = useCurrentUser();
-  const [currentUser, setCurrentUser] = useState(user);
+  const { data: user, refetch, isFetched } = useCurrentUser();
   const queryClient = useQueryClient();
-  const createUser = useCreateUser();
+  const [currentUser, setCurrentUser] = useState(user ? user : null);
 
   useEffect(() => {
     const auth = getAuth();
@@ -31,7 +32,7 @@ export function AuthProvider({ children }) {
         setAuthToken(token);
         setIsAuthenticated(true);
         localStorage.setItem("isAuthenticated", true);
-        const res = await refetchUser();
+        const res = await refetch();
         setCurrentUser(res.data[0]);
       } catch (error) {
         console.error("Error fetching token:", error);
@@ -77,6 +78,24 @@ export function AuthProvider({ children }) {
     }, 2500);
   };
 
+  // !TO FIX!!!
+  const { mutate: createNewUser, isLoading: isProcessing } = useMutation({
+    mutationFn: async (req) => {
+      const res = await postUser(req);
+      console.log({ res });
+      return { ...req, response: res };
+    },
+    onSuccess: async ({ email, password }) => {
+      await loginUser(email, password);
+    },
+    onError: (err) => {
+      console.log(err.response.data);
+
+      console.error("Error registering user:", err);
+      setErrorMessage("This email already has an account.");
+    },
+  });
+
   const signUp = async (data) => {
     const req = {
       email: data.email,
@@ -85,16 +104,7 @@ export function AuthProvider({ children }) {
       last_name: data.last_name,
       birthday: data.birthday,
     };
-
-    createUser.mutate(req, {
-      onSuccess: async () => {
-        await loginUser(data.email, data.password);
-      },
-      onError: (err) => {
-        console.error("Error registering user:", err);
-        setErrorMessage("Registration failed, please try again.");
-      },
-    });
+    createNewUser(req);
   };
 
   return (
@@ -104,6 +114,7 @@ export function AuthProvider({ children }) {
         errorMessage,
         currentUser,
         isFetched,
+        isProcessing,
         login,
         logout,
         signUp,

@@ -18,7 +18,7 @@ function ListsActions({
   onEdit,
   onDelete,
   onCreate,
-  todoListsArray,
+  allTodoLists,
   selectedList,
   onListchange,
 }) {
@@ -28,19 +28,19 @@ function ListsActions({
   useEffect(() => {
     if (isLoading) return;
 
-    if (!todoListsArray || todoListsArray.length === 0) {
+    if (!allTodoLists || allTodoLists.length === 0) {
       setDropdownCollection(null);
       return;
     }
 
     const dropdownCollection = createListCollection({
-      items: todoListsArray.map((item) => ({
+      items: allTodoLists.map((item) => ({
         label: item.title,
         value: item.id,
       })),
     });
     setDropdownCollection(dropdownCollection);
-  }, [todoListsArray, isLoading]);
+  }, [allTodoLists, isLoading]);
 
   const RenderListsDropdown = () => {
     return (
@@ -97,7 +97,7 @@ function ListsActions({
       </Skeleton>
 
       <Spacer display={{ base: "none", lg: "block" }} />
-      <Skeleton loading={isLoading && todoListsArray}>
+      <Skeleton loading={isLoading && allTodoLists}>
         <HStack>
           <ButtonItem
             bg="themeColor"

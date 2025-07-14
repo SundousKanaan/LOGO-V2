@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
-import { useFetchAllTodolists } from "../hooks/useFetchAllTodolists";
+import { useAllTodoLists } from "../hooks/useAllTodoLists";
 import { useTodoItemHandlers } from "../hooks/useTodoItemHandlers";
 import { useTodoListHandlers } from "../hooks/useTodoListHandlers";
 import { useUserHandlers } from "../hooks/useUserHandlers";
@@ -22,11 +22,10 @@ export default function Profile() {
 
   const [selectedList, setSelectedList] = useState(null);
 
-  const [openListPopup, setOpenListPopup] = useState(null); // create | edit | delete | null
-
   // =====================
   // Hooks & data fetching
   // =====================
+
   const {
     isAuthenticated,
     currentUser,
@@ -35,18 +34,20 @@ export default function Profile() {
   } = useAuth();
 
   const {
-    data: todoListsArray,
+    data: allTodoLists,
     refetch: refetchTodoLists,
-    isLoading: isListsArrayLoading,
-    isFetched: isListsArrayFetched,
-  } = useFetchAllTodolists();
+    isLoading: isAllTodoListsLoading,
+    isFetched: isAllTodoListsFetched,
+  } = useAllTodoLists();
 
   const {
     listTitle,
+    openListPopup,
     isEditable,
     isCreatingList,
     isUpdatingList,
     isDeletingList,
+    setOpenListPopup,
     setListTitle,
     handleChangeList,
     handleCreateList,
@@ -55,11 +56,10 @@ export default function Profile() {
   } = useTodoListHandlers(
     currentUser,
     selectedList,
-    todoListsArray,
-    isListsArrayLoading,
-    isListsArrayFetched,
+    allTodoLists,
+    isAllTodoListsLoading,
+    isAllTodoListsFetched,
     setSelectedList,
-    setOpenListPopup,
     refetchTodoLists
   );
 
@@ -75,7 +75,7 @@ export default function Profile() {
     handleDeleteListItem,
     handleEditListItem,
     handleNewTaskChange,
-  } = useTodoItemHandlers();
+  } = useTodoItemHandlers(refetchTodoLists);
 
   const {
     handledUser,
@@ -105,6 +105,13 @@ export default function Profile() {
     if (!isAuthenticated) navigate("/login", { replace: true });
   }, [isAuthenticated, navigate]);
 
+  useEffect(() => {
+    if (allTodoLists && selectedList)
+      return setSelectedList(
+        allTodoLists.find((list) => list.id === selectedList.id && list)
+      );
+  }, [allTodoLists]);
+
   return (
     <>
       <ProfileCard
@@ -116,8 +123,8 @@ export default function Profile() {
       />
 
       <ListsActions
-        todoListsArray={todoListsArray}
-        isLoading={!isListsArrayFetched}
+        allTodoLists={allTodoLists}
+        isLoading={!isAllTodoListsFetched}
         isEditable={isEditable}
         isAuthenticated={isAuthenticated}
         selectedList={selectedList}
@@ -128,9 +135,9 @@ export default function Profile() {
       />
 
       <TodoBoard
-        isLoading={isListsArrayLoading}
-        isFetched={isListsArrayFetched}
         listDetails={selectedList}
+        isLoading={isAllTodoListsLoading}
+        isFetched={isAllTodoListsFetched}
         isEditable={isEditable}
         handleEditListItem={handleEditListItem}
         openCreateItemPopup={openCreateItemPopup}

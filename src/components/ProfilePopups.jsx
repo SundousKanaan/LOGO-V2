@@ -59,13 +59,18 @@ export function ListPopup({
       }
     >
       {isCreate && (
-        <AddNewTodoList user={user} handleInputChange={handleInputChange} />
+        <AddNewTodoList
+          user={user}
+          handleInputChange={handleInputChange}
+          isProcessing={isProcessing}
+        />
       )}
       {isEdit && (
         <EditeTodoList
           user={user}
           handleInputChange={handleInputChange}
-          listTitle={selectedList.title}
+          listTitle={selectedList?.title}
+          isProcessing={isProcessing}
         />
       )}
       {isDelete && (
@@ -186,7 +191,6 @@ export function UserPopup({
       onClose={() => {
         setOpenUserPopup(false);
         setErrorEditMessage(null);
-        setAccountData(null);
       }}
       onSave={isEdit ? handleUpdateUser : handleDeleteUser}
       ActionButtonText={isEdit ? "Save" : "Delete"}

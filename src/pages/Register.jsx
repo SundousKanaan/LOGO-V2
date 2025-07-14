@@ -6,7 +6,7 @@ import InputField from "../components/mini-components/InputField";
 import ButtonItem from "../components/mini-components/ButtonItem";
 import LinkItem from "../components/mini-components/LinkItem";
 import { useAuth } from "../contexts/AuthContext";
-import { useValidateProfile } from "../services/usersServices.jsx";
+import { useValidateProfile } from "../hooks/useUserHooks.jsx";
 
 function Registing() {
   const [registerErrorMessage, setRegisterErrorMessage] = useState(null);
@@ -18,7 +18,7 @@ function Registing() {
     password: "",
     birthday: "",
   });
-  const { signUp, errorMessage } = useAuth();
+  const { signUp, errorMessage, isProcessing } = useAuth();
   const [passwordValue, setPasswordValue] = useState(null);
   const [confirmPasswordValue, setConfirmPasswordValue] = useState(null);
 
@@ -121,6 +121,7 @@ function Registing() {
       justifyContent="center"
       gap={convertPx(20)}
       bg="lightGray"
+      disabled={isProcessing}
     >
       <Stack>
         <Fieldset.Legend

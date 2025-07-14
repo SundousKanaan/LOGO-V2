@@ -44,6 +44,7 @@ function TodoBoard({
           }
           handleOpenPopup={() => openCreateItemPopup(colTitle)}
           isEditable={isEditable}
+          opacity={String(listDetails?.id).startsWith("temp-") ? 0.5 : 1}
         >
           {listDetails?.items
             ?.filter((item) => item && item.status === colTitle)

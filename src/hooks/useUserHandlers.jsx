@@ -1,13 +1,11 @@
 import { useState, useEffect, useCallback } from "react";
 import { useMutation, useQueryClient } from "react-query";
-import { updateUserAPI, deleteUserAPI } from "../services/usersServices";
-import { useValidateProfile } from "../services/usersServices";
+import { updateUser, deleteUser } from "../services/api";
+import { useValidateProfile } from "../hooks/useUserHooks";
+import { useAuth } from "../contexts/AuthContext";
 
-export function useUserHandlers({
-  initialUser,
-  logout = null,
-  queryKey = "userDetails",
-}) {
+export function useUserHandlers({ initialUser, logout, queryKey = "auth" }) {
+  const { currentUser } = useAuth();
   const queryClient = useQueryClient();
   const [handledUser, setHandledUser] = useState(null);
   const [openUserPopup, setOpenUserPopup] = useState(null); // edit | delete | null
@@ -16,8 +14,7 @@ export function useUserHandlers({
 
   // EFFECTS
   useEffect(() => {
-    if (!initialUser) return;
-    setHandledUser(initialUser);
+    if (initialUser) setHandledUser(initialUser);
   }, [initialUser]);
 
   useEffect(() => {
@@ -49,9 +46,9 @@ export function useUserHandlers({
   }, [handledUser]);
 
   // DELETE mutation
-  const { mutate: deleteUser, isLoading: isDeletingUser } = useMutation({
+  const { mutate: delete_user, isLoading: isDeletingUser } = useMutation({
     mutationFn: async (id) => {
-      const res = await deleteUserAPI(id);
+      const res = await deleteUser(id);
       await new Promise((resolve) => setTimeout(resolve, 1500));
       return res;
     },
@@ -64,7 +61,7 @@ export function useUserHandlers({
       setHandledUser(null);
       setUserErrorMessage(null);
       queryClient.invalidateQueries(queryKey);
-      if (typeof logout === "function") {
+      if (handledUser.id === currentUser.id) {
         await logout(); // Only logout if explicitly passed
       }
     },
@@ -78,10 +75,10 @@ export function useUserHandlers({
   });
 
   // EDIT mutation
-  const { mutate: updateUser, isLoading: isUpdatingUser } = useMutation({
+  const { mutate: update_user, isLoading: isUpdatingUser } = useMutation({
     mutationFn: async (data) => {
       await new Promise((resolve) => setTimeout(resolve, 1500));
-      const res = await updateUserAPI(data);
+      const res = await updateUser(data);
       return res;
     },
 
@@ -89,14 +86,24 @@ export function useUserHandlers({
       setOpenUserPopup(null);
       await queryClient.cancelQueries([queryKey]);
       const prevData = queryClient.getQueryData([queryKey]);
-      queryClient.setQueryData([queryKey], (oldData) => {
-        return oldData.map((user) => (user.id === newData.id ? newData : user));
+      queryClient.setQueryData([queryKey], (prevData) => {
+        if (Array.isArray(prevData)) {
+          return prevData.map((user) =>
+            user.id === newData.id ? newData : user
+          );
+        } else {
+          return { ...prevData, ...newData };
+        }
       });
       return { prevData };
     },
 
     onSuccess: async (newData) => {
       setUserErrorMessage(null);
+      await queryClient.invalidateQueries([queryKey]);
+      if (handledUser.id === currentUser.id) {
+        await queryClient.invalidateQueries(["auth"]);
+      }
       setHandledUser(newData);
     },
 
@@ -115,7 +122,6 @@ export function useUserHandlers({
   // Action handlers
   const handleUserDataChange = (e) => {
     const { name, value } = e.target;
-
     const nameMap = {
       firstName: "first_name",
       lastName: "last_name",
@@ -132,8 +138,8 @@ export function useUserHandlers({
 
   const handleDeleteUser = useCallback(() => {
     if (!handledUser) return;
-    deleteUser(handledUser.id);
-  }, [handledUser, deleteUser]);
+    delete_user(handledUser.id);
+  }, [handledUser, delete_user]);
 
   const handleUpdateUser = useCallback(() => {
     if (!handledUser) return;
@@ -147,8 +153,8 @@ export function useUserHandlers({
       is_active: true,
       user_type: handledUser.user_type,
     };
-    updateUser(data);
-  }, [handledUser, updateUser]);
+    update_user(data);
+  }, [handledUser, update_user]);
 
   return {
     handledUser,

@@ -3,7 +3,7 @@ import { convertPx } from "../../hooks/useConvertPx";
 import { UsePickRandomColor } from "../../hooks/usePickRandomColor";
 import InputField from "../mini-components/InputField";
 
-function EditeTodoList({ user, handleInputChange, listTitle }) {
+function EditeTodoList({ user, handleInputChange, listTitle, isProcessing }) {
   return (
     <>
       <Fieldset.Root>
@@ -42,6 +42,7 @@ function EditeTodoList({ user, handleInputChange, listTitle }) {
                 pb={convertPx(8)}
                 color="secondaryColor"
                 onChange={handleInputChange}
+                disabled={isProcessing}
               />
             </HStack>
           </Field.Root>
