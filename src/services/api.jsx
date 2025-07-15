@@ -109,3 +109,13 @@ export async function validateProfile(req) {
 export async function validateLogin(req) {
   await api.post("/users/validate-login/", req);
 }
+
+// products
+export async function fetchProducts({ pageParam = 1 }) {
+  const MAX_PRODUCT_PAGE = 10;
+  const response = await api.get(
+    `/products/api?page=${pageParam}&limit=${MAX_PRODUCT_PAGE}`
+  );
+  await new Promise((resolve) => setTimeout(resolve, 2000));
+  return response.data;
+}
