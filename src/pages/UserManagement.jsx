@@ -14,6 +14,9 @@ function UserManagement() {
   const [canBeUpdated, setCanBeUpdated] = useState(true);
 
   useEffect(() => {
+    if (!currentUser) return;
+    console.log(checkUserEditPermissions(currentUser));
+
     setCanBeUpdated(checkUserEditPermissions(currentUser));
   }, [currentUser]);
 

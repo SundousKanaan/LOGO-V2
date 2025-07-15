@@ -78,7 +78,7 @@ export function AuthProvider({ children }) {
     }, 2500);
   };
 
-  // !TO FIX!!!
+  // !TO FIX!!!!
   const { mutate: createNewUser, isLoading: isProcessing } = useMutation({
     mutationFn: async (req) => {
       const res = await postUser(req);
