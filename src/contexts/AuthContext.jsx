@@ -14,7 +14,11 @@ export function AuthProvider({ children }) {
     JSON.parse(localStorage.getItem("isAuthenticated")) || false;
   const [isAuthenticated, setIsAuthenticated] = useState(storedAuthStatus);
   const [errorMessage, setErrorMessage] = useState(null);
-  const { data: user, refetch: refetchUser, isLoading } = useCurrentUser();
+  const {
+    data: user,
+    refetch: refetchUser,
+    isLoading: isUserLoading,
+  } = useCurrentUser();
   const queryClient = useQueryClient();
   const [currentUser, setCurrentUser] = useState(user);
 
@@ -44,7 +48,7 @@ export function AuthProvider({ children }) {
     });
 
     return () => unsubscribe();
-  });
+  }, []);
 
   // Handle login logic
   const login = async (email, password) => {
@@ -112,7 +116,7 @@ export function AuthProvider({ children }) {
         isAuthenticated,
         errorMessage,
         currentUser,
-        isLoading,
+        isLoading: isUserLoading,
         isProcessing,
         login,
         logout,

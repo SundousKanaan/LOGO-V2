@@ -94,13 +94,6 @@ function EditeTodoItem({ data, onChange }) {
     }
   }
 
-  if (isLoading) {
-    return (
-      <Box p={convertPx(20)} textAlign="center">
-        <Text>Loading...</Text>
-      </Box>
-    );
-  }
   return (
     <Fieldset.Root>
       <Fieldset.Content>
@@ -143,19 +136,18 @@ function EditeTodoItem({ data, onChange }) {
             border={"solid 1px var(--chakra-colors-gray-300)"}
             borderRadius={convertPx(4)}
           >
-            {usersData && (
-              <Checkboxes
-                options={usersData}
-                variant={"subtle"}
-                minH={"fit-content"}
-                maxH={convertPx(100)}
-                p={`${convertPx(8)} ${convertPx(8)}`}
-                overflow="auto"
-                withIcon
-                selectedIds={data.assignee.map((assignee) => assignee.id)}
-                onChange={handleCheckboxChange}
-              />
-            )}
+            <Checkboxes
+              options={usersData}
+              variant={"subtle"}
+              minH={"fit-content"}
+              maxH={convertPx(100)}
+              p={`${convertPx(8)} ${convertPx(8)}`}
+              overflow="auto"
+              withIcon
+              selectedIds={data.assignee.map((assignee) => assignee.id)}
+              onChange={handleCheckboxChange}
+              isLoading={isLoading}
+            />
           </HStack>
         </VStack>
         <Grid gap={convertPx(20)} templateColumns={`${convertPx(150)} 1fr`}>

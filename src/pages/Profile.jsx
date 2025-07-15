@@ -22,6 +22,9 @@ export default function Profile() {
 
   const [selectedList, setSelectedList] = useState(null);
 
+  useEffect(() => {
+    console.log({ selectedList });
+  }, [selectedList]);
   // =====================
   // Hooks & data fetching
   // =====================
@@ -29,7 +32,7 @@ export default function Profile() {
   const {
     isAuthenticated,
     currentUser,
-    isFetched: isCurrentUserFetched,
+    isLoading: isCurrentUserLoading,
     logout,
   } = useAuth();
 
@@ -58,7 +61,6 @@ export default function Profile() {
     selectedList,
     allTodoLists,
     isAllTodoListsLoading,
-    isAllTodoListsFetched,
     setSelectedList,
     refetchTodoLists
   );
@@ -116,7 +118,7 @@ export default function Profile() {
     <>
       <ProfileCard
         user={handledUser}
-        isloading={!isCurrentUserFetched}
+        isloading={isCurrentUserLoading}
         onEdit={() => setOpenUserPopup("edit")}
         onDelete={() => setOpenUserPopup("delete")}
         isProcessing={isUpdatingUser || isDeletingUser}

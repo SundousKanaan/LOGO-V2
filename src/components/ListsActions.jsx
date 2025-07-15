@@ -27,7 +27,6 @@ function ListsActions({
   // Create dropdown collection for lists
   useEffect(() => {
     if (isLoading) return;
-
     if (!allTodoLists || allTodoLists.length === 0) {
       setDropdownCollection(null);
       return;

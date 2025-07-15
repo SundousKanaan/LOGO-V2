@@ -9,7 +9,6 @@ export function useTodoListHandlers(
   selectedList,
   allTodoLists,
   isAllTodoListsLoading,
-  isAllTodoListsFetched,
   setSelectedList,
   refetchTodoLists
 ) {
@@ -19,6 +18,20 @@ export function useTodoListHandlers(
   const [isEditable, setIsEditable] = useState(false);
   const { checkListPermissions } = usePermissions();
   const [openListPopup, setOpenListPopup] = useState(null); // create | edit | delete | null
+
+  // USE EFFECTS
+
+  // Initiële selectie
+  useEffect(() => {
+    if (!isAllTodoListsLoading && allTodoLists?.length > 0 && !selectedList) {
+      setSelectedList(allTodoLists[0]);
+      setListTitle(allTodoLists[0].title);
+    }
+  }, [allTodoLists, selectedList, isAllTodoListsLoading]);
+
+  useEffect(() => {
+    setIsEditable(checkListPermissions(selectedList));
+  }, [selectedList]);
 
   // CREATE todo list mutation
   const { mutate: createTodoList, isLoading: isCreatingList } = useMutation({
@@ -133,6 +146,8 @@ export function useTodoListHandlers(
       setOpenListPopup(null);
     },
     onSuccess: async () => {
+      // queryClient.invalidateQueries(["allTodoLists"]);
+
       const { data: updatedData } = await refetchTodoLists();
 
       if (updatedData?.length > 0) {
@@ -151,29 +166,6 @@ export function useTodoListHandlers(
       );
     },
   });
-
-  // USE EFFECTS
-
-  // Initiële selectie
-  useEffect(() => {
-    if (
-      !isAllTodoListsLoading &&
-      isAllTodoListsFetched &&
-      allTodoLists?.length > 0 &&
-      !selectedList
-    ) {
-      setSelectedList(allTodoLists[0]);
-      setListTitle(allTodoLists[0].title);
-    }
-  }, [
-    allTodoLists,
-    selectedList,
-    isAllTodoListsLoading && isAllTodoListsFetched,
-  ]);
-
-  useEffect(() => {
-    setIsEditable(checkListPermissions(selectedList));
-  }, [selectedList]);
 
   // Action handlers
   async function handleChangeList(data) {
