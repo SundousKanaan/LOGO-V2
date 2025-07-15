@@ -77,12 +77,14 @@ export function useUserHandlers({ initialUser, logout, queryKey = "auth" }) {
   // EDIT mutation
   const { mutate: update_user, isLoading: isUpdatingUser } = useMutation({
     mutationFn: async (data) => {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       const res = await updateUser(data);
       return res;
     },
 
     onMutate: async (newData) => {
+      console.log({ newData });
+
       setOpenUserPopup(null);
       await queryClient.cancelQueries([queryKey]);
       const prevData = queryClient.getQueryData([queryKey]);
@@ -101,10 +103,9 @@ export function useUserHandlers({ initialUser, logout, queryKey = "auth" }) {
     onSuccess: async (newData) => {
       setUserErrorMessage(null);
       await queryClient.invalidateQueries([queryKey]);
-      if (handledUser.id === currentUser.id) {
+      if (newData.id === currentUser.id && queryKey !== "auth") {
         await queryClient.invalidateQueries(["auth"]);
       }
-      setHandledUser(newData);
     },
 
     onError: (err, newData, context) => {
@@ -137,7 +138,7 @@ export function useUserHandlers({ initialUser, logout, queryKey = "auth" }) {
   };
 
   const handleDeleteUser = useCallback(() => {
-    if (!handledUser) return;    
+    if (!handledUser) return;
     delete_user(handledUser.id);
   }, [handledUser, delete_user]);
 

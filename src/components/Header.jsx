@@ -26,8 +26,7 @@ export default function Header({ toggleNavbar }) {
   const [pageTitle, setPageTitle] = useState("");
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const { currentUser, isFetched } = useAuth();
-
+  const { currentUser, isLoading } = useAuth();
 
   useEffect(() => {
     const currentPath = Pathes.find((path) => path.path === pathname);
@@ -92,7 +91,7 @@ export default function Header({ toggleNavbar }) {
         <SearchBar />
 
         <HStack>
-          <SkeletonCircle loading={!isFetched}>
+          <SkeletonCircle loading={isLoading}>
             <Box
               onClick={() =>
                 navigate(
@@ -123,7 +122,7 @@ export default function Header({ toggleNavbar }) {
             display={{ base: "none", lg: "flex" }}
           >
             <Skeleton
-              loading={!isFetched}
+              loading={isLoading}
               width={convertPx(100)}
               height={convertPx(20)}
               mb={convertPx(4)}
@@ -146,7 +145,7 @@ export default function Header({ toggleNavbar }) {
               </LinkItem>
             </Skeleton>
 
-            <Skeleton loading={!isFetched} width={convertPx(50)}>
+            <Skeleton loading={isLoading} width={convertPx(50)}>
               <Text
                 fontSize={convertPx(14)}
                 fontWeight="400"

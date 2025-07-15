@@ -115,7 +115,7 @@ export default function Profile() {
   return (
     <>
       <ProfileCard
-        user={handledUser || currentUser}
+        user={handledUser}
         isloading={!isCurrentUserFetched}
         onEdit={() => setOpenUserPopup("edit")}
         onDelete={() => setOpenUserPopup("delete")}

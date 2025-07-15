@@ -14,7 +14,7 @@ export function AuthProvider({ children }) {
     JSON.parse(localStorage.getItem("isAuthenticated")) || false;
   const [isAuthenticated, setIsAuthenticated] = useState(storedAuthStatus);
   const [errorMessage, setErrorMessage] = useState(null);
-  const { data: user, refetch: refetchUser, isFetched } = useCurrentUser();
+  const { data: user, refetch: refetchUser, isLoading } = useCurrentUser();
   const queryClient = useQueryClient();
   const [currentUser, setCurrentUser] = useState(user);
 
@@ -81,7 +81,6 @@ export function AuthProvider({ children }) {
     }, 2500);
   };
 
-  // !TO FIX!!!!
   const { mutate: createNewUser, isLoading: isProcessing } = useMutation({
     mutationFn: async (req) => {
       const res = await postUser(req);
@@ -91,7 +90,6 @@ export function AuthProvider({ children }) {
       await loginUser(email, password);
     },
     onError: (err) => {
-
       console.error("Error registering user:", err);
       setErrorMessage("This email already has an account.");
     },
@@ -114,7 +112,7 @@ export function AuthProvider({ children }) {
         isAuthenticated,
         errorMessage,
         currentUser,
-        isFetched,
+        isLoading,
         isProcessing,
         login,
         logout,
