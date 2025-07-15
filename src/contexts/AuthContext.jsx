@@ -14,9 +14,13 @@ export function AuthProvider({ children }) {
     JSON.parse(localStorage.getItem("isAuthenticated")) || false;
   const [isAuthenticated, setIsAuthenticated] = useState(storedAuthStatus);
   const [errorMessage, setErrorMessage] = useState(null);
-  const { data: user, refetch, isFetched } = useCurrentUser();
+  const { data: user, refetch: refetchUser, isFetched } = useCurrentUser();
   const queryClient = useQueryClient();
-  const [currentUser, setCurrentUser] = useState(user ? user : null);
+  const [currentUser, setCurrentUser] = useState(user);
+
+  useEffect(() => {
+    if (user) setCurrentUser(user);
+  }, [user]);
 
   useEffect(() => {
     const auth = getAuth();
@@ -32,8 +36,7 @@ export function AuthProvider({ children }) {
         setAuthToken(token);
         setIsAuthenticated(true);
         localStorage.setItem("isAuthenticated", true);
-        const res = await refetch();
-        setCurrentUser(res.data[0]);
+        await refetchUser();
       } catch (error) {
         console.error("Error fetching token:", error);
         setErrorMessage("Failed to fetch user token, please try again.");
@@ -41,7 +44,7 @@ export function AuthProvider({ children }) {
     });
 
     return () => unsubscribe();
-  }, []);
+  });
 
   // Handle login logic
   const login = async (email, password) => {
@@ -82,14 +85,12 @@ export function AuthProvider({ children }) {
   const { mutate: createNewUser, isLoading: isProcessing } = useMutation({
     mutationFn: async (req) => {
       const res = await postUser(req);
-      console.log({ res });
       return { ...req, response: res };
     },
     onSuccess: async ({ email, password }) => {
       await loginUser(email, password);
     },
     onError: (err) => {
-      console.log(err.response.data);
 
       console.error("Error registering user:", err);
       setErrorMessage("This email already has an account.");

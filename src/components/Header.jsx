@@ -28,6 +28,7 @@ export default function Header({ toggleNavbar }) {
   const { pathname } = useLocation();
   const { currentUser, isFetched } = useAuth();
 
+
   useEffect(() => {
     const currentPath = Pathes.find((path) => path.path === pathname);
     if (pathname.startsWith("/profile/")) {

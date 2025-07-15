@@ -137,9 +137,7 @@ export function useUserHandlers({ initialUser, logout, queryKey = "auth" }) {
   };
 
   const handleDeleteUser = useCallback(() => {
-    if (!handledUser) return;
-    console.log(handledUser);
-    
+    if (!handledUser) return;    
     delete_user(handledUser.id);
   }, [handledUser, delete_user]);
 

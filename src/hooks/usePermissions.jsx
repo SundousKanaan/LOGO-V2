@@ -11,8 +11,6 @@ export const usePermissions = () => {
   };
 
   const checkUserEditPermissions = (user) => {
-    console.log(user);
-
     if (!user) return;
     if (user.user_type === "admin") return true;
     return false;
