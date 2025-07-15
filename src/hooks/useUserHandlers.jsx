@@ -83,8 +83,6 @@ export function useUserHandlers({ initialUser, logout, queryKey = "auth" }) {
     },
 
     onMutate: async (newData) => {
-      console.log({ newData });
-
       setOpenUserPopup(null);
       await queryClient.cancelQueries([queryKey]);
       const prevData = queryClient.getQueryData([queryKey]);

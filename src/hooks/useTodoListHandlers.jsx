@@ -62,12 +62,12 @@ export function useTodoListHandlers(
     },
 
     onSuccess: async (realList, _variables, context) => {
-      setSelectedList(realList);
       queryClient.setQueriesData([
         "allTodoLists",
         (old = []) =>
           old.map((list) => (list.id === context.tempId ? realList : list)),
       ]);
+      queryClient.invalidateQueries(["allTodoLists"]);
     },
 
     onError: (err, _newList, context) => {
@@ -80,7 +80,8 @@ export function useTodoListHandlers(
       );
     },
 
-    onSettled: () => {
+    onSettled: (realList) => {
+      setSelectedList(realList);
       setListTitle(listTitle);
       setOpenListPopup(null);
     },

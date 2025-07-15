@@ -22,9 +22,6 @@ export default function Profile() {
 
   const [selectedList, setSelectedList] = useState(null);
 
-  useEffect(() => {
-    console.log({ selectedList });
-  }, [selectedList]);
   // =====================
   // Hooks & data fetching
   // =====================

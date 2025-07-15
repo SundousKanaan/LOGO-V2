@@ -31,7 +31,8 @@ export async function postTodoList(data) {
     owner: data.owner,
     items: [],
   };
-  await api.post("todos/todo_lists/", postRequest);
+  const res = await api.post("todos/todo_lists/", postRequest);
+  return res.data;
 }
 
 export async function updateTodoList(data) {
