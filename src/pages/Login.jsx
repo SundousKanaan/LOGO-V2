@@ -7,22 +7,19 @@ import ButtonItem from "../components/mini-components/ButtonItem";
 import LinkItem from "../components/mini-components/LinkItem";
 import { useAuth } from "../contexts/AuthContext";
 import { convertPx } from "../hooks/useConvertPx";
-import { useValidateLogin } from "../hooks/useUserHooks";
+// import { useServerValidateLogin } from "../hooks/useUserHooks"; to delete
+import { validateLoginLocally } from "../hooks/useLocalValidates";
 
 export default function Login() {
-  const [isDisabled, setIsDisabled] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { login, isAuthenticated } = useAuth();
+  const {
+    login,
+    isAuthenticated,
+    errorMessage: authLogingErrorMessage,
+  } = useAuth();
   const [errorMessage, setErrorMessage] = useState(null);
   const navigate = useNavigate();
-  const validateLogin = useValidateLogin();
-
-  useEffect(() => {
-    if (email != "" && password != "") {
-      return setIsDisabled(false);
-    }
-  }, [email, password]);
 
   const handleChangeValidation = (e) => {
     const { name, value } = e.target;
@@ -34,24 +31,22 @@ export default function Login() {
   };
 
   const handleLogin = async () => {
-    if (email && password) {
-      validateLogin.mutate(
-        { email: email, password: password },
-        {
-          onSuccess: async () => {
-            await login(email, password);
-          },
+    const localErrors = validateLoginLocally(email, password);
+    if (localErrors) {
+      setErrorMessage(localErrors);
+      return;
+    }
 
-          onError: (err) => {
-            const error = err.response.data.errors;
-            setErrorMessage(error.email);
-            setIsDisabled(true);
-            setTimeout(() => {
-              setErrorMessage(null);
-            }, "10000");
-          },
-        }
-      );
+    setErrorMessage(null);
+
+    try {
+      await login(email, password);
+    } catch (err) {
+      const error = err.response.data.errors;
+      setErrorMessage(error);
+      setTimeout(() => {
+        setErrorMessage(null);
+      }, "10000");
     }
   };
 
@@ -60,11 +55,8 @@ export default function Login() {
       setTimeout(() => {
         setEmail("");
         setPassword("");
-        setIsDisabled(true);
         navigate("/", { replace: true });
       }, 1000);
-    } else {
-      setIsDisabled(true);
     }
   }, [isAuthenticated, navigate]);
 
@@ -107,6 +99,7 @@ export default function Login() {
             bg={isAuthenticated ? "statusGreenLight" : "white"}
             color="secondaryColor"
             onChange={handleChangeValidation}
+            borderColor={errorMessage?.email && "red"}
           />
         </Field.Root>
 
@@ -121,18 +114,32 @@ export default function Login() {
             bg={isAuthenticated ? "statusGreenLight" : "white"}
             color="secondaryColor"
             onChange={handleChangeValidation}
+            borderColor={errorMessage?.password && "red"}
           />
         </Field.Root>
+
         {errorMessage && (
           <Text
-            color={errorMessage && isAuthenticated ? "green" : "red"}
+            color={"red"}
             fontSize={convertPx(12)}
             fontWeight="400"
             m="0"
             textAlign="center"
             width="100%"
           >
-            {errorMessage}
+            {errorMessage.email ? errorMessage.email : errorMessage.password}
+          </Text>
+        )}
+        {authLogingErrorMessage && (
+          <Text
+            color={"red"}
+            fontSize={convertPx(12)}
+            fontWeight="400"
+            m="0"
+            textAlign="center"
+            width="100%"
+          >
+            {authLogingErrorMessage}
           </Text>
         )}
       </Fieldset.Content>
@@ -148,7 +155,6 @@ export default function Login() {
         transition="all .5s"
         m="0"
         _hover={{ transform: "scale(1.05)" }}
-        disabled={isDisabled}
         onClick={handleLogin}
       >
         Login

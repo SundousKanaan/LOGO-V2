@@ -48,7 +48,7 @@ export function AuthProvider({ children }) {
     });
 
     return () => unsubscribe();
-  }, []);
+  });
 
   // Handle login logic
   const login = async (email, password) => {
@@ -60,7 +60,11 @@ export function AuthProvider({ children }) {
       }, 1500);
     } catch (error) {
       console.error("Error logging in:", error);
-      setErrorMessage("Login failed, please try again.");
+      if (error.code === "auth/invalid-credential") {
+        setErrorMessage("Invalid email or password.");
+      } else {
+        setErrorMessage("Login failed, please try again later.");
+      }
       return;
     }
   };

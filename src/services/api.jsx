@@ -106,9 +106,10 @@ export async function validateProfile(req) {
   await api.post("/users/validate-profile/", data);
 }
 
-export async function validateLogin(req) {
-  await api.post("/users/validate-login/", req);
-}
+// to delete
+// export async function validateLogin(req) {
+//   await api.post("/users/validate-login/", req);
+// }
 
 // products
 export async function fetchProducts({ pageParam = 1 }) {

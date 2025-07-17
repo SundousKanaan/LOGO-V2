@@ -3,7 +3,7 @@ import {
   fetchCurrentUser,
   fetchAllUsers,
   validateProfile,
-  validateLogin,
+  // validateLogin, to delete
 } from "../services/api";
 
 export const useCurrentUser = () => {
@@ -48,17 +48,18 @@ export function useValidateProfile() {
 }
 
 // validate login
-export function useValidateLogin() {
-  return useMutation({
-    mutationFn: validateLogin,
-    onSuccess: () => {
-      return { success: true };
-    },
-    onError: (err) => {
-      return {
-        success: false,
-        errors: err.response?.data?.errors || {},
-      };
-    },
-  });
-}
+// to delete
+// export function useServerValidateLogin() {
+//   return useMutation({
+//     mutationFn: validateLogin,
+//     onSuccess: () => {
+//       return { success: true };
+//     },
+//     onError: (err) => {
+//       return {
+//         success: false,
+//         errors: err.response?.data?.errors || {},
+//       };
+//     },
+//   });
+// }
