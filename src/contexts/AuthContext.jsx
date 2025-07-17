@@ -4,7 +4,6 @@ import { setAuthToken } from "../services/api";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useCurrentUser } from "../hooks/useUserHooks";
 import { useMutation, useQueryClient } from "react-query";
-
 import { postUser } from "../services/api";
 
 const AuthContext = createContext();
@@ -48,7 +47,7 @@ export function AuthProvider({ children }) {
     });
 
     return () => unsubscribe();
-  });
+  }, []);
 
   // Handle login logic
   const login = async (email, password) => {
