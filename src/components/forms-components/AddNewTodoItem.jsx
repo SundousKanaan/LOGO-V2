@@ -17,7 +17,12 @@ import InputField from "../mini-components/InputField";
 import Checkboxes from "../mini-components/checkboxes";
 import { useAllUsers } from "../../hooks/useUserHooks";
 
-function AddNewTodoItem({ defaultStatus, assignedList, onFormChange }) {
+function AddNewTodoItem({
+  defaultStatus,
+  assignedList,
+  onFormChange,
+  errorMessage,
+}) {
   const prevFormDataRef = useRef({});
   const [taskStatus, setTaskStatus] = useState(defaultStatus);
   const { data: dbUsers, isLoading } = useAllUsers();
@@ -144,19 +149,20 @@ function AddNewTodoItem({ defaultStatus, assignedList, onFormChange }) {
           </Dropdown>
         </HStack>
         <Grid
-          gap={convertPx(20)}
+          columnGap={convertPx(20)}
+          rowGap={{ base: convertPx(20), sm: 0 }}
           templateColumns={{
             base: `1fr`,
             sm: `${convertPx(150)} 1fr`,
           }}
         >
-          <Text>Assigned to</Text>
-
+          <Text>Assigned to*</Text>
           <HStack
             overflow={"auto"}
             w={"100%"}
-            border={"solid 1px var(--chakra-colors-gray-300)"}
+            border={"solid 1px"}
             borderRadius={convertPx(4)}
+            borderColor={errorMessage?.assignee ? "red" : "gray.300"}
           >
             <Checkboxes
               options={usersData}
@@ -170,6 +176,16 @@ function AddNewTodoItem({ defaultStatus, assignedList, onFormChange }) {
               isLoading={isLoading}
             />
           </HStack>
+          <Text
+            color="red"
+            fontSize={convertPx(12)}
+            fontWeight="400"
+            m="0"
+            width="100%"
+            gridColumnStart={2}
+          >
+            {errorMessage?.assignee}
+          </Text>
         </Grid>
         <Grid gap={convertPx(20)} templateColumns={`${convertPx(150)} 1fr`}>
           <Text>Assigned list</Text>
@@ -179,21 +195,32 @@ function AddNewTodoItem({ defaultStatus, assignedList, onFormChange }) {
         <Field.Root>
           <Grid
             w={"100%"}
-            gap={convertPx(20)}
+            columnGap={convertPx(20)}
+            rowGap={{ base: convertPx(20), sm: 0 }}
             templateColumns={`${convertPx(150)} 1fr`}
           >
-            <Field.Label>Task name</Field.Label>
+            <Field.Label>Task name*</Field.Label>
             <InputField
               w={"100%"}
               name="taskTitle"
               placeholder="Enter task name"
-              borderColor="gray.300"
               h={"fit-content"}
               pt={convertPx(8)}
               pb={convertPx(8)}
               color="secondaryColor"
               onChange={handleInputChange}
+              borderColor={errorMessage?.title ? "red" : "gray.300"}
             />
+            <Text
+              color="red"
+              fontSize={convertPx(12)}
+              fontWeight="400"
+              m="0"
+              width="100%"
+              gridColumnStart={2}
+            >
+              {errorMessage?.title}
+            </Text>
           </Grid>
         </Field.Root>
         <Field.Root>

@@ -6,12 +6,12 @@ import InputField from "../components/mini-components/InputField";
 import ButtonItem from "../components/mini-components/ButtonItem";
 import LinkItem from "../components/mini-components/LinkItem";
 import { useAuth } from "../contexts/AuthContext";
-import { useValidateProfile } from "../hooks/useUserHooks.jsx";
+// import { useValidateProfile } from "../hooks/useUserHooks.jsx";
 import { validateUserDataLocally } from "../hooks/useLocalValidates.jsx";
 
 function Registing() {
   const { signUp, errorMessage, isProcessing } = useAuth();
-  const validateProfile = useValidateProfile();
+  // const validateProfile = useValidateProfile();
   const accountMap = {
     first_name: "",
     last_name: "",
@@ -39,43 +39,9 @@ function Registing() {
       setRegisterErrorMessage(localerrors);
       return;
     }
-    setRegisterErrorMessage(null);
 
-    validateProfile.mutate(accountData, {
-      onSuccess: async () => {
-        await signUp(accountData);
-        setRegisterErrorMessage(null);
-      },
-      onError: (err) => {
-        const error = err.response.data.errors;
-        if (error.first_name || error.last_name) {
-          setRegisterErrorMessage({
-            type: error.first_name?.[0] ? "first_name" : "last_name",
-            message: error.first_name?.[0] || error.last_name?.[0],
-          });
-        } else if (error.phone) {
-          setRegisterErrorMessage({
-            type: "phone",
-            message: error.phone[0],
-          });
-        } else if (error.birthday) {
-          setRegisterErrorMessage({
-            type: "birthday",
-            message: error.birthday[0],
-          });
-        } else if (error.email) {
-          setRegisterErrorMessage({
-            type: "email",
-            message: error.email[0] || "Invalid email",
-          });
-        } else {
-          setRegisterErrorMessage({
-            type: "general",
-            message: "Registration failed. Please try again.",
-          });
-        }
-      },
-    });
+    await signUp(accountData);
+    setRegisterErrorMessage(null);
   };
 
   return (
@@ -117,7 +83,11 @@ function Registing() {
               name="first_name"
               bg="white"
               color="secondaryColor"
-              borderColor={registerErrorMessage?.first_name && "red"}
+              borderColor={
+                (registerErrorMessage?.first_name ||
+                  errorMessage?.first_name) &&
+                "red"
+              }
               onChange={handleInputChange}
             />
             <Text
@@ -129,7 +99,7 @@ function Registing() {
               position="absolute"
               bottom={"-1.5em"}
             >
-              {registerErrorMessage?.first_name}
+              {registerErrorMessage?.first_name || errorMessage?.first_name}
             </Text>
           </Field.Root>
 
@@ -142,14 +112,10 @@ function Registing() {
               name="last_name"
               bg="white"
               color="secondaryColor"
-              // boxShadow={
-              //   !registerErrorMessage
-              //     ? ""
-              //     : registerErrorMessage?.type === "last_name"
-              //     ? "inset 0 0 0 1px var(--chakra-colors-status-red)"
-              //     : "inset 0 0 0 1px var(--chakra-colors-status-green)"
-              // }
-              borderColor={registerErrorMessage?.first_name && "red"}
+              borderColor={
+                (registerErrorMessage?.last_name || errorMessage?.last_name) &&
+                "red"
+              }
               onChange={handleInputChange}
             />
             <Text
@@ -161,7 +127,7 @@ function Registing() {
               position="absolute"
               bottom={"-1.5em"}
             >
-              {registerErrorMessage?.last_name}
+              {registerErrorMessage?.last_name || errorMessage?.last_name}
             </Text>
           </Field.Root>
         </HStack>
@@ -175,15 +141,9 @@ function Registing() {
             name="email"
             bg="white"
             color="secondaryColor"
-            // boxShadow={
-            //   !registerErrorMessage
-            //     ? ""
-            //     : registerErrorMessage?.type === "email"
-            //     ? "inset 0 0 0 1px var(--chakra-colors-status-red)"
-            //     : "inset 0 0 0 1px var(--chakra-colors-status-green)"
-            // }
-
-            borderColor={registerErrorMessage?.first_name && "red"}
+            borderColor={
+              (registerErrorMessage?.email || errorMessage?.email) && "red"
+            }
             onChange={handleInputChange}
           />
           <Text
@@ -195,7 +155,7 @@ function Registing() {
             position="absolute"
             bottom={"-1.5em"}
           >
-            {registerErrorMessage?.email}
+            {registerErrorMessage?.email || errorMessage?.email}
           </Text>
         </Field.Root>
 
@@ -208,14 +168,9 @@ function Registing() {
             name="phone"
             bg="white"
             color="secondaryColor"
-            // boxShadow={
-            //   !registerErrorMessage
-            //     ? ""
-            //     : registerErrorMessage?.type === "email"
-            //     ? "inset 0 0 0 1px var(--chakra-colors-status-red)"
-            //     : "inset 0 0 0 1px var(--chakra-colors-status-green)"
-            // }
-            borderColor={registerErrorMessage?.phone && "red"}
+            borderColor={
+              (registerErrorMessage?.phone || errorMessage?.phone) && "red"
+            }
             onChange={handleInputChange}
           />
           <Text
@@ -227,7 +182,7 @@ function Registing() {
             position="absolute"
             bottom={"-1.5em"}
           >
-            {registerErrorMessage?.phone}
+            {registerErrorMessage?.phone || errorMessage?.phone}
           </Text>
         </Field.Root>
 
@@ -240,48 +195,8 @@ function Registing() {
             name="birthday"
             bg="white"
             color="secondaryColor"
-            // boxShadow={
-            //   !registerErrorMessage
-            //     ? ""
-            //     : registerErrorMessage?.type === "birthday"
-            //     ? "inset 0 0 0 1px var(--chakra-colors-status-red)"
-            //     : "inset 0 0 0 1px var(--chakra-colors-status-green)"
-            // }
-            borderColor={registerErrorMessage?.birthday && "red"}
-            onChange={handleInputChange}
-          />
-          <Text
-            color="red"
-            fontSize={convertPx(12)}
-            fontWeight="400"
-            m="0"
-            width="100%"
-            position="absolute"
-            bottom={"-1.5em"}
-          >
-            {registerErrorMessage?.birthday}
-          </Text>
-        </Field.Root>
-
-        <Field.Root>
-          <Field.Label color="secondaryColor">Password*</Field.Label>
-          <InputField
-            h={convertPx(50)}
-            type="password"
-            placeholder="Password"
-            name="password"
-            bg="white"
-            color="secondaryColor"
-            // boxShadow={
-            //   !registerErrorMessage
-            //     ? ""
-            //     : registerErrorMessage?.type === "password"
-            //     ? "inset 0 0 0 1px var(--chakra-colors-status-red)"
-            //     : "inset 0 0 0 1px var(--chakra-colors-status-green)"
-            // }
             borderColor={
-              (registerErrorMessage?.password ||
-                registerErrorMessage?.confirmPassword) &&
+              (registerErrorMessage?.birthday || errorMessage?.birthday) &&
               "red"
             }
             onChange={handleInputChange}
@@ -295,7 +210,37 @@ function Registing() {
             position="absolute"
             bottom={"-1.5em"}
           >
-            {registerErrorMessage?.password}
+            {registerErrorMessage?.birthday || errorMessage?.birthday}
+          </Text>
+        </Field.Root>
+
+        <Field.Root>
+          <Field.Label color="secondaryColor">Password*</Field.Label>
+          <InputField
+            h={convertPx(50)}
+            type="password"
+            placeholder="Password"
+            name="password"
+            bg="white"
+            color="secondaryColor"
+            borderColor={
+              (registerErrorMessage?.password ||
+                registerErrorMessage?.confirmPassword ||
+                errorMessage?.password) &&
+              "red"
+            }
+            onChange={handleInputChange}
+          />
+          <Text
+            color="red"
+            fontSize={convertPx(12)}
+            fontWeight="400"
+            m="0"
+            width="100%"
+            position="absolute"
+            bottom={"-1.5em"}
+          >
+            {registerErrorMessage?.password || errorMessage?.password}
           </Text>
         </Field.Root>
         <Field.Root>
@@ -307,16 +252,11 @@ function Registing() {
             name="confirmPassword"
             bg="white"
             color="secondaryColor"
-            // boxShadow={
-            //   !registerErrorMessage
-            //     ? ""
-            //     : registerErrorMessage?.type === "password"
-            //     ? "inset 0 0 0 1px var(--chakra-colors-status-red)"
-            //     : "inset 0 0 0 1px var(--chakra-colors-status-green)"
-            // }
             borderColor={
-              registerErrorMessage?.password ||
-              (registerErrorMessage?.confirmPassword && "red")
+              (registerErrorMessage?.password ||
+                registerErrorMessage?.confirmPassword ||
+                errorMessage?.password) &&
+              "red"
             }
             onChange={handleInputChange}
           />
@@ -344,7 +284,7 @@ function Registing() {
           {registerErrorMessage?.message}
         </Text>
 
-        {errorMessage !== "" && (
+        {errorMessage?.message && (
           <Text
             color="red"
             fontSize={convertPx(12)}
@@ -353,7 +293,7 @@ function Registing() {
             textAlign="center"
             width="100%"
           >
-            {errorMessage}
+            {errorMessage.message}
           </Text>
         )}
       </Fieldset.Content>

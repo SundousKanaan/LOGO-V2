@@ -50,11 +50,6 @@ function EditeUser({
               defaultValue={user.first_name}
               bg="white"
               color="secondaryColor"
-              // boxShadow={ to delete
-              //   errorState?.type === "first_name"
-              //     ? "inset 0 0 0 1px var(--chakra-colors-status-red)"
-              //     : "inset 0 0 0 1px var(--chakra-colors-status-green)"
-              // }
               borderColor={errorMessage?.first_name ? "red" : "green"}
               onChange={handleInputChange}
             />
@@ -89,11 +84,6 @@ function EditeUser({
               defaultValue={user.last_name}
               bg="white"
               color="secondaryColor"
-              // boxShadow={ to delete
-              //   errorState?.type === "last_name"
-              //     ? "inset 0 0 0 1px var(--chakra-colors-status-red)"
-              //     : "inset 0 0 0 1px var(--chakra-colors-status-green)"
-              // }              borderColor={errorMessage?.first_name ? "red" : "green"}
               borderColor={errorMessage?.last_name ? "red" : "green"}
               onChange={handleInputChange}
             />
@@ -128,11 +118,6 @@ function EditeUser({
               placeholder={"Phone: +31612345678"}
               bg="white"
               color="secondaryColor"
-              // boxShadow={ to delete
-              //   errorState?.type === "phone"
-              //     ? "inset 0 0 0 1px var(--chakra-colors-status-red)"
-              //     : "inset 0 0 0 1px var(--chakra-colors-status-green)"
-              // }
               borderColor={errorMessage?.phone ? "red" : "green"}
               onChange={handleInputChange}
             />
@@ -168,11 +153,6 @@ function EditeUser({
               placeholder={"Birthday: YYYY-MM-DD"}
               bg="white"
               color="secondaryColor"
-              // boxShadow={ to delete
-              //   errorState?.type === "birthday"
-              //     ? "inset 0 0 0 1px var(--chakra-colors-status-red)"
-              //     : "inset 0 0 0 1px var(--chakra-colors-status-green)"
-              // }
               borderColor={errorMessage?.birthday ? "red" : "green"}
               onChange={handleInputChange}
             />

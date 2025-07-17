@@ -1,13 +1,10 @@
 import { useState, useEffect } from "react";
 import {
   HStack,
-  VStack,
-  Box,
   Text,
   Grid,
   Fieldset,
   Field,
-  Flex,
   Textarea,
   Select,
   createListCollection,
@@ -18,13 +15,13 @@ import InputField from "../mini-components/InputField";
 import Checkboxes from "../mini-components/checkboxes";
 import { useAllUsers } from "../../hooks/useUserHooks";
 
-function EditeTodoItem({ data, onChange }) {
+function EditeTodoItem({ data, onChange, errorMessage }) {
   const { data: dbUsers, isLoading } = useAllUsers();
-  const [newStatus, setTaskStatus] = useState(data.status);
+  const [newStatus, setTaskStatus] = useState(data?.status);
   const [usersData, setUsersData] = useState([]);
-  const [selectedAssignee, setSelectedAssignee] = useState(data.assignee);
-  const [newDescription, setNewDescription] = useState(data.description);
-  const [newTaskTitle, setNewTaskTitle] = useState(data.title);
+  const [selectedAssignee, setSelectedAssignee] = useState(data?.assignee);
+  const [newDescription, setNewDescription] = useState(data?.description);
+  const [newTaskTitle, setNewTaskTitle] = useState(data?.title);
 
   const taskStatus = createListCollection({
     items: [
@@ -101,7 +98,7 @@ function EditeTodoItem({ data, onChange }) {
           <Text w={convertPx(150)}>Status</Text>
           <Dropdown
             collection={taskStatus}
-            defaultValue={data.status}
+            defaultValue={data?.status}
             withIndicator
             handleChange={changeStatus}
             fontWeight={"bold"}
@@ -128,13 +125,21 @@ function EditeTodoItem({ data, onChange }) {
             ))}
           </Dropdown>
         </HStack>
-        <VStack gap={convertPx(20)} align={"start"}>
-          <Text w={convertPx(150)}>Assigned to</Text>
+        <Grid
+          columnGap={convertPx(20)}
+          rowGap={{ base: convertPx(20), sm: 0 }}
+          templateColumns={{
+            base: `1fr`,
+            sm: `${convertPx(150)} 1fr`,
+          }}
+        >
+          <Text w={convertPx(150)}>Assigned to*</Text>
           <HStack
             overflow={"auto"}
             w={"100%"}
-            border={"solid 1px var(--chakra-colors-gray-300)"}
+            border={"solid 1px "}
             borderRadius={convertPx(4)}
+            borderColor={errorMessage?.assignee ? "red" : "gray.300"}
           >
             <Checkboxes
               options={usersData}
@@ -144,35 +149,56 @@ function EditeTodoItem({ data, onChange }) {
               p={`${convertPx(8)} ${convertPx(8)}`}
               overflow="auto"
               withIcon
-              selectedIds={data.assignee.map((assignee) => assignee.id)}
+              selectedIds={data?.assignee.map((assignee) => assignee.id)}
               onChange={handleCheckboxChange}
               isLoading={isLoading}
             />
           </HStack>
-        </VStack>
+          <Text
+            color="red"
+            fontSize={convertPx(12)}
+            fontWeight="400"
+            m="0"
+            width="100%"
+            gridColumnStart={2}
+          >
+            {errorMessage?.assignee}
+          </Text>
+        </Grid>
         <Grid gap={convertPx(20)} templateColumns={`${convertPx(150)} 1fr`}>
           <Text>Assigned list</Text>
-          <Text>{data.todo_list.title}</Text>
+          <Text>{data?.todo_list.title}</Text>
         </Grid>
         <Field.Root>
           <Grid
             w={"100%"}
-            gap={convertPx(20)}
+            columnGap={convertPx(20)}
+            rowGap={{ base: convertPx(20), sm: 0 }}
             templateColumns={`${convertPx(150)} 1fr`}
           >
-            <Field.Label>Task name</Field.Label>
+            <Field.Label>Task name*</Field.Label>
             <InputField
               w={"100%"}
               name="taskTitle"
-              defaultValue={data.title}
+              defaultValue={data?.title}
               placeholder="Enter task name"
-              borderColor="gray.300"
               h={"fit-content"}
               pt={convertPx(8)}
               pb={convertPx(8)}
               color="secondaryColor"
+              borderColor={errorMessage?.title ? "red" : "gray.300"}
               onChange={handleInputChange}
             />
+            <Text
+              color="red"
+              fontSize={convertPx(12)}
+              fontWeight="400"
+              m="0"
+              width="100%"
+              gridColumnStart={2}
+            >
+              {errorMessage?.title}
+            </Text>
           </Grid>
         </Field.Root>
         <Field.Root>
@@ -185,7 +211,7 @@ function EditeTodoItem({ data, onChange }) {
             <Textarea
               w={"100%"}
               name="taskDescription"
-              defaultValue={data.description}
+              defaultValue={data?.description}
               placeholder="Enter task description"
               borderColor="gray.300"
               h={"fit-content"}

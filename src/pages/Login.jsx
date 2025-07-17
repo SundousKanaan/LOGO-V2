@@ -7,7 +7,6 @@ import ButtonItem from "../components/mini-components/ButtonItem";
 import LinkItem from "../components/mini-components/LinkItem";
 import { useAuth } from "../contexts/AuthContext";
 import { convertPx } from "../hooks/useConvertPx";
-// import { useServerValidateLogin } from "../hooks/useUserHooks"; to delete
 import { validateLoginLocally } from "../hooks/useLocalValidates";
 
 export default function Login() {

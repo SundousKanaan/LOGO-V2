@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useMutation, useQueryClient } from "react-query";
 import { updateUser, deleteUser } from "../services/api";
-import { useValidateProfile } from "../hooks/useUserHooks";
 import { useAuth } from "../contexts/AuthContext";
 import { validateUserDataLocally } from "../hooks/useLocalValidates";
 
@@ -11,16 +10,17 @@ export function useUserHandlers({ initialUser, logout, queryKey = "auth" }) {
   const [handledUser, setHandledUser] = useState(null);
   const [openUserPopup, setOpenUserPopup] = useState(null); // edit | delete | null
   const [UserErrorMessage, setUserErrorMessage] = useState(null);
-  const validateProfile = useValidateProfile();
 
   // EFFECTS
   useEffect(() => {
     if (initialUser) setHandledUser(initialUser);
   }, [initialUser]);
 
-  // useEffect(() => {
-  //   if (!handledUser || openUserPopup !== "edit") return;
-  // }, [handledUser]);
+  useEffect(() => {
+    if (setOpenUserPopup) {
+      setHandledUser(initialUser);
+    }
+  }, [setOpenUserPopup]);
 
   // DELETE mutation
   const { mutate: delete_user, isLoading: isDeletingUser } = useMutation({
@@ -60,7 +60,6 @@ export function useUserHandlers({ initialUser, logout, queryKey = "auth" }) {
     },
 
     onMutate: async (newData) => {
-      setOpenUserPopup(null);
       await queryClient.cancelQueries([queryKey]);
       const prevData = queryClient.getQueryData([queryKey]);
       queryClient.setQueryData([queryKey], (prevData) => {
@@ -81,6 +80,7 @@ export function useUserHandlers({ initialUser, logout, queryKey = "auth" }) {
       if (newData.id === currentUser.id && queryKey !== "auth") {
         await queryClient.invalidateQueries(["auth"]);
       }
+      setOpenUserPopup(null);
     },
 
     onError: (err, newData, context) => {
@@ -88,10 +88,23 @@ export function useUserHandlers({ initialUser, logout, queryKey = "auth" }) {
         setHandledUser(context.prevData);
       }
 
-      console.error(
-        "Error with updating the user",
-        err.response?.data || err.message
-      );
+      const serverErrors = err.response?.data;
+      let extractedError = "Something went wrong";
+
+      if (typeof serverErrors === "object" && serverErrors !== null) {
+        extractedError = {};
+        Object.entries(serverErrors).forEach(([field, messages]) => {
+          extractedError[field] = Array.isArray(messages)
+            ? messages[0]
+            : messages;
+        });
+      } else if (typeof serverErrors === "string") {
+        extractedError = {
+          type: "general",
+          message: serverErrors,
+        };
+      }
+      setUserErrorMessage(extractedError);
     },
   });
 
@@ -119,6 +132,7 @@ export function useUserHandlers({ initialUser, logout, queryKey = "auth" }) {
 
   const handleUpdateUser = useCallback(() => {
     if (!handledUser) return;
+
     const data = {
       id: handledUser.id,
       first_name: handledUser.first_name,
@@ -135,32 +149,8 @@ export function useUserHandlers({ initialUser, logout, queryKey = "auth" }) {
       setUserErrorMessage(localErrors);
       return;
     }
-
-    validateProfile.mutate(handledUser, {
-      onSuccess: () => {
-        setUserErrorMessage(null);
-        update_user(data);
-      },
-      onError: (err) => {
-        const error = err.response.data.errors;
-        if (error.first_name || error.last_name) {
-          setUserErrorMessage({
-            type: error.first_name?.[0] ? "first_name" : "last_name",
-            message: error.first_name?.[0] || error.last_name?.[0],
-          });
-        } else if (error.phone) {
-          setUserErrorMessage({
-            type: "phone",
-            message: error.phone[0],
-          });
-        } else if (error.birthday) {
-          setUserErrorMessage({
-            type: "birthday",
-            message: error.birthday[0],
-          });
-        }
-      },
-    });
+    setUserErrorMessage(null);
+    update_user(data);
   }, [handledUser, update_user]);
 
   return {

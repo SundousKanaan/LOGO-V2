@@ -15,9 +15,8 @@ export const validateLoginLocally = (email, password) => {
 };
 
 export const validateUserDataLocally = (user) => {
-  // console.log(user);
-
   const errors = {};
+
   if (!user.first_name) {
     errors.first_name = "First name is required.";
   }
@@ -50,14 +49,27 @@ export const validateUserDataLocally = (user) => {
     }
   }
 
-  if (!user.password) {
+  if (user.password && user.password === "") {
     errors.password = "Password is required.";
-  } else if (user.password.length < 6) {
+  } else if (user.password && user.password.length < 6) {
     errors.password = "Password must be at least 6 characters.";
   }
   if (user.password != user.confirmPassword) {
     errors.confirmPassword = "Password and confirm password must be the same";
   }
 
+  return Object.keys(errors).length ? errors : null;
+};
+
+export const validateTodoItemDataLocally = (item) => {
+  const errors = {};
+
+  if (!item.title || item.title === "") {
+    errors.title = "Title is required.";
+  }
+
+  if (!item.assignee || item.assignee.length === 0) {
+    errors.assignee = "Assigned to is required.";
+  }
   return Object.keys(errors).length ? errors : null;
 };

@@ -25,6 +25,7 @@ const ProductCard = forwardRef(({ data, viewMode }, ref) => {
         boxSize={isGridMode ? "100%" : convertPx(68)}
         aspectRatio="1/1"
         layerStyle="ProductCardLayout.img"
+        loading="lazy"
       />
       <Card.Body
         p="0"

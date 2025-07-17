@@ -99,7 +99,13 @@ export function AuthProvider({ children }) {
     },
     onError: (err) => {
       console.error("Error registering user:", err);
-      setErrorMessage("This email already has an account.");
+      if (err.code == "auth/invalid-credential") {
+        setErrorMessage({
+          message: "Something went wrong. Please try again later.",
+        });
+      } else {
+        setErrorMessage(err.response?.data.errors);
+      }
     },
   });
 

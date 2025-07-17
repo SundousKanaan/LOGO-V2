@@ -1,12 +1,13 @@
 import { useState, useCallback } from "react";
 import { useMutation, useQueryClient } from "react-query";
-
 import { postTodoItem, deleteTodoItem, updateTodoItem } from "../services/api";
+import { validateTodoItemDataLocally } from "./useLocalValidates";
 
 export function useTodoItemHandlers(refetchTodoLists) {
   const queryClient = useQueryClient();
   const [newListItemDetails, setNewListItemDetails] = useState(null);
   const [openItemPopup, setOpenItemPopup] = useState(null); // {case: create | edit | delete, title: column_title} | null
+  const [errorMessage, setErrorMessage] = useState(null);
 
   // CREATE todo item mutation
   const { mutate: createTodoItem, isLoading: isCreatingItem } = useMutation({
@@ -59,12 +60,30 @@ export function useTodoItemHandlers(refetchTodoLists) {
       });
       queryClient.invalidateQueries(["allTodoLists"]);
       await refetchTodoLists();
+      setOpenItemPopup(null);
+      setErrorMessage(null);
     },
 
-    onError: (error, newItem, context) => {
+    onError: (err, newItem, context) => {
       if (context?.prevData) {
         queryClient.setQueryData(["allTodoLists"], context.prevData);
       }
+
+      const serverErrors = err.response?.data.errors;
+      let extractedError = "Something went wrong";
+
+      if (typeof serverErrors === "object") {
+        const [field, messages] = Object.entries(serverErrors)[0];
+        extractedError = {
+          [field]: messages[0],
+        };
+      } else if (typeof serverErrors === "string") {
+        extractedError = {
+          message: serverErrors,
+        };
+      }
+
+      setErrorMessage(extractedError);
     },
 
     onSettled: () => {
@@ -102,7 +121,6 @@ export function useTodoItemHandlers(refetchTodoLists) {
     },
 
     onMutate: async (newItem) => {
-      setOpenItemPopup(null);
       await queryClient.cancelQueries(["allTodoLists"]);
       const prevData = queryClient.getQueryData(["allTodoLists"]);
       const tempId = `temp-${newItem.id}`;
@@ -134,20 +152,39 @@ export function useTodoItemHandlers(refetchTodoLists) {
 
     onSuccess: () => {
       queryClient.invalidateQueries(["allTodoLists"]);
+      setOpenItemPopup(null);
+      setErrorMessage(null);
+      setNewListItemDetails(null);
     },
 
     onError: (err, context) => {
       if (context?.prevData) {
         queryClient.setQueryData(["allTodoLists"], context.prevData);
       }
+
       console.error(
         "Error updating todo item:",
         err.response?.data || err.message
       );
-    },
 
-    onSettled: () => {
-      setNewListItemDetails(null);
+      const serverErrors = err.response?.data;
+
+      let extractedError = "Something went wrong";
+
+      if (typeof serverErrors === "object" && serverErrors !== null) {
+        extractedError = {};
+        Object.entries(serverErrors).forEach(([field, messages]) => {
+          extractedError[field] = Array.isArray(messages)
+            ? messages[0]
+            : messages;
+        });
+      } else if (typeof serverErrors === "string") {
+        extractedError = {
+          message: serverErrors,
+        };
+      }
+
+      setErrorMessage(extractedError);
     },
   });
 
@@ -164,7 +201,14 @@ export function useTodoItemHandlers(refetchTodoLists) {
   // Action handlers
   async function handleCreateListItem() {
     if (!newListItemDetails) return;
-    setOpenItemPopup(null);
+
+    const localErrors = validateTodoItemDataLocally(newListItemDetails);
+    if (localErrors) {
+      setErrorMessage(localErrors);
+      return;
+    }
+
+    setErrorMessage(null);
     createTodoItem(newListItemDetails);
   }
 
@@ -173,22 +217,19 @@ export function useTodoItemHandlers(refetchTodoLists) {
   }
 
   async function handleEditListItem(newTaskDetails) {
-    const data = {
-      id: newTaskDetails.id,
-      title: newTaskDetails.title,
-      description: newTaskDetails.description,
-      status: newTaskDetails.status,
-      assignee: newTaskDetails.assignee,
-      todo_list: newTaskDetails.todo_list.id,
-    };
-
-    update_todoItem(data);
+    const localErrors = validateTodoItemDataLocally(newTaskDetails);
+    if (localErrors) {
+      setErrorMessage(localErrors);
+      return;
+    }
+    update_todoItem(newTaskDetails);
   }
 
   return {
     newListItemDetails,
     setNewListItemDetails,
     openItemPopup,
+    errorMessage,
     setOpenItemPopup,
     isCreatingItem,
     isDeletingItem,

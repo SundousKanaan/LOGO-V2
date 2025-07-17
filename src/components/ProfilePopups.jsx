@@ -86,6 +86,7 @@ export function ListItemPopup({
   list,
   openItemPopup,
   newListItemDetails,
+  errorMessage,
   handleCreateListItem,
   handleEditListItem,
   handleDeleteListItem,
@@ -131,25 +132,21 @@ export function ListItemPopup({
           ? "Deleting..."
           : "Delete"
       }
-      disableSaveButton={
-        isProcessing ||
-        ((isCreate || isEdit) &&
-          (newListItemDetails?.title === "" ||
-            !Array.isArray(newListItemDetails?.assignee) ||
-            newListItemDetails?.assignee.length === 0))
-      }
+      disableSaveButton={isProcessing}
     >
       {isCreate && (
         <AddNewTodoItem
           defaultStatus={title}
           assignedList={{ id: list.id, title: list.title }}
           onFormChange={handleNewTaskChange}
+          errorMessage={errorMessage}
         />
       )}
       {isEdit && (
         <EditeTodoItem
           data={list.items.find((item) => item.id === id)}
           onChange={handleNewTaskChange}
+          errorMessage={errorMessage}
         />
       )}
       {isDelete && (

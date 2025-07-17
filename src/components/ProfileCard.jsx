@@ -47,6 +47,7 @@ function ProfileCard({ user, isloading, onEdit, onDelete, isProcessing }) {
             textAlign={{ base: "center", md: "left" }}
             textTransform="capitalize"
             opacity={isProcessing && 0.5}
+            textWrap={"nowrap"}
           >
             {user?.first_name} {user?.last_name}
           </Text>

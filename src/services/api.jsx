@@ -59,6 +59,7 @@ export async function updateTodoItem(id, data) {
   const fixedData = {
     ...data,
     assignee: data.assignee.map((user) => user.id),
+    todo_list: data.todo_list.id,
   };
   await api.put(`todos/todo_items/${id}/`, fixedData);
 }
@@ -94,22 +95,6 @@ export async function deleteUser(id) {
   const req = await api.delete(`users/api/${id}/`);
   return req;
 }
-
-export async function validateProfile(req) {
-  const data = {
-    first_name: req.first_name,
-    last_name: req.last_name,
-    phone: req.phone || "",
-    birthday: req.birthday,
-    email: req.email,
-  };
-  await api.post("/users/validate-profile/", data);
-}
-
-// to delete
-// export async function validateLogin(req) {
-//   await api.post("/users/validate-login/", req);
-// }
 
 // products
 export async function fetchProducts({ pageParam = 1 }) {

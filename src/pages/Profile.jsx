@@ -68,6 +68,7 @@ export default function Profile() {
     isCreatingItem,
     isDeletingItem,
     isUpdatingItem,
+    errorMessage,
     openCreateItemPopup,
     setOpenItemPopup,
     handleCreateListItem,
@@ -168,6 +169,7 @@ export default function Profile() {
         list={selectedList}
         openItemPopup={openItemPopup}
         newListItemDetails={newListItemDetails}
+        errorMessage={errorMessage}
         handleCreateListItem={handleCreateListItem}
         handleEditListItem={handleEditListItem}
         handleDeleteListItem={handleDeleteListItem}
@@ -184,7 +186,7 @@ export default function Profile() {
 
       <UserPopup
         openUserPopup={openUserPopup}
-        user={handledUser || currentUser}
+        user={currentUser}
         errorEditMessage={UserErrorMessage}
         handleUpdateUser={handleUpdateUser}
         handleDeleteUser={handleDeleteUser}

@@ -1,9 +1,11 @@
-import { useQuery, useMutation } from "react-query";
+import {
+  useQuery,
+  //  useMutation
+} from "react-query";
 import {
   fetchCurrentUser,
   fetchAllUsers,
-  validateProfile,
-  // validateLogin, to delete
+  // validateProfile,
 } from "../services/api";
 
 export const useCurrentUser = () => {
@@ -32,29 +34,13 @@ export const useAllUsers = () => {
 };
 
 // validate user details
-export function useValidateProfile() {
-  return useMutation({
-    mutationFn: validateProfile,
-    onSuccess: () => {
-      return { success: true };
-    },
-    onError: (err) => {
-      return {
-        success: false,
-        errors: err.response?.data?.errors || {},
-      };
-    },
-  });
-}
-
-// validate login
-// to delete
-// export function useServerValidateLogin() {
+// export function useValidateProfile() {
 //   return useMutation({
-//     mutationFn: validateLogin,
+//     mutationFn: validateProfile,
 //     onSuccess: () => {
 //       return { success: true };
 //     },
+//     enabled: false,
 //     onError: (err) => {
 //       return {
 //         success: false,
