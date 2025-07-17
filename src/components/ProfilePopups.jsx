@@ -194,13 +194,13 @@ export function UserPopup({
       }}
       onSave={isEdit ? handleUpdateUser : handleDeleteUser}
       ActionButtonText={isEdit ? "Save" : "Delete"}
-      disableSaveButton={errorEditMessage || isProcessing}
+      disableSaveButton={isProcessing}
     >
       {isEdit && (
         <>
           <EditeUser
             user={user}
-            errorState={null}
+            errorMessage={errorEditMessage}
             handleInputChange={(e) => handleUserDataChange(e)}
             handleRoleChange={(option) =>
               setAccountData((prevData) => ({
@@ -209,7 +209,7 @@ export function UserPopup({
               }))
             }
           />
-          {errorEditMessage && (
+          {errorEditMessage?.message && (
             <Text color={"redColor"} mt={convertPx(16)} textAlign={"center"}>
               {errorEditMessage.message}
             </Text>

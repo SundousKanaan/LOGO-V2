@@ -22,8 +22,6 @@ export const loginUser = async (email, password) => {
     email,
     password
   );
-  console.log(userCredential);
-
   return userCredential.user;
 };
 

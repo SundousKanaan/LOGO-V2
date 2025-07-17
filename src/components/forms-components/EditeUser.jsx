@@ -2,6 +2,7 @@ import {
   Fieldset,
   Field,
   Select,
+  Text,
   createListCollection,
 } from "@chakra-ui/react";
 import { useAuth } from "../../contexts/AuthContext";
@@ -9,7 +10,12 @@ import { convertPx } from "../../hooks/useConvertPx";
 import InputField from "../mini-components/InputField";
 import Dropdown from "../mini-components/Dropdown";
 
-function EditeUser({ user, errorState, handleRoleChange, handleInputChange }) {
+function EditeUser({
+  user,
+  handleRoleChange,
+  handleInputChange,
+  errorMessage,
+}) {
   const { currentUser } = useAuth();
   const roleCollection = createListCollection({
     items: [
@@ -25,6 +31,7 @@ function EditeUser({ user, errorState, handleRoleChange, handleInputChange }) {
           display="flex"
           flexDirection="column"
           alignItems="center"
+          gap="2em"
         >
           <Field.Root
             display="flex"
@@ -38,17 +45,31 @@ function EditeUser({ user, errorState, handleRoleChange, handleInputChange }) {
             <InputField
               h={convertPx(50)}
               type="text"
+              placeholder="Example: John"
               name="firstName"
               defaultValue={user.first_name}
               bg="white"
               color="secondaryColor"
-              boxShadow={
-                errorState?.type === "first_name"
-                  ? "inset 0 0 0 1px var(--chakra-colors-status-red)"
-                  : "inset 0 0 0 1px var(--chakra-colors-status-green)"
-              }
+              // boxShadow={ to delete
+              //   errorState?.type === "first_name"
+              //     ? "inset 0 0 0 1px var(--chakra-colors-status-red)"
+              //     : "inset 0 0 0 1px var(--chakra-colors-status-green)"
+              // }
+              borderColor={errorMessage?.first_name ? "red" : "green"}
               onChange={handleInputChange}
             />
+            <Text
+              color="red"
+              fontSize={convertPx(12)}
+              fontWeight="400"
+              m="0"
+              width="100%"
+              position="absolute"
+              bottom={"-2em"}
+              pl={convertPx(150)}
+            >
+              {errorMessage?.first_name}
+            </Text>
           </Field.Root>
 
           <Field.Root
@@ -63,17 +84,31 @@ function EditeUser({ user, errorState, handleRoleChange, handleInputChange }) {
             <InputField
               h={convertPx(50)}
               type="text"
+              placeholder="Example: Doe"
               name="lastName"
               defaultValue={user.last_name}
               bg="white"
               color="secondaryColor"
-              boxShadow={
-                errorState?.type === "last_name"
-                  ? "inset 0 0 0 1px var(--chakra-colors-status-red)"
-                  : "inset 0 0 0 1px var(--chakra-colors-status-green)"
-              }
+              // boxShadow={ to delete
+              //   errorState?.type === "last_name"
+              //     ? "inset 0 0 0 1px var(--chakra-colors-status-red)"
+              //     : "inset 0 0 0 1px var(--chakra-colors-status-green)"
+              // }              borderColor={errorMessage?.first_name ? "red" : "green"}
+              borderColor={errorMessage?.last_name ? "red" : "green"}
               onChange={handleInputChange}
             />
+            <Text
+              color="red"
+              fontSize={convertPx(12)}
+              fontWeight="400"
+              m="0"
+              width="100%"
+              position="absolute"
+              bottom={"-2em"}
+              pl={convertPx(150)}
+            >
+              {errorMessage?.last_name}
+            </Text>
           </Field.Root>
 
           <Field.Root
@@ -93,13 +128,26 @@ function EditeUser({ user, errorState, handleRoleChange, handleInputChange }) {
               placeholder={"Phone: +31612345678"}
               bg="white"
               color="secondaryColor"
-              boxShadow={
-                errorState?.type === "phone"
-                  ? "inset 0 0 0 1px var(--chakra-colors-status-red)"
-                  : "inset 0 0 0 1px var(--chakra-colors-status-green)"
-              }
+              // boxShadow={ to delete
+              //   errorState?.type === "phone"
+              //     ? "inset 0 0 0 1px var(--chakra-colors-status-red)"
+              //     : "inset 0 0 0 1px var(--chakra-colors-status-green)"
+              // }
+              borderColor={errorMessage?.phone ? "red" : "green"}
               onChange={handleInputChange}
             />
+            <Text
+              color="red"
+              fontSize={convertPx(12)}
+              fontWeight="400"
+              m="0"
+              width="100%"
+              position="absolute"
+              bottom={"-2em"}
+              pl={convertPx(150)}
+            >
+              {errorMessage?.phone}
+            </Text>
           </Field.Root>
 
           <Field.Root
@@ -120,13 +168,26 @@ function EditeUser({ user, errorState, handleRoleChange, handleInputChange }) {
               placeholder={"Birthday: YYYY-MM-DD"}
               bg="white"
               color="secondaryColor"
-              boxShadow={
-                errorState?.type === "birthday"
-                  ? "inset 0 0 0 1px var(--chakra-colors-status-red)"
-                  : "inset 0 0 0 1px var(--chakra-colors-status-green)"
-              }
+              // boxShadow={ to delete
+              //   errorState?.type === "birthday"
+              //     ? "inset 0 0 0 1px var(--chakra-colors-status-red)"
+              //     : "inset 0 0 0 1px var(--chakra-colors-status-green)"
+              // }
+              borderColor={errorMessage?.birthday ? "red" : "green"}
               onChange={handleInputChange}
             />
+            <Text
+              color="red"
+              fontSize={convertPx(12)}
+              fontWeight="400"
+              m="0"
+              width="100%"
+              position="absolute"
+              bottom={"-2em"}
+              pl={convertPx(150)}
+            >
+              {errorMessage?.birthday}
+            </Text>
           </Field.Root>
 
           {currentUser?.user_type === "admin" && (

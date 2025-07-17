@@ -80,8 +80,8 @@ export async function fetchAllUsers() {
   return response.data;
 }
 
-export async function postUser(userData) {
-  const res = await api.post("users/api/", userData);
+export async function postUser(data) {
+  const res = await api.post("users/api/", data);
   return res.data;
 }
 

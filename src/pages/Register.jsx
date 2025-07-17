@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Field, Fieldset, Stack, Text, HStack } from "@chakra-ui/react";
 
 import { convertPx } from "../hooks/useConvertPx";
@@ -7,78 +7,45 @@ import ButtonItem from "../components/mini-components/ButtonItem";
 import LinkItem from "../components/mini-components/LinkItem";
 import { useAuth } from "../contexts/AuthContext";
 import { useValidateProfile } from "../hooks/useUserHooks.jsx";
+import { validateUserDataLocally } from "../hooks/useLocalValidates.jsx";
 
 function Registing() {
-  const [registerErrorMessage, setRegisterErrorMessage] = useState(null);
-
-  const [accountData, setAccountData] = useState({
+  const { signUp, errorMessage, isProcessing } = useAuth();
+  const validateProfile = useValidateProfile();
+  const accountMap = {
     first_name: "",
     last_name: "",
     email: "",
     password: "",
+    confirmPassword: "",
     birthday: "",
-  });
-  const { signUp, errorMessage, isProcessing } = useAuth();
-  const [passwordValue, setPasswordValue] = useState(null);
-  const [confirmPasswordValue, setConfirmPasswordValue] = useState(null);
-
-  const validateProfile = useValidateProfile();
+    phone: "",
+  };
+  const [accountData, setAccountData] = useState(accountMap);
+  const [registerErrorMessage, setRegisterErrorMessage] = useState(null);
 
   // handelers
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-
-    if (name === "firstName") {
-      setAccountData((prevData) => ({
-        ...prevData,
-        first_name: value,
-      }));
-    } else if (name === "lastName") {
-      setAccountData((prevData) => ({
-        ...prevData,
-        last_name: value,
-      }));
-    } else if (name === "email") {
-      setAccountData((prevData) => ({
-        ...prevData,
-        email: value,
-      }));
-    } else if (name === "birthday") {
-      setAccountData((prevData) => ({
-        ...prevData,
-        birthday: value,
-      }));
-    } else if (name === "password") {
-      setPasswordValue(value);
-    } else if (name === "confirmPassword") {
-      setConfirmPasswordValue(value);
-    }
+    setAccountData((prevData) => ({
+      ...prevData,
+      [name]: value.trim(),
+    }));
   };
 
-  useEffect(() => {
-    if (passwordValue && confirmPasswordValue) {
-      if (passwordValue !== confirmPasswordValue) {
-        setRegisterErrorMessage({
-          type: "password",
-          message: "Passwords do not match",
-        });
-      } else {
-        setRegisterErrorMessage(null);
-        setAccountData((prevData) => ({
-          ...prevData,
-          password: passwordValue,
-        }));
-      }
-    }
-  }, [passwordValue, confirmPasswordValue]);
-
   const handleRegister = async () => {
+    const localerrors = validateUserDataLocally(accountData);
+    if (localerrors) {
+      setRegisterErrorMessage(localerrors);
+      return;
+    }
+    setRegisterErrorMessage(null);
+
     validateProfile.mutate(accountData, {
       onSuccess: async () => {
         await signUp(accountData);
         setRegisterErrorMessage(null);
       },
-
       onError: (err) => {
         const error = err.response.data.errors;
         if (error.first_name || error.last_name) {
@@ -142,48 +109,65 @@ function Registing() {
       >
         <HStack>
           <Field.Root>
-            <Field.Label color="secondaryColor">First name</Field.Label>
+            <Field.Label color="secondaryColor">First name*</Field.Label>
             <InputField
               h={convertPx(50)}
               type="text"
               placeholder="Example: John"
-              name="firstName"
+              name="first_name"
               bg="white"
               color="secondaryColor"
-              boxShadow={
-                !registerErrorMessage
-                  ? ""
-                  : registerErrorMessage?.type === "first_name"
-                  ? "inset 0 0 0 1px var(--chakra-colors-status-red)"
-                  : "inset 0 0 0 1px var(--chakra-colors-status-green)"
-              }
+              borderColor={registerErrorMessage?.first_name && "red"}
               onChange={handleInputChange}
             />
+            <Text
+              color="red"
+              fontSize={convertPx(12)}
+              fontWeight="400"
+              m="0"
+              width="100%"
+              position="absolute"
+              bottom={"-1.5em"}
+            >
+              {registerErrorMessage?.first_name}
+            </Text>
           </Field.Root>
 
           <Field.Root>
-            <Field.Label color="secondaryColor">Last name</Field.Label>
+            <Field.Label color="secondaryColor">Last name*</Field.Label>
             <InputField
               h={convertPx(50)}
               type="text"
               placeholder="Example: Doe"
-              name="lastName"
+              name="last_name"
               bg="white"
               color="secondaryColor"
-              boxShadow={
-                !registerErrorMessage
-                  ? ""
-                  : registerErrorMessage?.type === "last_name"
-                  ? "inset 0 0 0 1px var(--chakra-colors-status-red)"
-                  : "inset 0 0 0 1px var(--chakra-colors-status-green)"
-              }
+              // boxShadow={
+              //   !registerErrorMessage
+              //     ? ""
+              //     : registerErrorMessage?.type === "last_name"
+              //     ? "inset 0 0 0 1px var(--chakra-colors-status-red)"
+              //     : "inset 0 0 0 1px var(--chakra-colors-status-green)"
+              // }
+              borderColor={registerErrorMessage?.first_name && "red"}
               onChange={handleInputChange}
             />
+            <Text
+              color="red"
+              fontSize={convertPx(12)}
+              fontWeight="400"
+              m="0"
+              width="100%"
+              position="absolute"
+              bottom={"-1.5em"}
+            >
+              {registerErrorMessage?.last_name}
+            </Text>
           </Field.Root>
         </HStack>
 
         <Field.Root>
-          <Field.Label color="secondaryColor">Email</Field.Label>
+          <Field.Label color="secondaryColor">Email*</Field.Label>
           <InputField
             h={convertPx(50)}
             type="email"
@@ -191,19 +175,64 @@ function Registing() {
             name="email"
             bg="white"
             color="secondaryColor"
-            boxShadow={
-              !registerErrorMessage
-                ? ""
-                : registerErrorMessage?.type === "email"
-                ? "inset 0 0 0 1px var(--chakra-colors-status-red)"
-                : "inset 0 0 0 1px var(--chakra-colors-status-green)"
-            }
+            // boxShadow={
+            //   !registerErrorMessage
+            //     ? ""
+            //     : registerErrorMessage?.type === "email"
+            //     ? "inset 0 0 0 1px var(--chakra-colors-status-red)"
+            //     : "inset 0 0 0 1px var(--chakra-colors-status-green)"
+            // }
+
+            borderColor={registerErrorMessage?.first_name && "red"}
             onChange={handleInputChange}
           />
+          <Text
+            color="red"
+            fontSize={convertPx(12)}
+            fontWeight="400"
+            m="0"
+            width="100%"
+            position="absolute"
+            bottom={"-1.5em"}
+          >
+            {registerErrorMessage?.email}
+          </Text>
         </Field.Root>
 
         <Field.Root>
-          <Field.Label color="secondaryColor">Birthday</Field.Label>
+          <Field.Label color="secondaryColor">Phone</Field.Label>
+          <InputField
+            h={convertPx(50)}
+            type="tel"
+            placeholder="Example: +31 123456789"
+            name="phone"
+            bg="white"
+            color="secondaryColor"
+            // boxShadow={
+            //   !registerErrorMessage
+            //     ? ""
+            //     : registerErrorMessage?.type === "email"
+            //     ? "inset 0 0 0 1px var(--chakra-colors-status-red)"
+            //     : "inset 0 0 0 1px var(--chakra-colors-status-green)"
+            // }
+            borderColor={registerErrorMessage?.phone && "red"}
+            onChange={handleInputChange}
+          />
+          <Text
+            color="red"
+            fontSize={convertPx(12)}
+            fontWeight="400"
+            m="0"
+            width="100%"
+            position="absolute"
+            bottom={"-1.5em"}
+          >
+            {registerErrorMessage?.phone}
+          </Text>
+        </Field.Root>
+
+        <Field.Root>
+          <Field.Label color="secondaryColor">Birthday*</Field.Label>
           <InputField
             h={convertPx(50)}
             type="date"
@@ -211,19 +240,31 @@ function Registing() {
             name="birthday"
             bg="white"
             color="secondaryColor"
-            boxShadow={
-              !registerErrorMessage
-                ? ""
-                : registerErrorMessage?.type === "birthday"
-                ? "inset 0 0 0 1px var(--chakra-colors-status-red)"
-                : "inset 0 0 0 1px var(--chakra-colors-status-green)"
-            }
+            // boxShadow={
+            //   !registerErrorMessage
+            //     ? ""
+            //     : registerErrorMessage?.type === "birthday"
+            //     ? "inset 0 0 0 1px var(--chakra-colors-status-red)"
+            //     : "inset 0 0 0 1px var(--chakra-colors-status-green)"
+            // }
+            borderColor={registerErrorMessage?.birthday && "red"}
             onChange={handleInputChange}
           />
+          <Text
+            color="red"
+            fontSize={convertPx(12)}
+            fontWeight="400"
+            m="0"
+            width="100%"
+            position="absolute"
+            bottom={"-1.5em"}
+          >
+            {registerErrorMessage?.birthday}
+          </Text>
         </Field.Root>
 
         <Field.Root>
-          <Field.Label color="secondaryColor">Password</Field.Label>
+          <Field.Label color="secondaryColor">Password*</Field.Label>
           <InputField
             h={convertPx(50)}
             type="password"
@@ -231,18 +272,34 @@ function Registing() {
             name="password"
             bg="white"
             color="secondaryColor"
-            boxShadow={
-              !registerErrorMessage
-                ? ""
-                : registerErrorMessage?.type === "password"
-                ? "inset 0 0 0 1px var(--chakra-colors-status-red)"
-                : "inset 0 0 0 1px var(--chakra-colors-status-green)"
+            // boxShadow={
+            //   !registerErrorMessage
+            //     ? ""
+            //     : registerErrorMessage?.type === "password"
+            //     ? "inset 0 0 0 1px var(--chakra-colors-status-red)"
+            //     : "inset 0 0 0 1px var(--chakra-colors-status-green)"
+            // }
+            borderColor={
+              (registerErrorMessage?.password ||
+                registerErrorMessage?.confirmPassword) &&
+              "red"
             }
             onChange={handleInputChange}
           />
+          <Text
+            color="red"
+            fontSize={convertPx(12)}
+            fontWeight="400"
+            m="0"
+            width="100%"
+            position="absolute"
+            bottom={"-1.5em"}
+          >
+            {registerErrorMessage?.password}
+          </Text>
         </Field.Root>
         <Field.Root>
-          <Field.Label color="secondaryColor">Confirm Password</Field.Label>
+          <Field.Label color="secondaryColor">Confirm Password*</Field.Label>
           <InputField
             h={convertPx(50)}
             type="password"
@@ -250,28 +307,43 @@ function Registing() {
             name="confirmPassword"
             bg="white"
             color="secondaryColor"
-            boxShadow={
-              !registerErrorMessage
-                ? ""
-                : registerErrorMessage?.type === "password"
-                ? "inset 0 0 0 1px var(--chakra-colors-status-red)"
-                : "inset 0 0 0 1px var(--chakra-colors-status-green)"
+            // boxShadow={
+            //   !registerErrorMessage
+            //     ? ""
+            //     : registerErrorMessage?.type === "password"
+            //     ? "inset 0 0 0 1px var(--chakra-colors-status-red)"
+            //     : "inset 0 0 0 1px var(--chakra-colors-status-green)"
+            // }
+            borderColor={
+              registerErrorMessage?.password ||
+              (registerErrorMessage?.confirmPassword && "red")
             }
             onChange={handleInputChange}
           />
-        </Field.Root>
-        {registerErrorMessage && (
           <Text
             color="red"
             fontSize={convertPx(12)}
             fontWeight="400"
             m="0"
-            textAlign="center"
             width="100%"
+            position="absolute"
+            bottom={"-1.5em"}
           >
-            {registerErrorMessage.message}
+            {registerErrorMessage?.confirmPassword}
           </Text>
-        )}
+        </Field.Root>
+
+        <Text
+          color="red"
+          fontSize={convertPx(12)}
+          fontWeight="400"
+          m="0"
+          textAlign="center"
+          width="100%"
+        >
+          {registerErrorMessage?.message}
+        </Text>
+
         {errorMessage !== "" && (
           <Text
             color="red"

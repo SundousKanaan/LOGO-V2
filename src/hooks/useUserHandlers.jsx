@@ -3,6 +3,7 @@ import { useMutation, useQueryClient } from "react-query";
 import { updateUser, deleteUser } from "../services/api";
 import { useValidateProfile } from "../hooks/useUserHooks";
 import { useAuth } from "../contexts/AuthContext";
+import { validateUserDataLocally } from "../hooks/useLocalValidates";
 
 export function useUserHandlers({ initialUser, logout, queryKey = "auth" }) {
   const { currentUser } = useAuth();
@@ -17,33 +18,9 @@ export function useUserHandlers({ initialUser, logout, queryKey = "auth" }) {
     if (initialUser) setHandledUser(initialUser);
   }, [initialUser]);
 
-  useEffect(() => {
-    if (!handledUser || openUserPopup !== "edit") return;
-    validateProfile.mutate(handledUser, {
-      onSuccess: () => {
-        setUserErrorMessage(null);
-      },
-      onError: (err) => {
-        const error = err.response.data.errors;
-        if (error.first_name || error.last_name) {
-          setUserErrorMessage({
-            type: error.first_name?.[0] ? "first_name" : "last_name",
-            message: error.first_name?.[0] || error.last_name?.[0],
-          });
-        } else if (error.phone) {
-          setUserErrorMessage({
-            type: "phone",
-            message: error.phone[0],
-          });
-        } else if (error.birthday) {
-          setUserErrorMessage({
-            type: "birthday",
-            message: error.birthday[0],
-          });
-        }
-      },
-    });
-  }, [handledUser]);
+  // useEffect(() => {
+  //   if (!handledUser || openUserPopup !== "edit") return;
+  // }, [handledUser]);
 
   // DELETE mutation
   const { mutate: delete_user, isLoading: isDeletingUser } = useMutation({
@@ -152,7 +129,38 @@ export function useUserHandlers({ initialUser, logout, queryKey = "auth" }) {
       is_active: true,
       user_type: handledUser.user_type,
     };
-    update_user(data);
+
+    const localErrors = validateUserDataLocally(data);
+    if (localErrors) {
+      setUserErrorMessage(localErrors);
+      return;
+    }
+
+    validateProfile.mutate(handledUser, {
+      onSuccess: () => {
+        setUserErrorMessage(null);
+        update_user(data);
+      },
+      onError: (err) => {
+        const error = err.response.data.errors;
+        if (error.first_name || error.last_name) {
+          setUserErrorMessage({
+            type: error.first_name?.[0] ? "first_name" : "last_name",
+            message: error.first_name?.[0] || error.last_name?.[0],
+          });
+        } else if (error.phone) {
+          setUserErrorMessage({
+            type: "phone",
+            message: error.phone[0],
+          });
+        } else if (error.birthday) {
+          setUserErrorMessage({
+            type: "birthday",
+            message: error.birthday[0],
+          });
+        }
+      },
+    });
   }, [handledUser, update_user]);
 
   return {
