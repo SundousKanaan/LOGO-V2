@@ -77,9 +77,11 @@ export function useUserHandlers({ initialUser, logout, queryKey = "auth" }) {
     onSuccess: async (newData) => {
       setUserErrorMessage(null);
       await queryClient.invalidateQueries([queryKey]);
+
       if (newData.id === currentUser.id && queryKey !== "auth") {
         await queryClient.invalidateQueries(["auth"]);
       }
+      queryClient.invalidateQueries("allTodoLists");
       setOpenUserPopup(null);
     },
 

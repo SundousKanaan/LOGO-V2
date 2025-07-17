@@ -145,7 +145,11 @@ export default function Header({ toggleNavbar }) {
               </LinkItem>
             </Skeleton>
 
-            <Skeleton loading={isLoading} width={convertPx(50)}>
+            <Skeleton
+              loading={isLoading}
+              width={convertPx(50)}
+              height={convertPx(15)}
+            >
               <Text
                 fontSize={convertPx(14)}
                 fontWeight="400"
