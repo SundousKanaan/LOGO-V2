@@ -37,14 +37,14 @@ function Checkboxes({
             ? Array.from({ length: 10 }).map((_, i) => (
                 <Flex
                   key={i}
-                  pl={convertPx(35)}
+                  pl={convertPx(20)}
                   gap={convertPx(8)}
                   alignItems={"center"}
                 >
                   {withIcon && (
                     <SkeletonCircle size={convertPx(30)}></SkeletonCircle>
                   )}
-                  <Skeleton h={convertPx(24)} w={convertPx(170)}></Skeleton>
+                  <Skeleton h={convertPx(24)} w={convertPx(84)}></Skeleton>
                 </Flex>
               ))
             : options &&

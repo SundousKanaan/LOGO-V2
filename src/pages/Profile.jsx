@@ -16,10 +16,6 @@ import ListsActions from "../components/ListsActions";
 import TodoBoard from "../components/Todo-Board";
 
 export default function Profile() {
-  // =====================
-  // States
-  // =====================
-
   const [selectedList, setSelectedList] = useState(null);
 
   // =====================

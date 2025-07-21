@@ -94,7 +94,14 @@ function EditeTodoItem({ data, onChange, errorMessage }) {
   return (
     <Fieldset.Root>
       <Fieldset.Content>
-        <HStack gap={convertPx(20)}>
+        <Grid
+          columnGap={convertPx(20)}
+          rowGap={{ base: convertPx(20), sm: 0 }}
+          templateColumns={{
+            base: `${convertPx(100)} 1fr`,
+            sm: `${convertPx(150)} 1fr`,
+          }}
+        >
           <Text w={convertPx(150)}>Status</Text>
           <Dropdown
             collection={taskStatus}
@@ -124,9 +131,9 @@ function EditeTodoItem({ data, onChange, errorMessage }) {
               </Select.Item>
             ))}
           </Dropdown>
-        </HStack>
+        </Grid>
         <Grid
-          columnGap={convertPx(20)}
+          columnGap={{ base: `${convertPx(0)}`, sm: `${convertPx(20)}` }}
           rowGap={{ base: convertPx(20), sm: 0 }}
           templateColumns={{
             base: `1fr`,
@@ -140,6 +147,7 @@ function EditeTodoItem({ data, onChange, errorMessage }) {
             border={"solid 1px "}
             borderRadius={convertPx(4)}
             borderColor={errorMessage?.assignee ? "red" : "gray.300"}
+            gridColumnStart={{ base: 1, sm: 2 }}
           >
             <Checkboxes
               options={usersData}
@@ -165,7 +173,13 @@ function EditeTodoItem({ data, onChange, errorMessage }) {
             {errorMessage?.assignee}
           </Text>
         </Grid>
-        <Grid gap={convertPx(20)} templateColumns={`${convertPx(150)} 1fr`}>
+        <Grid
+          gap={convertPx(20)}
+          templateColumns={{
+            base: `${convertPx(100)} 1fr`,
+            sm: `${convertPx(150)} 1fr`,
+          }}
+        >
           <Text>Assigned list</Text>
           <Text>{data?.todo_list.title}</Text>
         </Grid>
@@ -174,7 +188,10 @@ function EditeTodoItem({ data, onChange, errorMessage }) {
             w={"100%"}
             columnGap={convertPx(20)}
             rowGap={{ base: convertPx(20), sm: 0 }}
-            templateColumns={`${convertPx(150)} 1fr`}
+            templateColumns={{
+              base: `${convertPx(100)} 1fr`,
+              sm: `${convertPx(150)} 1fr`,
+            }}
           >
             <Field.Label>Task name*</Field.Label>
             <InputField

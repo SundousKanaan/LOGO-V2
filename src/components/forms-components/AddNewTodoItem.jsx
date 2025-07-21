@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import {
   HStack,
-  VStack,
   Text,
   Fieldset,
   Field,
@@ -9,7 +8,6 @@ import {
   Select,
   createListCollection,
   Grid,
-  Skeleton,
 } from "@chakra-ui/react";
 import { convertPx } from "../../hooks/useConvertPx";
 import Dropdown from "../mini-components/Dropdown";
@@ -117,7 +115,14 @@ function AddNewTodoItem({
   return (
     <Fieldset.Root>
       <Fieldset.Content>
-        <HStack gap={convertPx(20)}>
+        <Grid
+          columnGap={convertPx(20)}
+          rowGap={{ base: convertPx(20), sm: 0 }}
+          templateColumns={{
+            base: `${convertPx(100)} 1fr`,
+            sm: `${convertPx(150)} 1fr`,
+          }}
+        >
           <Text w={convertPx(150)}>Status</Text>
           <Dropdown
             collection={statusCollection}
@@ -147,9 +152,9 @@ function AddNewTodoItem({
               </Select.Item>
             ))}
           </Dropdown>
-        </HStack>
+        </Grid>
         <Grid
-          columnGap={convertPx(20)}
+          columnGap={{ base: `${convertPx(0)}`, sm: `${convertPx(20)}` }}
           rowGap={{ base: convertPx(20), sm: 0 }}
           templateColumns={{
             base: `1fr`,
@@ -163,6 +168,7 @@ function AddNewTodoItem({
             border={"solid 1px"}
             borderRadius={convertPx(4)}
             borderColor={errorMessage?.assignee ? "red" : "gray.300"}
+            gridColumnStart={{ base: 1, sm: 2 }}
           >
             <Checkboxes
               options={usersData}
@@ -187,7 +193,13 @@ function AddNewTodoItem({
             {errorMessage?.assignee}
           </Text>
         </Grid>
-        <Grid gap={convertPx(20)} templateColumns={`${convertPx(150)} 1fr`}>
+        <Grid
+          gap={convertPx(20)}
+          templateColumns={{
+            base: `${convertPx(100)} 1fr`,
+            sm: `${convertPx(150)} 1fr`,
+          }}
+        >
           <Text>Assigned list</Text>
 
           <Text>{assignedList.title}</Text>
@@ -197,7 +209,10 @@ function AddNewTodoItem({
             w={"100%"}
             columnGap={convertPx(20)}
             rowGap={{ base: convertPx(20), sm: 0 }}
-            templateColumns={`${convertPx(150)} 1fr`}
+            templateColumns={{
+              base: `${convertPx(100)} 1fr`,
+              sm: `${convertPx(150)} 1fr`,
+            }}
           >
             <Field.Label>Task name*</Field.Label>
             <InputField
