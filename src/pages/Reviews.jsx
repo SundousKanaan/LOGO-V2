@@ -7,8 +7,11 @@ import {
   ButtonGroup,
   Text,
   Box,
-  Skeleton,
+  Center,
+  VStack,
 } from "@chakra-ui/react";
+import { Spinner } from "@chakra-ui/react";
+
 import { convertPx } from "../hooks/useConvertPx";
 import { useProducts } from "../hooks/useProducts";
 
@@ -25,7 +28,9 @@ export default function Reviews() {
     isLoading,
     isFetching,
   } = useProducts();
+
   const observer = useRef();
+  
   const lastProductElementRef = useCallback(
     (node) => {
       if (isLoading) return;
@@ -101,43 +106,42 @@ export default function Reviews() {
         </HStack>
       </Flex>
 
-      <Box
-        layerStyle={
-          viewMode === "grid"
-            ? "ProductCardsListGridLayout"
-            : "ProductCardsListLayout"
-        }
-      >
-        {products && isLoading
-          ? Array.from({ length: 10 }).map((_, index) => (
-              <Skeleton
+      {products && isLoading ? (
+        <Center mt={convertPx(16)} mb={convertPx(16)}>
+          <VStack>
+            <Spinner color={"themeColor"} />
+            <Text color={"themeColor"}>Loading...</Text>
+          </VStack>
+        </Center>
+      ) : (
+        <Box
+          layerStyle={
+            viewMode === "grid"
+              ? "ProductCardsListGridLayout"
+              : "ProductCardsListLayout"
+          }
+        >
+          {products.map((product, index) => {
+            const isLastProduct = products.length === index + 1;
+            return (
+              <ProductCard
+                ref={isLastProduct ? lastProductElementRef : null}
+                data={product}
                 key={index}
-                loading={isLoading}
-                borderRadius={convertPx(24)}
-              >
-                <ProductCard viewMode={viewMode} />
-              </Skeleton>
-            ))
-          : products.map((product, index) => {
-              const isLastProduct = products.length === index + 1;
-              return (
-                <ProductCard
-                  ref={isLastProduct ? lastProductElementRef : null}
-                  data={product}
-                  key={index}
-                  viewMode={viewMode}
-                />
-              );
-            })}
-
-        {isFetchingNextPage &&
-          hasNextPage &&
-          Array.from({ length: 10 }).map((_, index) => (
-            <Skeleton key={`next-${index}`} borderRadius={convertPx(24)}>
-              <ProductCard viewMode={viewMode} />
-            </Skeleton>
-          ))}
-      </Box>
+                viewMode={viewMode}
+              />
+            );
+          })}
+        </Box>
+      )}
+      {isFetchingNextPage && hasNextPage && (
+        <Center mt={convertPx(16)} mb={convertPx(16)}>
+          <VStack>
+            <Spinner color={"themeColor"} />
+            <Text color={"themeColor"}>Loading...</Text>
+          </VStack>
+        </Center>
+      )}
     </>
   );
 }

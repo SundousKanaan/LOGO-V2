@@ -98,10 +98,9 @@ export async function deleteUser(id) {
 }
 
 // products
-export async function fetchProducts({ pageParam = 1 }) {
-  const MAX_PRODUCT_PAGE = 10;
+export async function fetchProducts({ pageParam = 1, maxProductPage = 10 }) {
   const response = await api.get(
-    `/products/api?page=${pageParam}&limit=${MAX_PRODUCT_PAGE}`
+    `/products/api?page=${pageParam}&limit=${maxProductPage}`
   );
   await new Promise((resolve) => setTimeout(resolve, 2000));
   return response.data;
