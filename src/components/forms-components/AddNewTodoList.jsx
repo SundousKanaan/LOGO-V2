@@ -14,8 +14,12 @@ function AddNewTodoList({
       <Fieldset.Root>
         <Fieldset.Content>
           <Grid
+            w={"100%"}
             columnGap={convertPx(20)}
-            templateColumns={`${convertPx(100)} 1fr`}
+            templateColumns={{
+              base: `${convertPx(100)} 1fr`,
+              sm: `${convertPx(150)} 1fr`,
+            }}
           >
             <Text w={convertPx(150)}>List owner</Text>
             <HStack>
@@ -39,10 +43,14 @@ function AddNewTodoList({
 
           <Field.Root>
             <Grid
+              w={"100%"}
               columnGap={convertPx(20)}
-              templateColumns={`${convertPx(100)} 1fr`}
+              templateColumns={{
+                base: `${convertPx(100)} 1fr`,
+                sm: `${convertPx(150)} 1fr`,
+              }}
             >
-              <Field.Label w={convertPx(230)}>List name</Field.Label>
+              <Field.Label>List name*</Field.Label>
               <InputField
                 w={"100%"}
                 name="taskTitle"
