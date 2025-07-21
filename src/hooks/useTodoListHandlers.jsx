@@ -41,6 +41,7 @@ export function useTodoListHandlers(
       await new Promise((resolve) => setTimeout(resolve, 1500));
       return respones;
     },
+
     onMutate: (data) => {
       queryClient.cancelQueries(["allTodoLists"]);
       const prevList = queryClient.getQueriesData(["allTodoLists"]);
@@ -55,6 +56,7 @@ export function useTodoListHandlers(
         ...old,
         tempList,
       ]);
+      setSelectedList(tempList);
 
       return {
         prevList,
@@ -104,6 +106,7 @@ export function useTodoListHandlers(
       queryClient.setQueryData(["allTodoLists"], (old = []) =>
         old.map((list) => (list.id === data.id ? tempList : list))
       );
+      setSelectedList(tempList);
 
       return {
         prevList,
@@ -133,9 +136,17 @@ export function useTodoListHandlers(
       const response = await deleteTodoList(id);
       return response;
     },
-    onSuccess: async () => {
-      // queryClient.invalidateQueries(["allTodoLists"]);
 
+    onMutate: async (id) => {
+      const tempId = `temp-${id}`;
+      const tempList = {
+        ...selectedList,
+        id: tempId,
+      };
+      setSelectedList(tempList);
+    },
+
+    onSuccess: async () => {
       const { data: updatedData } = await refetchTodoLists();
 
       if (updatedData?.length > 0) {

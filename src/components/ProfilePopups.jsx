@@ -59,8 +59,8 @@ export function ListPopup({
         <AddNewTodoList
           user={user}
           handleInputChange={handleInputChange}
-          errorMessage={errorMessage}
           isProcessing={isProcessing}
+          errorMessage={errorMessage}
         />
       )}
       {isEdit && (
@@ -84,7 +84,7 @@ export function ListPopup({
             m="0"
             width="100%"
           >
-            {errorMessage.details &&
+            {errorMessage?.details &&
               "Something went wrong. Please try again later."}
           </Text>
         </>
