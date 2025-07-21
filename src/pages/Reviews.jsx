@@ -30,7 +30,7 @@ export default function Reviews() {
   } = useProducts();
 
   const observer = useRef();
-  
+
   const lastProductElementRef = useCallback(
     (node) => {
       if (isLoading) return;
@@ -135,7 +135,7 @@ export default function Reviews() {
         </Box>
       )}
       {isFetchingNextPage && hasNextPage && (
-        <Center mt={convertPx(16)} mb={convertPx(16)}>
+        <Center mt={convertPx(16)} mb={convertPx(32)}>
           <VStack>
             <Spinner color={"themeColor"} />
             <Text color={"themeColor"}>Loading...</Text>
