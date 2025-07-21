@@ -44,10 +44,7 @@ export function useUserHandlers({ initialUser, logout, queryKey = "auth" }) {
     },
 
     onError: (err) => {
-      console.error(
-        "Error with deleting this user.",
-        err.response?.data || err.message
-      );
+      setUserErrorMessage(err.response.data.detail);
     },
   });
 

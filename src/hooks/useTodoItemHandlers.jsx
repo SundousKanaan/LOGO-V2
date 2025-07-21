@@ -105,10 +105,7 @@ export function useTodoItemHandlers(refetchTodoLists) {
     },
 
     onError: (err) => {
-      console.error(
-        "Error with Item deleting",
-        err.response?.data || err.message
-      );
+      setErrorMessage(err.response.data.detail);
     },
   });
 
@@ -161,11 +158,6 @@ export function useTodoItemHandlers(refetchTodoLists) {
       if (context?.prevData) {
         queryClient.setQueryData(["allTodoLists"], context.prevData);
       }
-
-      console.error(
-        "Error updating todo item:",
-        err.response?.data || err.message
-      );
 
       const serverErrors = err.response?.data;
 

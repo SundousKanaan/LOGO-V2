@@ -41,14 +41,15 @@ export default function Profile() {
   } = useAllTodoLists();
 
   const {
-    listTitle,
     openListPopup,
+    errorMessage: listErrorMessage,
     isEditable,
     isCreatingList,
     isUpdatingList,
     isDeletingList,
     setOpenListPopup,
     setListTitle,
+    setErrorMessage: setListErrorMessage,
     handleChangeList,
     handleCreateList,
     handleEditList,
@@ -148,13 +149,16 @@ export default function Profile() {
       <ListPopup
         user={currentUser}
         openListPopup={openListPopup}
+        errorMessage={listErrorMessage}
         selectedList={selectedList}
-        listTitle={listTitle}
         handleInputChange={(e) => setListTitle(e.target.value)}
         handleCreateList={handleCreateList}
         handleEditList={handleEditList}
         handleDeleteList={handleDeleteList}
-        setOpenListPopup={setOpenListPopup}
+        setOpenListPopup={() => {
+          setOpenListPopup(null);
+          setListErrorMessage(null);
+        }}
         isProcessing={
           openListPopup &&
           (openListPopup === "create"

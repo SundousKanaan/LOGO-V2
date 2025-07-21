@@ -1,14 +1,23 @@
-import { HStack, Text, Avatar, Fieldset, Field } from "@chakra-ui/react";
+import { HStack, Grid, Text, Avatar, Fieldset, Field } from "@chakra-ui/react";
 import { convertPx } from "../../hooks/useConvertPx";
 import { UsePickRandomColor } from "../../hooks/usePickRandomColor";
 import InputField from "../mini-components/InputField";
 
-function EditeTodoList({ user, handleInputChange, listTitle, isProcessing }) {
+function EditeTodoList({
+  user,
+  handleInputChange,
+  listTitle,
+  isProcessing,
+  errorMessage,
+}) {
   return (
     <>
       <Fieldset.Root>
         <Fieldset.Content>
-          <HStack gap={convertPx(20)}>
+          <Grid
+            columnGap={convertPx(20)}
+            templateColumns={`${convertPx(150)} 1fr`}
+          >
             <Text w={convertPx(150)}>List owner</Text>
             <HStack>
               <Avatar.Root
@@ -27,24 +36,43 @@ function EditeTodoList({ user, handleInputChange, listTitle, isProcessing }) {
                 {user.first_name} {user.last_name}
               </Text>
             </HStack>
-          </HStack>
+          </Grid>
 
           <Field.Root>
-            <HStack gap={convertPx(20)} align={"start"}>
+            <Grid
+              columnGap={convertPx(20)}
+              templateColumns={`${convertPx(150)} 1fr`}
+            >
               <Field.Label w={convertPx(230)}>List name</Field.Label>
               <InputField
                 w={"100%"}
                 name="taskTitle"
                 defaultValue={listTitle}
-                borderColor="gray.300"
                 h={"fit-content"}
                 pt={convertPx(8)}
                 pb={convertPx(8)}
                 color="secondaryColor"
+                borderColor={errorMessage ? "red" : "gray.300"}
                 onChange={handleInputChange}
                 disabled={isProcessing}
               />
-            </HStack>
+
+              {errorMessage && (
+                <Text
+                  color="red"
+                  fontSize={convertPx(12)}
+                  fontWeight="400"
+                  m="0"
+                  width="100%"
+                  gridColumnStart={1}
+                  gridColumnEnd={3}
+                >
+                  {errorMessage.title
+                    ? errorMessage.title
+                    : "Something went wrong. Please try again later."}
+                </Text>
+              )}
+            </Grid>
           </Field.Root>
         </Fieldset.Content>
       </Fieldset.Root>

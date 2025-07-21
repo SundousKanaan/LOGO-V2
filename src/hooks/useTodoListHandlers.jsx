@@ -3,6 +3,7 @@ import { useMutation } from "react-query";
 import { useQueryClient } from "react-query";
 import { postTodoList, updateTodoList, deleteTodoList } from "../services/api";
 import { usePermissions } from "./usePermissions";
+import { validateTodoListDataLocally } from "./useLocalValidates";
 
 export function useTodoListHandlers(
   currentUser,
@@ -18,6 +19,7 @@ export function useTodoListHandlers(
   const [isEditable, setIsEditable] = useState(false);
   const { checkListPermissions } = usePermissions();
   const [openListPopup, setOpenListPopup] = useState(null); // create | edit | delete | null
+  const [errorMessage, setErrorMessage] = useState(null);
 
   // USE EFFECTS
 
@@ -25,7 +27,6 @@ export function useTodoListHandlers(
   useEffect(() => {
     if (!isAllTodoListsLoading && allTodoLists?.length > 0 && !selectedList) {
       setSelectedList(allTodoLists[0]);
-      setListTitle(allTodoLists[0].title);
     }
   }, [allTodoLists, selectedList, isAllTodoListsLoading]);
 
@@ -68,22 +69,16 @@ export function useTodoListHandlers(
           old.map((list) => (list.id === context.tempId ? realList : list)),
       ]);
       queryClient.invalidateQueries(["allTodoLists"]);
+      setSelectedList(realList);
+      setListTitle("");
+      setOpenListPopup(null);
     },
 
     onError: (err, _newList, context) => {
       if (context?.prev) {
         queryClient.setQueryData(["allTodoLists"], context.prev);
       }
-      console.error(
-        "Error with creating new list",
-        err.response?.data || err.message
-      );
-    },
-
-    onSettled: (realList) => {
-      setSelectedList(realList);
-      setListTitle(listTitle);
-      setOpenListPopup(null);
+      setErrorMessage(err.response.data);
     },
   });
 
@@ -92,9 +87,9 @@ export function useTodoListHandlers(
     mutationFn: async (data) => {
       const response = await updateTodoList(data);
       await new Promise((resolve) => setTimeout(resolve, 1500));
-
       return response;
     },
+
     onMutate: (data) => {
       queryClient.cancelQueries(["allTodoLists"]);
       const prevList = queryClient.getQueriesData(["allTodoLists"]);
@@ -122,17 +117,12 @@ export function useTodoListHandlers(
       );
       setSelectedList(realList);
       queryClient.invalidateQueries(["allTodoLists"]);
-    },
-    onError: (err) => {
-      console.error(
-        "Error with creating new list",
-        err.response?.data || err.message
-      );
+      setListTitle("");
+      setOpenListPopup(null);
     },
 
-    onSettled: () => {
-      setListTitle(listTitle);
-      setOpenListPopup(null);
+    onError: (err) => {
+      setErrorMessage(err.response.data);
     },
   });
 
@@ -143,9 +133,6 @@ export function useTodoListHandlers(
       const response = await deleteTodoList(id);
       return response;
     },
-    onSettled: () => {
-      setOpenListPopup(null);
-    },
     onSuccess: async () => {
       // queryClient.invalidateQueries(["allTodoLists"]);
 
@@ -153,18 +140,16 @@ export function useTodoListHandlers(
 
       if (updatedData?.length > 0) {
         setSelectedList(updatedData[0]);
-        setListTitle(updatedData[0].title);
       } else {
         setSelectedList(null);
-        setListTitle("");
         setIsEditable(false);
       }
+      setListTitle("");
+      setOpenListPopup(null);
     },
+
     onError: (err) => {
-      console.error(
-        "Error with creating new list",
-        err.response?.data || err.message
-      );
+      setErrorMessage(err.response.data.detail);
     },
   });
 
@@ -177,10 +162,23 @@ export function useTodoListHandlers(
   }
 
   async function handleCreateList() {
+    setErrorMessage(null);
+    const localErrors = validateTodoListDataLocally(listTitle);
+    if (localErrors) {
+      setErrorMessage(localErrors);
+      return;
+    }
     createTodoList({ title: listTitle, owner: currentUser.id });
   }
 
   async function handleEditList() {
+    setErrorMessage(null);
+    const localErrors = validateTodoListDataLocally(listTitle);
+    if (localErrors) {
+      setErrorMessage(localErrors);
+      return;
+    }
+
     const updatedListData = {
       id: selectedList.id,
       title: listTitle,
@@ -191,19 +189,23 @@ export function useTodoListHandlers(
   }
 
   async function handleDeleteList() {
+    setErrorMessage(null);
     delete_todoList(selectedList.id);
   }
 
   return {
-    listTitle,
     setListTitle,
     isEditable,
+    errorMessage,
     openListPopup,
     setOpenListPopup,
+    setErrorMessage,
+
     handleChangeList,
     handleCreateList,
     handleEditList,
     handleDeleteList,
+
     isCreatingList,
     isUpdatingList,
     isDeletingList,

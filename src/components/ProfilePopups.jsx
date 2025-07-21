@@ -12,7 +12,7 @@ export function ListPopup({
   user,
   openListPopup,
   selectedList,
-  listTitle,
+  errorMessage,
   handleInputChange,
   handleCreateList,
   handleEditList,
@@ -53,15 +53,13 @@ export function ListPopup({
         (isDelete && isProcessing && "Deleting...") ||
         saveButtonTexts[openListPopup]
       }
-      disableSaveButton={
-        isProcessing ||
-        (!isDelete && (selectedList?.title === listTitle || listTitle === ""))
-      }
+      disableSaveButton={isProcessing}
     >
       {isCreate && (
         <AddNewTodoList
           user={user}
           handleInputChange={handleInputChange}
+          errorMessage={errorMessage}
           isProcessing={isProcessing}
         />
       )}
@@ -71,12 +69,25 @@ export function ListPopup({
           handleInputChange={handleInputChange}
           listTitle={selectedList?.title}
           isProcessing={isProcessing}
+          errorMessage={errorMessage}
         />
       )}
       {isDelete && (
-        <Text>
-          Are you sure you want to delete "{selectedList.title}" list?
-        </Text>
+        <>
+          <Text>
+            Are you sure you want to delete "{selectedList.title}" list?
+          </Text>
+          <Text
+            color="red"
+            fontSize={convertPx(12)}
+            fontWeight="400"
+            m="0"
+            width="100%"
+          >
+            {errorMessage.details &&
+              "Something went wrong. Please try again later."}
+          </Text>
+        </>
       )}
     </Popup>
   );

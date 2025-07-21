@@ -41,7 +41,8 @@ export async function updateTodoList(data) {
 }
 
 export async function deleteTodoList(id) {
-  await api.delete(`todos/todo_lists/${id}/`);
+  const res = await api.delete(`todos/todo_lists/${id}/`);
+  return res.data;
 }
 
 // todo Items

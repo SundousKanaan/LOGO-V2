@@ -61,6 +61,16 @@ export const validateUserDataLocally = (user) => {
   return Object.keys(errors).length ? errors : null;
 };
 
+export const validateTodoListDataLocally = (title) => {
+  const errors = {};
+
+  if (!title || title == "") {
+    errors.title = "Title is required.";
+  }
+
+  return Object.keys(errors).length ? errors : null;
+};
+
 export const validateTodoItemDataLocally = (item) => {
   const errors = {};
 
