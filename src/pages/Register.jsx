@@ -11,6 +11,7 @@ import { validateUserDataLocally } from "../hooks/useLocalValidates.jsx";
 
 function Registing() {
   const { signUp, errorMessage, isProcessing } = useAuth();
+
   // const validateProfile = useValidateProfile();
   const accountMap = {
     first_name: "",
@@ -23,6 +24,7 @@ function Registing() {
   };
   const [accountData, setAccountData] = useState(accountMap);
   const [registerErrorMessage, setRegisterErrorMessage] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   // handelers
   const handleInputChange = (e) => {
@@ -34,14 +36,27 @@ function Registing() {
   };
 
   const handleRegister = async () => {
+    setLoading(true);
     const localerrors = validateUserDataLocally(accountData);
     if (localerrors) {
       setRegisterErrorMessage(localerrors);
+      setLoading(false);
       return;
     }
 
-    await signUp(accountData);
-    setRegisterErrorMessage(null);
+    try {
+      await signUp(accountData);
+      setRegisterErrorMessage(null);
+      setLoading(false);
+    } catch (e) {
+      setLoading(false);
+
+      const error = e.response.data.errors;
+      setRegisterErrorMessage(error);
+      setTimeout(() => {
+        setRegisterErrorMessage(null);
+      }, "10000");
+    }
   };
 
   return (
@@ -314,8 +329,9 @@ function Registing() {
           transform: "scale(0.9)",
           transition: "transform 0.2s",
         }}
+        isDisabled={loading}
       >
-        Create account
+        {loading ? "Creating..." : "Create account"}
       </ButtonItem>
 
       <Text

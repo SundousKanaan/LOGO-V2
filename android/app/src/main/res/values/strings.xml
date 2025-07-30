@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">logo</string>
+    <string name="title_activity_main">logo</string>
+    <string name="package_name">com.capisoft.logo</string>
+    <string name="custom_url_scheme">com.capisoft.logo</string>
+</resources>

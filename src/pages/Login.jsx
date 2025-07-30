@@ -12,6 +12,7 @@ import { validateLoginLocally } from "../hooks/useLocalValidates";
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
   const {
     login,
     isAuthenticated,
@@ -30,9 +31,11 @@ export default function Login() {
   };
 
   const handleLogin = async () => {
+    setLoading(true);
     const localErrors = validateLoginLocally(email, password);
     if (localErrors) {
       setErrorMessage(localErrors);
+      setLoading(false);
       return;
     }
 
@@ -40,7 +43,10 @@ export default function Login() {
 
     try {
       await login(email, password);
+      setLoading(false);
     } catch (err) {
+      setLoading(false);
+
       const error = err.response.data.errors;
       setErrorMessage(error);
       setTimeout(() => {
@@ -155,8 +161,9 @@ export default function Login() {
         m="0"
         _hover={{ transform: "scale(1.05)" }}
         onClick={handleLogin}
+        isDisabled={loading}
       >
-        Login
+        {loading ? "Loading..." : "Login"}
       </ButtonItem>
 
       <Text

@@ -51,6 +51,8 @@ export function AuthProvider({ children }) {
 
   // Handle login logic
   const login = async (email, password) => {
+    console.log(email, password);
+
     try {
       await loginUser(email, password);
       setIsAuthenticated(true);
