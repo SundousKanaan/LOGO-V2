@@ -1,7 +1,9 @@
 import axios from "axios";
+import { Capacitor } from "@capacitor/core";
 
+const isNative = Capacitor.isNativePlatform();
 export const api = axios.create({
-  baseURL: "http://192.168.0.199:8000",
+  baseURL: isNative ? "http://10.0.2.2:8000" : "http://192.168.0.199:8000",
   headers: {
     "Content-Type": "application/json",
     Accept: "application/json",
