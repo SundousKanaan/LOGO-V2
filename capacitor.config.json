@@ -1,5 +1,17 @@
 {
   "appId": "com.capisoft.logo",
   "appName": "logo",
-  "webDir": "dist"
+  "webDir": "dist",
+
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 3000,
+      "backgroundColor": "#6f6cf3",
+      "showSpinner": false,
+      "androidSpinnerStyle": "small",
+      "iosSpinnerStyle": "small",
+      "splashFullScreen": true,
+      "splashImmersive": true
+    }
+  }
 }
