@@ -98,7 +98,7 @@ export default function Login() {
           <InputField
             h={convertPx(50)}
             type="email"
-            placeholder="email"
+            placeholder="Email address"
             name="email"
             value={email}
             bg={isAuthenticated ? "statusGreenLight" : "white"}

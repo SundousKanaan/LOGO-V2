@@ -13,7 +13,12 @@ export function useProducts() {
       return lastPage.length ? allPages.length + 1 : undefined;
     },
     onError: (error) => {
-      console.error("Error fetching products:", error);
+      console.error(
+        "Error fetching products:",
+        error,
+        error.message,
+        error.response || error.toString()
+      );
     },
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,

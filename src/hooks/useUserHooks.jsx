@@ -8,7 +8,13 @@ export const useCurrentUser = () => {
     retry: false,
     enabled: false,
     onError: (error) => {
-      console.error("fetchCurrentUser API Error:", error);
+      console.error(
+        "Error fetching current user:",
+        error,
+        error.message,
+        error.response || error.toString()
+      );
+
       throw error;
     },
   });

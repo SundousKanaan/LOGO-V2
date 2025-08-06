@@ -31,16 +31,16 @@ export default function UsersTable({
             </Table.ColumnHeader>
           )}
           {headerTitles?.map((title, i) => (
-            <Table.ColumnHeader
-              key={i}
-              color={"white"}
-              fontWeight={"600"}
-              textWrap={"nowrap"}
-              w={title === "Avatar" && "fit-content"}
-            >
-              {title}
-            </Table.ColumnHeader>
-          ))}
+              <Table.ColumnHeader
+                key={i}
+                color={"white"}
+                fontWeight={"600"}
+                textWrap={"nowrap"}
+                w={title === "Avatar" && "fit-content"}
+              >
+                {title}
+              </Table.ColumnHeader>
+            ))}
         </Table.Row>
       </Table.Header>
 

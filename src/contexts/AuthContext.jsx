@@ -31,6 +31,7 @@ export function AuthProvider({ children }) {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (!firebaseUser) {
         setIsAuthenticated(false);
+        setAuthToken(null); // Clear token
         return;
       }
 

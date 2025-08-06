@@ -16,6 +16,7 @@ function UserManagement() {
   useEffect(() => {
     if (!currentUser) return;
     setCanBeUpdated(checkUserEditPermissions(currentUser));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser]);
 
   const {
