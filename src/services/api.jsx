@@ -1,7 +1,12 @@
 import axios from "axios";
+import { Capacitor } from "@capacitor/core";
+const platform = Capacitor.getPlatform();
 
 export const api = axios.create({
-  baseURL: "http://192.168.178.161:8000",
+  baseURL:
+    platform === "android" || platform === "ios"
+      ? "http://10.0.2.2:8000"
+      : "http://192.168.0.199:8000",
   headers: {
     "Content-Type": "application/json",
     Accept: "application/json",
@@ -71,8 +76,12 @@ export async function deleteTodoItem(id) {
 
 // user
 export async function fetchCurrentUser() {
+  console.log("[api] Current User fetch initiated");
+
   await new Promise((resolve) => setTimeout(resolve, 1500));
   const response = await api.get("/users/me/");
+  console.log("[api] Current User:", response.data);
+
   return response.data[0];
 }
 
@@ -100,7 +109,7 @@ export async function deleteUser(id) {
 // products
 export async function fetchProducts({ pageParam = 1, maxProductPage = 10 }) {
   const response = await api.get(
-    `/products/api?page=${pageParam}&limit=${maxProductPage}`
+    `/products/api/?page=${pageParam}&limit=${maxProductPage}`
   );
   await new Promise((resolve) => setTimeout(resolve, 2000));
   return response.data;

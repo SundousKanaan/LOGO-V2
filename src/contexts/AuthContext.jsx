@@ -6,11 +6,15 @@ import { useCurrentUser } from "../hooks/useUserHooks";
 import { useMutation, useQueryClient } from "react-query";
 import { postUser } from "../services/api";
 
+import { Capacitor } from "@capacitor/core";
+
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
   const storedAuthStatus =
     JSON.parse(localStorage.getItem("isAuthenticated")) || false;
+  const storedToken = localStorage.getItem("authToken") || null;
+
   const [isAuthenticated, setIsAuthenticated] = useState(storedAuthStatus);
   const [errorMessage, setErrorMessage] = useState(null);
   const {
@@ -20,9 +24,19 @@ export function AuthProvider({ children }) {
   } = useCurrentUser();
   const queryClient = useQueryClient();
   const [currentUser, setCurrentUser] = useState(user);
+  const platform = Capacitor.getPlatform();
 
   useEffect(() => {
-    if (user) setCurrentUser(user);
+    if (storedToken) {
+      setAuthToken(storedToken);
+      setIsAuthenticated(true);
+    }
+  }, [storedToken]);
+
+  useEffect(() => {
+    if (user) {
+      setCurrentUser(user);
+    }
   }, [user]);
 
   useEffect(() => {
@@ -31,14 +45,26 @@ export function AuthProvider({ children }) {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (!firebaseUser) {
         setIsAuthenticated(false);
-        setAuthToken(null); // Clear token
+        setAuthToken(null);
+        localStorage.removeItem("authToken");
+        localStorage.setItem("isAuthenticated", false);
         return;
       }
 
       try {
-        const token = await firebaseUser.getIdToken();
+        let token;
+        if (platform === "android" || platform === "ios") {
+          const { FirebaseAuth } = await import(
+            "@capacitor-firebase/authentication"
+          );
+          const tokenResult = await FirebaseAuth.getIdToken();
+          token = tokenResult.token;
+        } else {
+          token = await firebaseUser.getIdToken();
+        }
         setAuthToken(token);
         setIsAuthenticated(true);
+        localStorage.setItem("authToken", token);
         localStorage.setItem("isAuthenticated", true);
         await refetchUser();
       } catch (error) {
@@ -75,7 +101,6 @@ export function AuthProvider({ children }) {
   const logout = async () => {
     setErrorMessage("Logout successful, see you soon!");
     setIsAuthenticated(false);
-
     queryClient.clear();
     localStorage.clear();
     try {

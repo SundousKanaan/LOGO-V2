@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Routes, Route, Outlet, Navigate, HashRouter } from "react-router-dom";
 import { useAuth } from "./contexts/AuthContext";
 import { Grid, GridItem } from "@chakra-ui/react";
 import { convertPx } from "./hooks/useConvertPx";
+import { SafeArea } from "capacitor-plugin-safe-area";
 
 import Navbar from "./components/Navbar";
 import Header from "./components/Header";
@@ -32,6 +33,26 @@ function PrivateLayouts() {
     setIsNavbarOpen(!isNavbarOpen);
   }
 
+  const [insets, setInsets] = useState({
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+  });
+
+  useEffect(() => {
+    async function fetchInsets() {
+      try {
+        const result = await SafeArea.getSafeAreaInsets();
+        setInsets(result.insets);
+      } catch (e) {
+        console.warn("SafeArea plugin error", e);
+      }
+    }
+
+    fetchInsets();
+  }, []);
+
   return (
     <Grid
       gridTemplateColumns={{
@@ -53,7 +74,13 @@ function PrivateLayouts() {
       bg="lightGray"
       h="100vh"
       overflow="hidden"
-      pt={{ base: "20px", md: "0" }}
+      pt={{
+        base: insets.top == 0 ? convertPx(20) : convertPx(insets.top),
+        md: convertPx(insets.top),
+      }}
+      pb={convertPx(insets.bottom)}
+      pl={convertPx(insets.left)}
+      pr={convertPx(insets.right)}
     >
       <GridItem
         gridArea={{ md: "navbar" }}
