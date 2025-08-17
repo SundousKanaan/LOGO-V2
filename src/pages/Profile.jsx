@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
-import { useAllTodoLists } from "../hooks/useAllTodoLists";
+import { useAllTodoLists } from "../hooks/useAllTodoListsHooks";
 import { useTodoItemHandlers } from "../hooks/useTodoItemHandlers";
 import { useTodoListHandlers } from "../hooks/useTodoListHandlers";
 import { useUserHandlers } from "../hooks/useUserHandlers";
@@ -103,10 +103,11 @@ export default function Profile() {
   }, [isAuthenticated, navigate]);
 
   useEffect(() => {
-    if (allTodoLists && selectedList)
-      return setSelectedList(
+    if (allTodoLists && selectedList) {
+      setSelectedList(
         allTodoLists.find((list) => list.id === selectedList.id && list)
       );
+    }
   }, [allTodoLists]);
 
   return (

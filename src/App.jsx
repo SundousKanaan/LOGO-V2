@@ -85,7 +85,7 @@ function PrivateLayouts() {
       <GridItem
         gridArea={{ md: "navbar" }}
         position={{ base: "fixed", md: "static" }}
-        top={{ base: convertPx(65), md: "auto" }}
+        top={{ base: convertPx(65 + insets.top), md: "auto" }}
         left={{ base: "0", md: "auto" }}
         bottom={{ base: "0", md: "auto" }}
         right={{ base: "0", md: "auto" }}

@@ -6,13 +6,51 @@ export const api = axios.create({
   baseURL:
     platform === "android" || platform === "ios"
       ? "http://10.0.2.2:8000"
-      : "http://192.168.0.199:8000",
+      : "http://192.168.1.234:8000",
   headers: {
     "Content-Type": "application/json",
     Accept: "application/json",
   },
   withCredentials: true,
 });
+
+// requests check!
+// Log when request starts
+// api.interceptors.request.use(
+//   (config) => {
+//     console.log(
+//       `[API] Request START: ${config.method?.toUpperCase()} ${config.baseURL}${
+//         config.url
+//       }`
+//     );
+//     console.log("[API] Request headers:", config.headers);
+//     console.log("[API] Request data:", config.data);
+//     return config;
+//   },
+//   (error) => {
+//     console.error("[API] Request ERROR before sending:", error);
+//     return Promise.reject(error);
+//   }
+// );
+
+// Log when response comes back
+// api.interceptors.response.use(
+//   (response) => {
+//     console.log(
+//       `[API] Response SUCCESS: ${response.status} ${response.config.url}`
+//     );
+//     console.log("[API] Response data:", response.data);
+//     return response;
+//   },
+//   (error) => {
+//     console.error(
+//       `[API] Response ERROR for ${error.config?.url || "unknown URL"}`
+//     );
+//     console.error("[API] Error message:", error.message);
+//     console.error("[API] Error response:", error.response?.data);
+//     return Promise.reject(error);
+//   }
+// );
 
 export const setAuthToken = (token) => {
   if (token) {
@@ -76,12 +114,8 @@ export async function deleteTodoItem(id) {
 
 // user
 export async function fetchCurrentUser() {
-  console.log("[api] Current User fetch initiated");
-
   await new Promise((resolve) => setTimeout(resolve, 1500));
   const response = await api.get("/users/me/");
-  console.log("[api] Current User:", response.data);
-
   return response.data[0];
 }
 

@@ -91,7 +91,10 @@ export default function Header({ toggleNavbar }) {
         <SearchBar />
 
         <HStack>
-          <SkeletonCircle loading={isLoading}>
+          <SkeletonCircle
+            loading={isLoading || currentUser === null}
+            size={convertPx(40)}
+          >
             <Box
               onClick={() =>
                 navigate(
@@ -122,7 +125,7 @@ export default function Header({ toggleNavbar }) {
             display={{ base: "none", lg: "flex" }}
           >
             <Skeleton
-              loading={isLoading}
+              loading={isLoading || currentUser === null}
               width={convertPx(100)}
               height={convertPx(20)}
               mb={convertPx(4)}

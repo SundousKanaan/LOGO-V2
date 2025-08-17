@@ -14,6 +14,6 @@ export const useAllTodoLists = () => {
       console.error("API Error:", error.response?.data || error.message),
 
     retry: false,
-    enabled: !!currentUser,
+    enabled: !!currentUser?.id, // Only run if currentUser is available
   });
 };
