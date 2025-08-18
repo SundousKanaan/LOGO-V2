@@ -1,10 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Routes, Route, Outlet, Navigate, HashRouter } from "react-router-dom";
 import { useAuth } from "./contexts/AuthContext";
 import { Grid, GridItem } from "@chakra-ui/react";
 import { convertPx } from "./hooks/useConvertPx";
-import { SafeArea } from "capacitor-plugin-safe-area";
 
+import { useSafeArea } from "./hooks/useSafeArea";
 import Navbar from "./components/Navbar";
 import Header from "./components/Header";
 import Pathes from "./global/pathes";
@@ -15,7 +15,6 @@ import Registing from "./pages/Register";
 // Private and Public Route wrappers
 function PrivateRoute() {
   const { isAuthenticated } = useAuth();
-
   return isAuthenticated ? <Outlet /> : <Navigate to="/login" replace />;
 }
 
@@ -27,31 +26,12 @@ function PublicRoute() {
 
 // Layout wrapper for the private pages
 function PrivateLayouts() {
+  const { insets } = useSafeArea();
   const [isNavbarOpen, setIsNavbarOpen] = useState(false);
 
   function toggleNavbar() {
     setIsNavbarOpen(!isNavbarOpen);
   }
-
-  const [insets, setInsets] = useState({
-    top: 0,
-    bottom: 0,
-    left: 0,
-    right: 0,
-  });
-
-  useEffect(() => {
-    async function fetchInsets() {
-      try {
-        const result = await SafeArea.getSafeAreaInsets();
-        setInsets(result.insets);
-      } catch (e) {
-        console.warn("SafeArea plugin error", e);
-      }
-    }
-
-    fetchInsets();
-  }, []);
 
   return (
     <Grid
@@ -85,13 +65,13 @@ function PrivateLayouts() {
       <GridItem
         gridArea={{ md: "navbar" }}
         position={{ base: "fixed", md: "static" }}
-        top={{ base: convertPx(65 + insets.top), md: "auto" }}
+        top={{ base: "0", md: "auto" }}
         left={{ base: "0", md: "auto" }}
         bottom={{ base: "0", md: "auto" }}
         right={{ base: "0", md: "auto" }}
         zIndex="1000"
         bg={{ base: "inherit", md: "white" }}
-        h={{ base: `calc(100% - ${convertPx(60)})`, md: "100%" }}
+        h={"100%"}
         transition="0.3s"
         transform={{
           base: isNavbarOpen ? "scaleY(1)" : "scaleY(0)",

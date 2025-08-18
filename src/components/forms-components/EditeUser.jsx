@@ -9,14 +9,18 @@ import { useAuth } from "../../contexts/AuthContext";
 import { convertPx } from "../../hooks/useConvertPx";
 import InputField from "../mini-components/InputField";
 import Dropdown from "../mini-components/Dropdown";
+import { Capacitor } from "@capacitor/core";
 
 function EditeUser({
   user,
   handleRoleChange,
   handleInputChange,
+  handleBirthdaySelect,
   errorMessage,
 }) {
   const { currentUser } = useAuth();
+  const platform = Capacitor.getPlatform();
+
   const roleCollection = createListCollection({
     items: [
       { value: "admin", label: "Admin" },
@@ -144,18 +148,41 @@ function EditeUser({
             <Field.Label w={convertPx(120)} color="secondaryColor">
               Birthday
             </Field.Label>
-            <InputField
-              required
-              h={convertPx(50)}
-              type="date"
-              name="birthday"
-              defaultValue={user.birthday}
-              placeholder={"Birthday: YYYY-MM-DD"}
-              bg="white"
-              color="secondaryColor"
-              borderColor={errorMessage?.birthday ? "red" : "green"}
-              onChange={handleInputChange}
-            />
+
+            {platform == "web" ? (
+              <InputField
+                h={convertPx(50)}
+                type="date"
+                defaultValue={user.birthday}
+                name="birthday"
+                bg="white"
+                color={"secondaryColor"}
+                borderColor={
+                  errorMessage?.birthday || errorMessage?.birthday
+                    ? "red"
+                    : "green"
+                }
+                onChange={handleInputChange}
+              />
+            ) : (
+              <InputField
+                h={convertPx(50)}
+                type="text"
+                placeholder="yyyy-MM-dd"
+                // defaultValue={user.birthday}
+                value={user.birthday}
+                name="birthday"
+                bg="white"
+                color={"secondaryColor"}
+                borderColor={
+                  errorMessage?.birthday || errorMessage?.birthday
+                    ? "red"
+                    : "green"
+                }
+                readOnly
+                onClick={handleBirthdaySelect}
+              />
+            )}
             <Text
               color="red"
               fontSize={convertPx(12)}

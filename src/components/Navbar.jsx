@@ -1,13 +1,14 @@
 import { List, Text, Spacer, Flex } from "@chakra-ui/react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { LogoutIcon } from "../global/icons";
+import { useAuth } from "../contexts/AuthContext";
+import { convertPx } from "../hooks/useConvertPx";
+import { IoMdClose } from "react-icons/io";
 
+import ButtonItem from "./mini-components/ButtonItem";
 import Pathes from "../global/pathes";
 import LinkItem from "../components/mini-components/LinkItem";
 import HeadingItem from "../components/mini-components/HeadingItem";
-import { LogoutIcon } from "../global/icons";
-import { useAuth } from "../contexts/AuthContext";
-import ButtonItem from "./mini-components/ButtonItem";
-import { convertPx } from "../hooks/useConvertPx";
 
 export default function Navbar({ toggleNavbar }) {
   const { logout } = useAuth();
@@ -34,8 +35,22 @@ export default function Navbar({ toggleNavbar }) {
       flexDirection="column"
       justify={{ base: "space-between", md: "start" }}
       align="start"
-      gap={{ base: `${convertPx(0)}`, md: `${convertPx(34)}` }}
+      gap={{ base: `${convertPx(16)}`, md: `${convertPx(34)}` }}
     >
+      <ButtonItem
+        variant={"solid"}
+        minWidth={convertPx(45)}
+        h={convertPx(45)}
+        px="0"
+        display={{ base: "flex", md: "none" }}
+        color="secondaryColor"
+        bg="white"
+        borderRadius={convertPx(8)}
+        onClick={handleToggleNavbar}
+      >
+        <IoMdClose color="secondaryColor" />
+      </ButtonItem>
+
       <HeadingItem
         as="h1"
         fontFamily="fonts.heading"
@@ -91,7 +106,7 @@ export default function Navbar({ toggleNavbar }) {
                     4
                   )} ${convertPx(6)}`}
                 >
-                  3{/* TODO: make the amunt dynamic */}
+                  3
                 </Text>
               )}
               {

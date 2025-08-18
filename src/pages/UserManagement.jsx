@@ -28,6 +28,7 @@ function UserManagement() {
     setUserErrorMessage,
     setHandledUser,
     setOpenUserPopup,
+    handleBirthdaySelect,
     handleDeleteUser,
     handleUpdateUser,
     handleUserDataChange,
@@ -77,6 +78,7 @@ function UserManagement() {
         setAccountData={setHandledUser}
         setErrorEditMessage={setUserErrorMessage}
         handleUserDataChange={handleUserDataChange}
+        handleBirthdaySelect={handleBirthdaySelect}
         isProcessing={
           openUserPopup === "edit" ? isUpdatingUser : isDeletingUser
         }

@@ -6,11 +6,15 @@ import InputField from "../components/mini-components/InputField";
 import ButtonItem from "../components/mini-components/ButtonItem";
 import LinkItem from "../components/mini-components/LinkItem";
 import { useAuth } from "../contexts/AuthContext";
-// import { useValidateProfile } from "../hooks/useUserHooks.jsx";
 import { validateUserDataLocally } from "../hooks/useLocalValidates.jsx";
+import { useSafeArea } from "../hooks/useSafeArea";
+import { DatePicker } from "@capacitor-community/date-picker";
+import { Capacitor } from "@capacitor/core";
 
-function Registing() {
+function Registering() {
   const { signUp, errorMessage, isProcessing } = useAuth();
+  const { insets } = useSafeArea();
+  const platform = Capacitor.getPlatform();
 
   // const validateProfile = useValidateProfile();
   const accountMap = {
@@ -33,6 +37,28 @@ function Registing() {
       ...prevData,
       [name]: value.trim(),
     }));
+  };
+
+  const handleBirthdaySelect = async () => {
+    try {
+      const result = await DatePicker.present({
+        mode: "date",
+        locale: "nl-NL", // adjust for your user
+        format: "yyyy-MM-dd", // string format you want back
+        date: accountData.birthday // preselect if already chosen
+          ? new Date(accountData.birthday)
+          : new Date(""), // fallback default
+      });
+
+      if (result?.value) {
+        setAccountData((prev) => ({
+          ...prev,
+          birthday: result.value, // result.value is a formatted string
+        }));
+      }
+    } catch (err) {
+      console.error("Date picker error:", err);
+    }
   };
 
   const handleRegister = async () => {
@@ -61,8 +87,8 @@ function Registing() {
 
   return (
     <Fieldset.Root
-      width="100vw"
-      height="100vh"
+      width="100dvw"
+      height="100dvh"
       display="flex"
       flexDirection="column"
       alignItems="center"
@@ -70,6 +96,11 @@ function Registing() {
       gap={convertPx(20)}
       bg="lightGray"
       disabled={isProcessing}
+      overflowY="auto"
+      pb={convertPx(insets.bottom)}
+      pl={convertPx(insets.left)}
+      pr={convertPx(insets.right)}
+      pt={convertPx(insets.top)}
     >
       <Stack>
         <Fieldset.Legend
@@ -203,19 +234,36 @@ function Registing() {
 
         <Field.Root>
           <Field.Label color="secondaryColor">Birthday*</Field.Label>
-          <InputField
-            h={convertPx(50)}
-            type="date"
-            placeholder="Birthday"
-            name="birthday"
-            bg="white"
-            color="secondaryColor"
-            borderColor={
-              (registerErrorMessage?.birthday || errorMessage?.birthday) &&
-              "red"
-            }
-            onChange={handleInputChange}
-          />
+          {platform == "web" ? (
+            <InputField
+              h={convertPx(50)}
+              type="date"
+              name="birthday"
+              bg="white"
+              color={"secondaryColor"}
+              borderColor={
+                (registerErrorMessage?.birthday || errorMessage?.birthday) &&
+                "red"
+              }
+              onChange={handleInputChange}
+            />
+          ) : (
+            <InputField
+              h={convertPx(50)}
+              type="text"
+              placeholder="yyyy-MM-dd"
+              value={accountData.birthday}
+              name="birthday"
+              bg="white"
+              color={"secondaryColor"}
+              borderColor={
+                (registerErrorMessage?.birthday || errorMessage?.birthday) &&
+                "red"
+              }
+              readOnly
+              onClick={handleBirthdaySelect}
+            />
+          )}
           <Text
             color="red"
             fontSize={convertPx(12)}
@@ -356,4 +404,4 @@ function Registing() {
   );
 }
 
-export default Registing;
+export default Registering;

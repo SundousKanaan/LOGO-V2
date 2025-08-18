@@ -6,7 +6,7 @@ export const api = axios.create({
   baseURL:
     platform === "android" || platform === "ios"
       ? "http://10.0.2.2:8000"
-      : "http://192.168.1.234:8000",
+      : "http://192.168.0.199:8000",
   headers: {
     "Content-Type": "application/json",
     Accept: "application/json",

@@ -27,8 +27,6 @@ export function AuthProvider({ children }) {
   const platform = Capacitor.getPlatform();
 
   useEffect(() => {
-    console.log("[AuthContext] Current user updated:", user);
-
     if (user) {
       setCurrentUser(user);
     } else {
@@ -45,6 +43,7 @@ export function AuthProvider({ children }) {
       // Fetch token right after login
       let token;
       if (platform === "android" || platform === "ios") {
+        // FirebaseAuthentication is a Capacitor plugin
         const { FirebaseAuthentication } = await import(
           "@capacitor-firebase/authentication"
         );
@@ -98,7 +97,7 @@ export function AuthProvider({ children }) {
       return { ...req, response: res };
     },
     onSuccess: async ({ email, password }) => {
-      await loginUser(email, password);
+      await login(email, password);
     },
     onError: (err) => {
       console.error("Error registering user:", err);
@@ -110,7 +109,7 @@ export function AuthProvider({ children }) {
     },
   });
 
-  const signUp = async (data) => {
+  const signUp = (data) => {
     const req = {
       email: data.email,
       password: data.password,

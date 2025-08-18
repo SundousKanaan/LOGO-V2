@@ -83,6 +83,7 @@ export default function Profile() {
     setUserErrorMessage,
     setHandledUser,
     setOpenUserPopup,
+    handleBirthdaySelect,
     handleDeleteUser,
     handleUpdateUser,
     handleUserDataChange,
@@ -187,7 +188,7 @@ export default function Profile() {
 
       <UserPopup
         openUserPopup={openUserPopup}
-        user={currentUser}
+        user={handledUser || currentUser}
         errorEditMessage={UserErrorMessage}
         handleUpdateUser={handleUpdateUser}
         handleDeleteUser={handleDeleteUser}
@@ -195,6 +196,7 @@ export default function Profile() {
         setAccountData={setHandledUser}
         setErrorEditMessage={setUserErrorMessage}
         handleUserDataChange={handleUserDataChange}
+        handleBirthdaySelect={handleBirthdaySelect}
         isProcessing={
           openUserPopup === "edit" ? isUpdatingUser : isDeletingUser
         }

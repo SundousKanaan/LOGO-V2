@@ -3,6 +3,7 @@ import { useMutation, useQueryClient } from "react-query";
 import { updateUser, deleteUser } from "../services/api";
 import { useAuth } from "../contexts/AuthContext";
 import { validateUserDataLocally } from "../hooks/useLocalValidates";
+import { DatePicker } from "@capacitor-community/date-picker";
 
 export function useUserHandlers({ initialUser, logout, queryKey = "auth" }) {
   const { currentUser } = useAuth();
@@ -124,6 +125,28 @@ export function useUserHandlers({ initialUser, logout, queryKey = "auth" }) {
     }));
   };
 
+  const handleBirthdaySelect = async () => {
+    try {
+      const result = await DatePicker.present({
+        mode: "date",
+        locale: "nl-NL", // adjust for your user
+        format: "yyyy-MM-dd", // string format you want back
+        date: handledUser.birthday // preselect if already chosen
+          ? new Date(handledUser.birthday)
+          : new Date(""), // fallback default
+      });
+
+      if (result?.value) {
+        setHandledUser((prev) => ({
+          ...prev,
+          birthday: result.value, // result.value is a formatted string
+        }));
+      }
+    } catch (err) {
+      console.error("[Date picker] error:", err);
+    }
+  };
+
   const handleDeleteUser = useCallback(() => {
     if (!handledUser) return;
     delete_user(handledUser.id);
@@ -161,6 +184,7 @@ export function useUserHandlers({ initialUser, logout, queryKey = "auth" }) {
     setUserErrorMessage,
     setHandledUser,
     setOpenUserPopup,
+    handleBirthdaySelect,
     handleDeleteUser,
     handleUpdateUser,
     handleUserDataChange,

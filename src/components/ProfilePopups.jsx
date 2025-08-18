@@ -183,6 +183,7 @@ export function UserPopup({
   handleDeleteUser,
   setOpenUserPopup,
   handleUserDataChange,
+  handleBirthdaySelect,
   setAccountData,
   setErrorEditMessage,
   isProcessing,
@@ -216,6 +217,7 @@ export function UserPopup({
                 user_type: option.value[0],
               }))
             }
+            handleBirthdaySelect={handleBirthdaySelect}
           />
           {errorEditMessage?.message && (
             <Text color={"redColor"} mt={convertPx(16)} textAlign={"center"}>
