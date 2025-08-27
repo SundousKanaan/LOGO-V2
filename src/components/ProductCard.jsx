@@ -3,6 +3,7 @@ import { Image, Text, VStack, Card } from "@chakra-ui/react";
 import { convertPx } from "../hooks/useConvertPx";
 import LinkItem from "../components/mini-components/LinkItem";
 import HeadingItem from "../components/mini-components/HeadingItem";
+import productPlaceholderImg from "../assets/product-placeholder.png";
 
 const ProductCard = forwardRef(({ data, viewMode }, ref) => {
   if (!viewMode) {
@@ -19,7 +20,7 @@ const ProductCard = forwardRef(({ data, viewMode }, ref) => {
       }
     >
       <Image
-        src={data?.image_src || "src/assets/product-placeholder.png"}
+        src={data?.image_src || productPlaceholderImg}
         alt="Product Image"
         borderRadius={isGridMode ? convertPx(24) : convertPx(8)}
         boxSize={isGridMode ? "100%" : convertPx(68)}

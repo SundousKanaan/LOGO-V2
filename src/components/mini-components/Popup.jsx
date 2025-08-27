@@ -1,5 +1,6 @@
 import { Dialog, Portal, CloseButton, Button } from "@chakra-ui/react";
 import { convertPx } from "../../hooks/useConvertPx";
+import { Haptics, ImpactStyle } from "@capacitor/haptics";
 
 function Popup({
   title,
@@ -11,6 +12,13 @@ function Popup({
   ActionButtonText = "Save",
   children,
 }) {
+
+  const handleOnSave = async () => {
+    if (disableSaveButton) return;
+    await Haptics.impact({ style: ImpactStyle.Heavy });
+    onSave();
+  };
+
   return (
     <Dialog.Root open={isOpen} scrollBehavior="outside">
       <Portal>
@@ -37,7 +45,7 @@ function Popup({
                 <Button
                   w={convertPx(150)}
                   bg={"themeColor"}
-                  onClick={onSave}
+                  onClick={handleOnSave}
                   disabled={disableSaveButton}
                   textTransform={"capitalize"}
                 >

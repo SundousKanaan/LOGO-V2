@@ -8,6 +8,7 @@ import {
   SimpleGrid,
 } from "@chakra-ui/react";
 import { convertPx } from "../hooks/useConvertPx";
+import adminImg from "../assets/topAdmin.jpg";
 
 import ButtonItem from "../components/mini-components/ButtonItem";
 import CountingCard from "../components/CountingCard";
@@ -120,12 +121,11 @@ export default function Dashboard() {
           <NotifOfTakeDownds />
         </GridItem>
         <GridItem colSpan={{ base: 1, lg: 2, xl: 1 }}>
-          {/* // TODO: make the data dynamic */}
           <TopAdmin
             name="Carl Meadows"
             role="Admin"
             noticesReviewed="12,123"
-            img="/src/assets/topAdmin.jpg"
+            img={adminImg}
             path="/TopSellers"
           />
         </GridItem>

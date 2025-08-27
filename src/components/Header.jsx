@@ -15,6 +15,7 @@ import { HiMenuAlt2 } from "react-icons/hi";
 import { convertPx } from "../hooks/useConvertPx";
 import { useAuth } from "../contexts/AuthContext";
 import { UsePickRandomColor } from "../hooks/usePickRandomColor";
+import { Haptics, ImpactStyle  } from "@capacitor/haptics";
 
 import Pathes from "../global/pathes";
 import SearchBar from "../components/mini-components/SearchBar";
@@ -95,14 +96,15 @@ export default function Header({ toggleNavbar }) {
             size={convertPx(40)}
           >
             <Box
-              onClick={() =>
+              onClick={async () => {
+                await Haptics.impact({ style: ImpactStyle.Heavy });
                 navigate(
                   `/profile/${currentUser?.first_name}${currentUser?.last_name}`,
                   {
                     replace: true,
                   }
                 )
-              }
+              }}
               cursor="pointer"
             >
               <Avatar.Root
