@@ -47,7 +47,6 @@ export default function Header({ toggleNavbar }) {
       as="header"
       width="100%"
       h={{ base: convertPx(110), md: convertPx(50) }}
-      pt={{ base: convertPx(16), lg: "0" }}
       flexDirection={{ base: "column", md: "row" }}
       justifyContent="space-between"
       gap={{ base: convertPx(5), md: convertPx(20) }}

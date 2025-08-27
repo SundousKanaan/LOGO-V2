@@ -7,7 +7,7 @@
     "cleartext": true,
     "proxy": {
       "/api": {
-        "target": "http://10.0.2.2:8000",
+        "target": "http://192.168.0.199:8000",
         "changeOrigin": true,
         "pathRewrite": {
           "^/api": ""

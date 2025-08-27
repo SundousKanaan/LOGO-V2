@@ -19,3 +19,6 @@ project(':capacitor-splash-screen').projectDir = new File('../node_modules/@capa
 
 include ':capacitor-plugin-safe-area'
 project(':capacitor-plugin-safe-area').projectDir = new File('../node_modules/capacitor-plugin-safe-area/android')
+
+include ':deviceshake'
+project(':deviceshake').projectDir = new File('../deviceshake/android')

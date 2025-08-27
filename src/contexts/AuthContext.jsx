@@ -5,6 +5,10 @@ import { getAuth } from "firebase/auth";
 import { useCurrentUser } from "../hooks/useUserHooks";
 import { useMutation, useQueryClient } from "react-query";
 import { Capacitor } from "@capacitor/core";
+import { Haptics, ImpactStyle } from "@capacitor/haptics";
+
+import {DeviceShake} from "../../deviceshake/src/index";
+import Popup from "../components/mini-components/Popup";
 
 const AuthContext = createContext();
 
@@ -25,6 +29,7 @@ export function AuthProvider({ children }) {
   const queryClient = useQueryClient();
   const [currentUser, setCurrentUser] = useState(user);
   const platform = Capacitor.getPlatform();
+  const [showPopup, setShowPopup] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -34,10 +39,24 @@ export function AuthProvider({ children }) {
     }
   }, [user]);
 
+  useEffect(() => {
+    if(!isAuthenticated) return;
+    DeviceShake.enableListening();
+    DeviceShake.addListener('shake', async () => {
+      await Haptics.impact({ style: ImpactStyle.Heavy });
+      setShowPopup(true);
+    });
+    return () => {
+      DeviceShake.stopListening();
+      DeviceShake.removeAllListeners();
+    };
+  }, [isAuthenticated]);
+
   const login = async (email, password) => {
     try {
       // Perform login (Firebase web or Capacitor behind loginUser)
       await loginUser(email, password);
+
       setIsAuthenticated(true);
 
       // Fetch token right after login
@@ -75,13 +94,14 @@ export function AuthProvider({ children }) {
   };
 
   const logout = async () => {
-    setErrorMessage("Logout successful, see you soon!");
-    setIsAuthenticated(false);
-    queryClient.clear();
-    localStorage.clear();
-
     try {
       await logoutUser();
+      DeviceShake.stopListening();
+      DeviceShake.removeAllListeners();
+      setIsAuthenticated(false);
+      queryClient.clear();
+      localStorage.clear();
+      setErrorMessage("Logout successful, see you soon!");
     } catch (error) {
       console.error("Error logging out:", error);
       setErrorMessage("Logout failed, please try again.");
@@ -136,6 +156,7 @@ export function AuthProvider({ children }) {
       }}
     >
       {children}
+      {showPopup && <Popup title="Are you sure you want to logout?" isOpen={showPopup} onClose={() => setShowPopup(false)} ActionButtonText="Logout" onSave={() => {logout(); setShowPopup(false);}} />}
     </AuthContext.Provider>
   );
 }

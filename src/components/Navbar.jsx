@@ -4,6 +4,7 @@ import { LogoutIcon } from "../global/icons";
 import { useAuth } from "../contexts/AuthContext";
 import { convertPx } from "../hooks/useConvertPx";
 import { IoMdClose } from "react-icons/io";
+import { Haptics, ImpactStyle } from "@capacitor/haptics";
 
 import ButtonItem from "./mini-components/ButtonItem";
 import Pathes from "../global/pathes";
@@ -14,8 +15,8 @@ export default function Navbar({ toggleNavbar }) {
   const { logout } = useAuth();
   const navigate = useNavigate();
   const { pathname } = useLocation();
-
-  const handleToggleNavbar = () => {
+  const handleToggleNavbar = async () => {
+    await Haptics.impact({ style: ImpactStyle.Heavy });
     toggleNavbar();
   };
 
@@ -29,13 +30,16 @@ export default function Navbar({ toggleNavbar }) {
       as="nav"
       h="100%"
       p={{
-        base: `${convertPx(15)} ${convertPx(20)}`,
+        base: `${convertPx(15)} ${convertPx(20)} ${convertPx(35)} ${convertPx(
+          15
+        )}`,
         lg: `${convertPx(40)} ${convertPx(20)}`,
       }}
       flexDirection="column"
       justify={{ base: "space-between", md: "start" }}
       align="start"
       gap={{ base: `${convertPx(16)}`, md: `${convertPx(34)}` }}
+      overflowX={"auto"}
     >
       <ButtonItem
         variant={"solid"}
@@ -120,7 +124,7 @@ export default function Navbar({ toggleNavbar }) {
           </List.Item>
         ))}
       </List.Root>
-      <Spacer display={{ base: "none", md: "block" }} />
+      <Spacer display={{ base: "none", lg: "block" }} />
       <ButtonItem
         variant="ghost"
         width="100%"
